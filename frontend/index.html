@@ -15,7 +15,14 @@
   --white:#fff;--mw:1200px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Hind Siliguri',sans-serif;background:#f0ede6;color:var(--txt);}
+body{
+  font-family:'Hind Siliguri',sans-serif;
+  background:#f0ede6;
+  color:var(--txt);
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
 
 /* ══ SCROLLBAR ══ */
 ::-webkit-scrollbar{width:5px;height:5px;}
@@ -104,7 +111,7 @@ body{font-family:'Hind Siliguri',sans-serif;background:#f0ede6;color:var(--txt);
 .cat-lbl{font-size:.72rem;font-weight:500;color:#3a5a34;margin-top:3px;white-space:nowrap;}
 
 /* ══ PAGE VIEWS ══ */
-.page{display:none;}
+.page{display:none; flex:1; }
 .page.active{display:block;}
 
 /* ══ MAIN HOME ══ */
@@ -233,8 +240,8 @@ body{font-family:'Hind Siliguri',sans-serif;background:#f0ede6;color:var(--txt);
 .why-card h3{font-size:.92rem;font-weight:700;color:var(--gd);margin-bottom:5px;}
 .why-card p{font-size:.78rem;color:var(--txt2);line-height:1.6;}
 
-/* ══ FOOTER ══ */
-footer{background:var(--gd);color:#c8e6b0;padding:32px 16px 16px;}
+/* ══ FOOTER (global) ══ */
+footer{background:var(--gd);color:#c8e6b0;padding:32px 16px 16px; flex-shrink:0; }
 .fin{max-width:var(--mw);margin:0 auto;}
 .fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:24px;margin-bottom:20px;}
 footer h4{color:#fff;font-size:.88rem;margin-bottom:10px;font-weight:700;}
@@ -477,9 +484,9 @@ footer p{font-size:.79rem;line-height:1.7;}
     </div>
     <ul class="nav-links">
       <li><a onclick="goHome()" id="navHome" class="active">হোম</a></li>
-      <li><a onclick="goProductsPage()">পণ্য</a></li>
-      <li><a onclick="goAboutPage()">আমাদের সম্পর্কে</a></li>
-      <li><a onclick="goContactPage()">যোগাযোগ</a></li>
+      <li><a onclick="goProductsPage()" id="navProducts">পণ্য</a></li>
+      <li><a onclick="goAboutPage()" id="navAbout">আমাদের সম্পর্কে</a></li>
+      <li><a onclick="goContactPage()" id="navContact">যোগাযোগ</a></li>
     </ul>
     <div class="nb-right">
       <div class="search-wrap" id="deskSearchWrap">
@@ -505,119 +512,118 @@ footer p{font-size:.79rem;line-height:1.7;}
   </div>
 </div>
 
-<!-- ═══ PAGE: HOME ═══ -->
-<div id="page-home" class="page active">
-
-<!-- HERO -->
-<div class="hero" id="heroSection">
-  <div class="slide active s1">
-    <svg class="hero-svg" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-      <rect width="700" height="360" fill="url(#hg1)"/>
-      <ellipse cx="1050" cy="360" rx="580" ry="220" fill="#2d5a22" opacity=".62"/>
-      <circle cx="1220" cy="60" r="54" fill="#FFD700" opacity=".4"/>
-      <rect x="720" y="228" width="400" height="76" fill="#F4C430" opacity=".48" rx="4"/>
-      <defs><linearGradient id="hg1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1a4010" stop-opacity=".86"/><stop offset="100%" stop-color="#1a4010" stop-opacity="0"/></linearGradient></defs>
-    </svg>
-  </div>
-  <div class="slide s2">
-    <svg class="hero-svg" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-      <rect width="700" height="360" fill="url(#hg2)"/>
-      <circle cx="1050" cy="180" r="150" fill="#f5a623" opacity=".15"/>
-      <ellipse cx="1020" cy="260" rx="90" ry="110" fill="#f5a623" opacity=".5"/>
-      <defs><linearGradient id="hg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#3d2b1f" stop-opacity=".86"/><stop offset="100%" stop-color="#3d2b1f" stop-opacity="0"/></linearGradient></defs>
-    </svg>
-  </div>
-  <div class="slide s3">
-    <svg class="hero-svg" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-      <rect width="700" height="360" fill="url(#hg3)"/>
-      <circle cx="1100" cy="180" r="130" fill="#4a9e6f" opacity=".2"/>
-      <defs><linearGradient id="hg3" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1a3a5c" stop-opacity=".86"/><stop offset="100%" stop-color="#1a3a5c" stop-opacity="0"/></linearGradient></defs>
-    </svg>
-  </div>
-  <div class="hero-cw">
-    <div class="hero-ci">
-      <h1 id="hTitle">গ্রামীণ সতেজতা ও স্বাদের আসল স্বাদ</h1>
-      <p id="hSub">বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়</p>
-      <a onclick="document.getElementById('sec-products').scrollIntoView({behavior:'smooth'})" class="btn-hero" style="cursor:pointer">পণ্য কিনুন</a>
+<!-- PAGE CONTAINER (dynamic pages) -->
+<div class="page active" id="page-home">
+  <!-- HERO -->
+  <div class="hero" id="heroSection">
+    <div class="slide active s1">
+      <svg class="hero-svg" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <rect width="700" height="360" fill="url(#hg1)"/>
+        <ellipse cx="1050" cy="360" rx="580" ry="220" fill="#2d5a22" opacity=".62"/>
+        <circle cx="1220" cy="60" r="54" fill="#FFD700" opacity=".4"/>
+        <rect x="720" y="228" width="400" height="76" fill="#F4C430" opacity=".48" rx="4"/>
+        <defs><linearGradient id="hg1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1a4010" stop-opacity=".86"/><stop offset="100%" stop-color="#1a4010" stop-opacity="0"/></linearGradient></defs>
+      </svg>
     </div>
-  </div>
-  <div class="slide-dots" id="slideDots">
-    <div class="dot active" onclick="goSlide(0)"></div>
-    <div class="dot" onclick="goSlide(1)"></div>
-    <div class="dot" onclick="goSlide(2)"></div>
-  </div>
-</div>
-
-<!-- CAT SCROLL BAR -->
-<div class="cat-bar-outer">
-  <div class="cat-bar-inner">
-    <div class="cat-track" id="catTrack"></div>
-  </div>
-</div>
-
-<!-- MAIN PRODUCTS -->
-<div class="main" id="sec-products">
-  <div class="sec-block">
-    <div class="sec-head">
-      <h2>🏆 আমাদের বেস্ট সেলার</h2>
-      <div class="sec-arrows">
-        <button class="arr-btn" onclick="slideRow('best',-1)"><i class="fa-solid fa-chevron-left"></i></button>
-        <button class="arr-btn" onclick="slideRow('best',1)"><i class="fa-solid fa-chevron-right"></i></button>
+    <div class="slide s2">
+      <svg class="hero-svg" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <rect width="700" height="360" fill="url(#hg2)"/>
+        <circle cx="1050" cy="180" r="150" fill="#f5a623" opacity=".15"/>
+        <ellipse cx="1020" cy="260" rx="90" ry="110" fill="#f5a623" opacity=".5"/>
+        <defs><linearGradient id="hg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#3d2b1f" stop-opacity=".86"/><stop offset="100%" stop-color="#3d2b1f" stop-opacity="0"/></linearGradient></defs>
+      </svg>
+    </div>
+    <div class="slide s3">
+      <svg class="hero-svg" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <rect width="700" height="360" fill="url(#hg3)"/>
+        <circle cx="1100" cy="180" r="130" fill="#4a9e6f" opacity=".2"/>
+        <defs><linearGradient id="hg3" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1a3a5c" stop-opacity=".86"/><stop offset="100%" stop-color="#1a3a5c" stop-opacity="0"/></linearGradient></defs>
+      </svg>
+    </div>
+    <div class="hero-cw">
+      <div class="hero-ci">
+        <h1 id="hTitle">গ্রামীণ সতেজতা ও স্বাদের আসল স্বাদ</h1>
+        <p id="hSub">বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়</p>
+        <a onclick="document.getElementById('sec-products').scrollIntoView({behavior:'smooth'})" class="btn-hero" style="cursor:pointer">পণ্য কিনুন</a>
       </div>
     </div>
-    <div class="best-wrap"><div class="best-slider" id="slider-best">
-      <!-- skeleton -->
-      <div class="bcard"><div class="skeleton-card"><div class="sk-img skeleton"></div><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div><div class="sk-line shorter skeleton" style="margin-bottom:14px"></div></div></div>
-      <div class="bcard"><div class="skeleton-card"><div class="sk-img skeleton"></div><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div><div class="sk-line shorter skeleton" style="margin-bottom:14px"></div></div></div>
-      <div class="bcard"><div class="skeleton-card"><div class="sk-img skeleton"></div><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div><div class="sk-line shorter skeleton" style="margin-bottom:14px"></div></div></div>
-      <div class="bcard"><div class="skeleton-card"><div class="sk-img skeleton"></div><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div><div class="sk-line shorter skeleton" style="margin-bottom:14px"></div></div></div>
-    </div></div>
+    <div class="slide-dots" id="slideDots">
+      <div class="dot active" onclick="goSlide(0)"></div>
+      <div class="dot" onclick="goSlide(1)"></div>
+      <div class="dot" onclick="goSlide(2)"></div>
+    </div>
   </div>
 
-  <div class="sec-block" id="sec-catrow">
-    <div class="sec-head">
-      <div style="display:flex;align-items:center;overflow-x:auto;scrollbar-width:none;">
-        <div id="catTabs" style="display:flex;gap:0;"></div>
+  <!-- CAT SCROLL BAR -->
+  <div class="cat-bar-outer">
+    <div class="cat-bar-inner">
+      <div class="cat-track" id="catTrack"></div>
+    </div>
+  </div>
+
+  <!-- MAIN PRODUCTS -->
+  <div class="main" id="sec-products">
+    <div class="sec-block">
+      <div class="sec-head">
+        <h2>🏆 আমাদের বেস্ট সেলার</h2>
+        <div class="sec-arrows">
+          <button class="arr-btn" onclick="slideRow('best',-1)"><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="arr-btn" onclick="slideRow('best',1)"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
       </div>
-      <div class="sec-arrows">
-        <button class="arr-btn" onclick="slideRow('catrow',-1)"><i class="fa-solid fa-chevron-left"></i></button>
-        <button class="arr-btn" onclick="slideRow('catrow',1)"><i class="fa-solid fa-chevron-right"></i></button>
+      <div class="best-wrap"><div class="best-slider" id="slider-best">
+        <!-- skeleton -->
+        <div class="bcard"><div class="skeleton-card"><div class="sk-img skeleton"></div><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div><div class="sk-line shorter skeleton" style="margin-bottom:14px"></div></div></div>
+        <div class="bcard"><div class="skeleton-card"><div class="sk-img skeleton"></div><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div><div class="sk-line shorter skeleton" style="margin-bottom:14px"></div></div></div>
+        <div class="bcard"><div class="skeleton-card"><div class="sk-img skeleton"></div><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div><div class="sk-line shorter skeleton" style="margin-bottom:14px"></div></div></div>
+        <div class="bcard"><div class="skeleton-card"><div class="sk-img skeleton"></div><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div><div class="sk-line shorter skeleton" style="margin-bottom:14px"></div></div></div>
+      </div></div>
+    </div>
+
+    <div class="sec-block" id="sec-catrow">
+      <div class="sec-head">
+        <div style="display:flex;align-items:center;overflow-x:auto;scrollbar-width:none;">
+          <div id="catTabs" style="display:flex;gap:0;"></div>
+        </div>
+        <div class="sec-arrows">
+          <button class="arr-btn" onclick="slideRow('catrow',-1)"><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="arr-btn" onclick="slideRow('catrow',1)"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+      <div class="cat-row-wrap"><div class="cat-row" id="slider-catrow">
+        <div class="pcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
+        <div class="pcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
+        <div class="pcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
+      </div></div>
+    </div>
+
+    <div class="sec-block">
+      <div class="sec-head"><h2>📦 সকল পণ্য</h2></div>
+      <div class="all-grid" id="allGrid">
+        <div class="agcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
+        <div class="agcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
+        <div class="agcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
+        <div class="agcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
+        <div class="agcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
       </div>
     </div>
-    <div class="cat-row-wrap"><div class="cat-row" id="slider-catrow">
-      <div class="pcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
-      <div class="pcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
-      <div class="pcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
-    </div></div>
   </div>
 
-  <div class="sec-block">
-    <div class="sec-head"><h2>📦 সকল পণ্য</h2></div>
-    <div class="all-grid" id="allGrid">
-      <div class="agcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
-      <div class="agcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
-      <div class="agcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
-      <div class="agcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
-      <div class="agcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
+  <!-- WHY -->
+  <section class="why-sec" id="sec-about">
+    <div class="why-in">
+      <div class="why-ttl">কেন আমাদের পণ্য কিনবেন?</div>
+      <div class="why-grid">
+        <div class="why-card"><span class="why-ic">🌿</span><h3>বিশুদ্ধ</h3><p>কোনো কৃত্রিম রং বা প্রিজারভেটিভ ছাড়া, সরাসরি গ্রামের কৃষক থেকে সংগৃহীত।</p></div>
+        <div class="why-card"><span class="why-ic">🏅</span><h3>গুণগত মান</h3><p>প্রতিটি পণ্য কঠোর মানের মধ্য দিয়ে পরীক্ষিত এবং আপনার কাছে পৌঁছানো হয়।</p></div>
+        <div class="why-card"><span class="why-ic">🚚</span><h3>দ্রুত ডেলিভারি</h3><p>সারাদেশে দ্রুত ও নিরাপদ ডেলিভারি। অর্ডার করুন এবং ঘরে বসে পান।</p></div>
+      </div>
     </div>
-  </div>
-</div>
-
-<!-- WHY -->
-<section class="why-sec" id="sec-about">
-  <div class="why-in">
-    <div class="why-ttl">কেন আমাদের পণ্য কিনবেন?</div>
-    <div class="why-grid">
-      <div class="why-card"><span class="why-ic">🌿</span><h3>বিশুদ্ধ</h3><p>কোনো কৃত্রিম রং বা প্রিজারভেটিভ ছাড়া, সরাসরি গ্রামের কৃষক থেকে সংগৃহীত।</p></div>
-      <div class="why-card"><span class="why-ic">🏅</span><h3>গুণগত মান</h3><p>প্রতিটি পণ্য কঠোর মানের মধ্য দিয়ে পরীক্ষিত এবং আপনার কাছে পৌঁছানো হয়।</p></div>
-      <div class="why-card"><span class="why-ic">🚚</span><h3>দ্রুত ডেলিভারি</h3><p>সারাদেশে দ্রুত ও নিরাপদ ডেলিভারি। অর্ডার করুন এবং ঘরে বসে পান।</p></div>
-    </div>
-  </div>
-</section>
+  </section>
 </div> <!-- end page-home -->
 
 <!-- ═══ PAGE: PRODUCTS LISTING ═══ -->
-<div id="page-products" class="page">
+<div class="page" id="page-products">
   <div class="products-page">
     <div class="products-header">
       <div class="products-title"><i class="fa-solid fa-box-open" style="color:var(--gd)"></i> সকল পণ্য</div>
@@ -634,90 +640,54 @@ footer p{font-size:.79rem;line-height:1.7;}
     <div id="productsGrid" class="products-grid"></div>
     <div id="productsPagination" class="prod-pagination"></div>
   </div>
-  <footer>
-    <div class="fin">
-      <div class="fgrid">
-        <div>
-          <div class="logo" onclick="goHome()" style="margin-bottom:12px;display:flex;">
-            <div class="logo-icon">🏡</div>
-            <div class="logo-txt">আসল <span>গ্রামের মজা 🌿</span></div>
-          </div>
-          <p>বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়।</p>
-        </div>
-        <div><h4>নেভিগেশন</h4><ul class="flinks"><li><a onclick="goHome()">হোম</a></li><li><a onclick="goProductsPage()">পণ্য</a></li></ul></div>
-        <div><h4>পণ্য বিভাগ</h4><ul class="flinks" id="footerCatLinks"></ul></div>
-        <div><h4>সাহায্য</h4><ul class="flinks"><li><a>যোগাযোগ করুন</a></li></ul></div>
-      </div>
-      <div class="fbot">&copy; 2024 আসল গ্রামের মজা</div>
-    </div>
-  </footer>
 </div>
 
 <!-- ═══ PAGE: ABOUT ═══ -->
-<div id="page-about" class="page">
+<div class="page" id="page-about">
   <div class="about-page" id="aboutContent"></div>
-  <footer>
-    <div class="fin">
-      <div class="fgrid">
-        <div>
-          <div class="logo" onclick="goHome()" style="margin-bottom:12px;display:flex;">
-            <div class="logo-icon">🏡</div>
-            <div class="logo-txt">আসল <span>গ্রামের মজা 🌿</span></div>
-          </div>
-          <p>বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়।</p>
-        </div>
-        <div><h4>নেভিগেশন</h4><ul class="flinks"><li><a onclick="goHome()">হোম</a></li><li><a onclick="goAboutPage()">আমাদের সম্পর্কে</a></li></ul></div>
-        <div><h4>পণ্য বিভাগ</h4><ul class="flinks" id="aboutFooterCats"></ul></div>
-        <div><h4>সাহায্য</h4><ul class="flinks"><li><a>যোগাযোগ করুন</a></li></ul></div>
-      </div>
-      <div class="fbot">&copy; 2024 আসল গ্রামের মজা</div>
-    </div>
-  </footer>
 </div>
 
 <!-- ═══ PAGE: CONTACT ═══ -->
-<div id="page-contact" class="page">
+<div class="page" id="page-contact">
   <div class="contact-page" id="contactContent"></div>
-  <footer>
-    <div class="fin">
-      <div class="fgrid">
-        <div>
-          <div class="logo" onclick="goHome()" style="margin-bottom:12px;display:flex;">
-            <div class="logo-icon">🏡</div>
-            <div class="logo-txt">আসল <span>গ্রামের মজা 🌿</span></div>
-          </div>
-          <p>বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়।</p>
-        </div>
-        <div><h4>নেভিগেশন</h4><ul class="flinks"><li><a onclick="goHome()">হোম</a></li><li><a onclick="goContactPage()">যোগাযোগ</a></li></ul></div>
-        <div><h4>পণ্য বিভাগ</h4><ul class="flinks" id="contactFooterCats"></ul></div>
-        <div><h4>সাহায্য</h4><ul class="flinks"><li><a>যোগাযোগ করুন</a></li></ul></div>
-      </div>
-      <div class="fbot">&copy; 2024 আসল গ্রামের মজা</div>
-    </div>
-  </footer>
 </div>
 
 <!-- ═══ PAGE: PRODUCT DETAIL ═══ -->
-<div id="page-product" class="page">
+<div class="page" id="page-product">
   <div id="pdpContent"></div>
-  <footer>
-    <div class="fin">
-      <div class="fgrid">
-        <div>
-          <div class="logo" onclick="goHome()" style="margin-bottom:12px;display:flex;">
-            <div class="logo-icon">🏡</div>
-            <div class="logo-txt">আসল <span>গ্রামের মজা 🌿</span></div>
-          </div>
-          <p>বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়।</p>
-        </div>
-        <div><h4>নেভিগেশন</h4><ul class="flinks"><li><a onclick="goHome()">হোম</a></li></ul></div>
-        <div><h4>পণ্য বিভাগ</h4><ul class="flinks" id="pdpFooterCats"></ul></div>
-        <div><h4>সাহায্য</h4><ul class="flinks"><li><a>যোগাযোগ করুন</a></li></ul></div>
-      </div>
-      <div class="fbot">&copy; 2024 আসল গ্রামের মজা</div>
-    </div>
-  </footer>
 </div>
+
+<!-- GLOBAL FOOTER (outside pages) -->
+<footer>
+  <div class="fin">
+    <div class="fgrid">
+      <div>
+        <div class="logo" onclick="goHome()" style="margin-bottom:12px;display:flex;">
+          <div class="logo-icon">🏡</div>
+          <div class="logo-txt">আসল <span>গ্রামের মজা 🌿</span></div>
+        </div>
+        <p id="footerDesc">বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়। সরাসরি কৃষক থেকে আপনার কাছে।</p>
+        <div class="soc">
+          <a href="#" id="fbLink" class="sb"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" id="igLink" class="sb"><i class="fa-brands fa-instagram"></i></a>
+        </div>
+      </div>
+      <div><h4>নেভিগেশন</h4><ul class="flinks"><li><a onclick="goHome()">হোম</a></li><li><a onclick="goProductsPage()">পণ্য</a></li><li><a onclick="goAboutPage()">আমাদের সম্পর্কে</a></li><li><a onclick="goContactPage()">যোগাযোগ</a></li></ul></div>
+      <div><h4>পণ্য বিভাগ</h4><ul class="flinks" id="footerCatLinks"></ul></div>
+      <div>
+        <h4>সাহায্য</h4>
+        <ul class="flinks">
+          <li><a>ডেলিভারি তথ্য</a></li>
+          <li><a>রিটার্ন পলিসি</a></li>
+          <li><a>গোপনীয়তা নীতি</a></li>
+          <li><a onclick="goContactPage()">যোগাযোগ করুন</a></li>
+        </ul>
+        <div style="margin-top:10px;font-size:.79rem;color:#c8e6b0;" id="footerPhone"></div>
+      </div>
+    </div>
+    <div class="fbot" id="footerCopyright">&copy; 2024 আসল গ্রামের মজা | সর্বস্বত্ব সংরক্ষিত</div>
+  </div>
+</footer>
 
 <!-- CART SIDEBAR -->
 <div class="cart-ov" id="cartOv" onclick="toggleCart()"></div>
@@ -935,16 +905,11 @@ function goSlide(n) {
 
 /* ════ FOOTER ════ */
 function buildFooter() {
-  // Category links for all footers
+  // Category links for footers
   const catLinks = document.getElementById('footerCatLinks');
-  const aboutFooter = document.getElementById('aboutFooterCats');
-  const contactFooter = document.getElementById('contactFooterCats');
-  const pdpFooter = document.getElementById('pdpFooterCats');
   const linksHtml = cats.map(c => `<li><a onclick="goProductsPage('${c.id}')">${c.em} ${c.lbl}</a></li>`).join('');
   if (catLinks) catLinks.innerHTML = linksHtml;
-  if (aboutFooter) aboutFooter.innerHTML = linksHtml;
-  if (contactFooter) contactFooter.innerHTML = linksHtml;
-  if (pdpFooter) pdpFooter.innerHTML = linksHtml;
+  // Update phone from settings later
 }
 
 /* ════ IMAGE HELPER ════ */
@@ -953,11 +918,19 @@ function imgTag(src, alt) {
   return `<img src="${src}" alt="${alt}" loading="lazy" onerror="this.style.display='none'">`;
 }
 
-/* ════ ROUTING ════ */
+/* ════ ROUTING AND ACTIVE NAV ════ */
+function setActiveNav(page) {
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  if (page === 'home') document.getElementById('navHome').classList.add('active');
+  else if (page === 'products') document.getElementById('navProducts').classList.add('active');
+  else if (page === 'about') document.getElementById('navAbout').classList.add('active');
+  else if (page === 'contact') document.getElementById('navContact').classList.add('active');
+}
+
 function goHome() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-home').classList.add('active');
-  document.getElementById('navHome').classList.add('active');
+  setActiveNav('home');
   window.history.pushState({}, '', '#/');
   window.scrollTo(0, 0);
 }
@@ -969,7 +942,7 @@ function goProductsPage(cat = '') {
   }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-products').classList.add('active');
-  document.getElementById('navHome').classList.remove('active');
+  setActiveNav('products');
   window.history.pushState({}, '', '#/products');
   window.scrollTo(0, 0);
   loadProductsPage(1);
@@ -978,7 +951,7 @@ function goProductsPage(cat = '') {
 function goAboutPage() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-about').classList.add('active');
-  document.getElementById('navHome').classList.remove('active');
+  setActiveNav('about');
   window.history.pushState({}, '', '#/about');
   window.scrollTo(0, 0);
   loadAboutPageContent();
@@ -987,7 +960,7 @@ function goAboutPage() {
 function goContactPage() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-contact').classList.add('active');
-  document.getElementById('navHome').classList.remove('active');
+  setActiveNav('contact');
   window.history.pushState({}, '', '#/contact');
   window.scrollTo(0, 0);
   loadContactPageContent();
@@ -1002,7 +975,7 @@ function goProduct(id) {
   buildPdp(p);
   document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
   document.getElementById('page-product').classList.add('active');
-  document.getElementById('navHome').classList.remove('active');
+  setActiveNav(''); // product page has no nav highlight
   const slug = p.nm.replace(/\s+/g, '-');
   window.history.pushState({ pid: id }, '', `#/product/${slug}-${id}`);
   window.scrollTo(0, 0);
@@ -1012,6 +985,7 @@ async function loadProductById(id) {
   document.getElementById('pdpContent').innerHTML = '<div style="padding:60px;text-align:center;"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--gd)"></i></div>';
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-product').classList.add('active');
+  setActiveNav('');
   window.scrollTo(0, 0);
   try {
     const p = await api(`/api/products/${id}`);
@@ -1687,7 +1661,11 @@ async function loadContactPageContent() {
     const data = await api('/api/pages/contact');
     const contact = data || {};
     const faqs = contact.faqs || [];
-    const mapHtml = contact.mapUrl ? `<iframe class="contact-map" src="${contact.mapUrl}" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>` : '';
+    // Only show map if URL looks valid (starts with http)
+    let mapHtml = '';
+    if (contact.mapUrl && contact.mapUrl.startsWith('http')) {
+      mapHtml = `<iframe class="contact-map" src="${contact.mapUrl}" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+    }
     container.innerHTML = `
       <div class="contact-title">${contact.title || 'যোগাযোগ করুন'}</div>
       ${contact.subtitle ? `<div class="contact-subtitle">${contact.subtitle}</div>` : ''}
