@@ -170,7 +170,10 @@ const Order = mongoose.model('Order', orderSchema);
 const heroSchema = new mongoose.Schema({
   title: String,
   subtitle: String,
-  gradient: String,
+  gradient: { type: String, default: 's1' },
+  img: { type: String, default: '' },
+  imgPublicId: { type: String, default: '' },
+  ctaText: { type: String, default: '' },
   active: { type: Boolean, default: true },
   order: { type: Number, default: 0 },
 });
@@ -614,6 +617,43 @@ app.put('/api/settings', authMiddleware, async (req, res) => {
   }
 });
 
+
+// ─── PUBLIC PAGE ENDPOINTS ───
+app.get("/api/pages/about", async (req, res) => {
+  try {
+    const s = await Settings.findOne({ key: "aboutPage" });
+    res.json(s ? s.value : {});
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get("/api/pages/contact", async (req, res) => {
+  try {
+    const s = await Settings.findOne({ key: "contactPage" });
+    res.json(s ? s.value : {});
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get("/api/pages/products", async (req, res) => {
+  try {
+    const { cat, page = 1, limit = 24, search } = req.query;
+    const filter = { active: true };
+    if (cat) filter.cat = cat;
+    if (search) filter["$or"] = [{ nm: { "$regex": search, "$options": "i" } }, { sub: { "$regex": search, "$options": "i" } }];
+    const total = await Product.countDocuments(filter);
+    const products = await Product.find(filter).sort({ createdAt: -1 }).skip((parseInt(page) - 1) * parseInt(limit)).limit(parseInt(limit));
+    const cats = await Category.find({ active: true }).sort({ order: 1 });
+    res.json({ products, total, pages: Math.ceil(total / parseInt(limit)), categories: cats });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get("/api/public/settings", async (req, res) => {
+  try {
+    const settings = await Settings.find();
+    const obj = {};
+    settings.forEach(s => { if (!["aboutPage","contactPage"].includes(s.key)) obj[s.key] = s.value; });
+    res.json(obj);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
 // ─── DASHBOARD STATS ───
 app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
   try {
