@@ -407,6 +407,15 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .progress-bar { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; margin-top:5px; }
 .progress-fill { height:100%; background:linear-gradient(90deg,var(--green),var(--green3)); border-radius:2px; transition:width .6s ease; }
 
+/* EMOJI SUGGESTIONS */
+.emoji-suggest-wrap { margin-top:8px; }
+.emoji-suggest-label { font-size:.68rem; color:var(--txt3); margin-bottom:5px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+.emoji-suggest-row { display:flex; flex-wrap:wrap; gap:5px; }
+.emoji-chip { background:var(--bg3); border:1.5px solid var(--border); border-radius:8px; padding:5px 10px; font-size:1.1rem; cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:5px; user-select:none; }
+.emoji-chip:hover { border-color:var(--green); background:var(--green-glow); transform:scale(1.08); }
+.emoji-chip.selected { border-color:var(--green); background:var(--green-glow); box-shadow:0 0 0 2px var(--green-glow); }
+.emoji-chip .chip-lbl { font-size:.62rem; color:var(--txt2); }
+
 /* PAGE CONTENT SECTIONS */
 .content-editor { background:var(--bg3); border:1.5px solid var(--border); border-radius:8px; padding:14px; min-height:120px; color:var(--txt); font-family:inherit; font-size:.87rem; outline:none; resize:vertical; width:100%; transition:border-color .2s; }
 .content-editor:focus { border-color:var(--green); }
@@ -1036,11 +1045,21 @@ textarea.form-control { resize:vertical; min-height:80px; }
     <div class="modal-body">
       <input type="hidden" id="catId">
       <div class="form-row">
-        <div class="form-group2"><label>ক্যাটাগরি ID <span>*</span></label><input type="text" class="form-control" id="cId" placeholder="মধু"></div>
+        <div class="form-group2">
+          <label>ক্যাটাগরি ID <span>*</span></label>
+          <input type="text" class="form-control" id="cId" placeholder="মধু" oninput="suggestEmojis(this.value)">
+        </div>
         <div class="form-group2"><label>লেবেল <span>*</span></label><input type="text" class="form-control" id="cLbl" placeholder="মধু"></div>
       </div>
       <div class="form-row">
-        <div class="form-group2"><label>ইমোজি</label><input type="text" class="form-control" id="cEm" placeholder="🍯" maxlength="4"></div>
+        <div class="form-group2">
+          <label>ইমোজি</label>
+          <input type="text" class="form-control" id="cEm" placeholder="🍯" maxlength="4">
+          <div class="emoji-suggest-wrap" id="emojiSuggestWrap" style="display:none">
+            <div class="emoji-suggest-label">💡 সাজেস্টেড ইমোজি</div>
+            <div class="emoji-suggest-row" id="emojiSuggestRow"></div>
+          </div>
+        </div>
         <div class="form-group2"><label>ক্রম নম্বর</label><input type="number" class="form-control" id="cOrder" placeholder="1"></div>
       </div>
     </div>
@@ -1635,7 +1654,159 @@ function openCatModal(cat=null) {
   document.getElementById('cEm').value=cat?cat.em:'🛒';
   document.getElementById('cOrder').value=cat?cat.order:1;
   document.getElementById('catModalTitle').innerHTML=cat?'<i class="fa-solid fa-pen-to-square" style="color:var(--blue)"></i> ক্যাটাগরি সম্পাদনা':'<i class="fa-solid fa-tag" style="color:var(--orange)"></i> নতুন ক্যাটাগরি';
+  // Show emoji suggestions based on current ID
+  suggestEmojis(cat?cat.id:'');
   openModal('catModal');
+}
+
+/* ── EMOJI SUGGESTION ENGINE ── */
+const EMOJI_MAP = {
+  // মধু / honey
+  'মধু':['🍯','🐝','🌻','🌼','🍀'],
+  'honey':['🍯','🐝','🌻'],
+  // দুধ / milk / dairy
+  'দুধ':['🥛','🐄','🧈','🫙'],
+  'milk':['🥛','🐄'],
+  'dairy':['🥛','🧈','🐄'],
+  // মাছ / fish
+  'মাছ':['🐟','🐠','🎣','🐡','🫙'],
+  'fish':['🐟','🐠','🎣'],
+  // মাংস / meat / গরু / মুরগি
+  'মাংস':['🥩','🍖','🐄','🐓'],
+  'গরু':['🐄','🥩','🍖'],
+  'মুরগি':['🐓','🍗','🥚'],
+  'meat':['🥩','🍖'],
+  // ডিম / egg
+  'ডিম':['🥚','🍳','🐓'],
+  'egg':['🥚','🍳'],
+  // সবজি / vegetables
+  'সবজি':['🥦','🥕','🍆','🧅','🥗'],
+  'vegetables':['🥦','🥕','🍆'],
+  'শাক':['🥬','🌿','🥦'],
+  // ফল / fruit
+  'ফল':['🍎','🍊','🍋','🍇','🫐'],
+  'fruit':['🍎','🍊'],
+  'আম':['🥭','🍋','🌟'],
+  'কলা':['🍌','🌿'],
+  'লিচু':['🍒','🍓','🌺'],
+  // চাল / rice / grain
+  'চাল':['🌾','🍚','🌿'],
+  'rice':['🌾','🍚'],
+  'গম':['🌾','🍞'],
+  'আটা':['🌾','🍞','🥖'],
+  // তেল / oil
+  'তেল':['🫙','🌻','🫒'],
+  'oil':['🫙','🫒'],
+  'সরিষা':['🌻','🫙','🌿'],
+  // মসলা / spice
+  'মসলা':['🌶️','🧄','🧅','🫙','🌿'],
+  'spice':['🌶️','🧄'],
+  'মরিচ':['🌶️','🔴'],
+  'হলুদ':['🟡','🌿','🫙'],
+  // পিঠা / cake / মিষ্টি
+  'পিঠা':['🍮','🧁','🍰','🌾'],
+  'মিষ্টি':['🍬','🍭','🧁','🍰'],
+  'sweet':['🍬','🍭','🍰'],
+  'cake':['🎂','🍰','🧁'],
+  // চা / tea / coffee
+  'চা':['🍵','☕','🌿'],
+  'tea':['🍵','🌿'],
+  'coffee':['☕','🫘'],
+  // ঘি / ghee / butter
+  'ঘি':['🧈','🫙','🍯'],
+  'ghee':['🧈','🫙'],
+  'butter':['🧈'],
+  // পানীয় / drink / juice
+  'জুস':['🥤','🍹','🍊'],
+  'juice':['🥤','🍹'],
+  'drink':['🥤','🍺'],
+  'পানীয়':['🥤','🍹','💧'],
+  // নারিকেল / coconut
+  'নারিকেল':['🥥','🌴','🫙'],
+  'coconut':['🥥','🌴'],
+  // খেজুর / date
+  'খেজুর':['🌴','🫙','🍯'],
+  // আদা / ginger
+  'আদা':['🫚','🌿','🍵'],
+  // রসুন / garlic
+  'রসুন':['🧄','🌿'],
+  // পেঁয়াজ / onion
+  'পেঁয়াজ':['🧅','🌿'],
+  // হাঁস / duck / কবুতর
+  'হাঁস':['🦆','🥚','🍗'],
+  // কুটির / handicraft / হস্তশিল্প
+  'হস্তশিল্প':['🧶','🪡','✂️','🎨'],
+  'handicraft':['🧶','🎨'],
+  // শুঁটকি / dried fish
+  'শুঁটকি':['🐟','🌞','🫙'],
+  // নদী / river / পুকুর
+  'নদী':['🌊','🐟','🎣'],
+  // গ্রাম / village / rural
+  'গ্রাম':['🏡','🌾','🌿','🌻'],
+  'village':['🏡','🌾'],
+  // প্যাকেজ / combo
+  'প্যাকেজ':['📦','🎁','🛍️'],
+  'combo':['📦','🎁'],
+  'অফার':['🏷️','🎁','💥'],
+  // ঔষধি / herbal / ayurvedic
+  'ঔষধি':['🌿','🍃','💊'],
+  'herbal':['🌿','🍃'],
+  // চিনি / sugar
+  'চিনি':['🍬','🧂','🫙'],
+  'sugar':['🍬'],
+  // নতুন / new
+  'নতুন':['✨','🆕','🌟'],
+};
+
+function suggestEmojis(id) {
+  const wrap = document.getElementById('emojiSuggestWrap');
+  const row = document.getElementById('emojiSuggestRow');
+  if (!id || id.length < 1) { wrap.style.display='none'; return; }
+  
+  const lower = id.toLowerCase().trim();
+  let found = [];
+  
+  // Exact match first
+  for (const [key, emojis] of Object.entries(EMOJI_MAP)) {
+    if (lower === key.toLowerCase()) { found = [...emojis]; break; }
+  }
+  
+  // Partial match
+  if (!found.length) {
+    for (const [key, emojis] of Object.entries(EMOJI_MAP)) {
+      if (lower.includes(key.toLowerCase()) || key.toLowerCase().includes(lower)) {
+        found.push(...emojis);
+      }
+    }
+  }
+  
+  // Smart character-level match for Bangla
+  if (!found.length && lower.length >= 2) {
+    const char2 = lower.substring(0,2);
+    for (const [key, emojis] of Object.entries(EMOJI_MAP)) {
+      if (key.toLowerCase().startsWith(char2)) found.push(...emojis);
+    }
+  }
+  
+  // Remove duplicates & limit
+  found = [...new Set(found)].slice(0, 8);
+  
+  if (!found.length) { wrap.style.display='none'; return; }
+  
+  const currentEm = document.getElementById('cEm').value;
+  row.innerHTML = found.map(em => `
+    <div class="emoji-chip ${em===currentEm?'selected':''}" onclick="pickEmoji('${em}')" title="${em}">
+      ${em}
+    </div>`).join('');
+  wrap.style.display = 'block';
+}
+
+function pickEmoji(em) {
+  document.getElementById('cEm').value = em;
+  // Update chip selection
+  document.querySelectorAll('#emojiSuggestRow .emoji-chip').forEach(c => {
+    c.classList.toggle('selected', c.textContent.trim() === em);
+  });
 }
 function editCat(cat) { openCatModal(cat); }
 async function saveCat() {
