@@ -159,12 +159,68 @@ body{font-family:'Hind Siliguri',sans-serif;background:#f0ede6;color:var(--txt);
 .pcard .c-img{height:200px;}
 .pcard:hover .c-img img{transform:scale(1.07);}
 
-/* ══ ALL PRODUCTS GRID ══ */
+/* ══ ALL PRODUCTS GRID (home) ══ */
 .all-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
 .agcard{background:#fff;border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:box-shadow .2s,transform .2s;cursor:pointer;position:relative;}
 .agcard:hover{box-shadow:0 4px 18px rgba(0,0,0,.12);transform:translateY(-2px);}
 .agcard .c-img{height:200px;}
 .agcard:hover .c-img img{transform:scale(1.07);}
+
+/* ══ PRODUCTS PAGE (dedicated) ══ */
+.products-page{max-width:var(--mw);margin:0 auto;padding:20px 16px 40px;}
+.products-header{margin-bottom:24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;}
+.products-title{font-size:1.4rem;font-weight:700;color:var(--gd);display:flex;align-items:center;gap:8px;}
+.products-filters{display:flex;flex-wrap:wrap;gap:10px;}
+.filter-select{padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:.85rem;background:#fff;color:var(--txt);outline:none;cursor:pointer;}
+.filter-select:focus{border-color:var(--gd);}
+.search-prod-wrap{position:relative;}
+.search-prod-input{padding:8px 36px 8px 14px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:.85rem;width:250px;outline:none;}
+.search-prod-input:focus{border-color:var(--gd);}
+.search-prod-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#888;cursor:pointer;}
+.products-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:20px 0;}
+.prod-card{background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:box-shadow .2s,transform .2s;cursor:pointer;position:relative;}
+.prod-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.12);transform:translateY(-2px);}
+.prod-card .c-img{height:180px;}
+.prod-card .c-body{padding:8px 10px 10px;}
+.prod-card .c-name{font-size:.82rem;}
+.prod-pagination{display:flex;justify-content:center;gap:8px;margin:28px 0 10px;flex-wrap:wrap;}
+.pg-btn{width:36px;height:36px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.82rem;color:#555;transition:all .15s;}
+.pg-btn:hover{background:var(--gd);color:#fff;border-color:var(--gd);}
+.pg-btn.active{background:var(--gd);color:#fff;border-color:var(--gd);}
+.pg-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ══ ABOUT PAGE ══ */
+.about-page{max-width:var(--mw);margin:0 auto;padding:24px 16px 40px;}
+.about-banner{width:100%;height:260px;border-radius:12px;overflow:hidden;margin-bottom:28px;position:relative;}
+.about-banner img{width:100%;height:100%;object-fit:cover;}
+.about-title{font-size:1.8rem;font-weight:700;color:var(--txt);margin-bottom:8px;text-align:center;}
+.about-tagline{font-size:1rem;color:var(--txt2);text-align:center;margin-bottom:28px;max-width:700px;margin-left:auto;margin-right:auto;}
+.about-mv{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:32px 0;}
+.about-mv-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:22px 18px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+.about-mv-card h3{font-size:1.1rem;color:var(--gd);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.about-mv-card p{font-size:.9rem;color:#555;line-height:1.7;}
+.about-stats{display:flex;flex-wrap:wrap;justify-content:center;gap:24px;margin:40px 0;}
+.about-stat-item{background:var(--cream);border-radius:8px;padding:18px 20px;min-width:140px;text-align:center;border:1px solid var(--border);}
+.about-stat-value{font-size:1.8rem;font-weight:700;color:var(--gd);}
+.about-stat-label{font-size:.86rem;color:var(--txt2);}
+.about-content{background:#fff;border:1px solid var(--border);border-radius:8px;padding:28px;margin:28px 0;line-height:1.9;font-size:.92rem;color:#444;}
+
+/* ══ CONTACT PAGE ══ */
+.contact-page{max-width:var(--mw);margin:0 auto;padding:24px 16px 40px;}
+.contact-title{font-size:1.8rem;font-weight:700;color:var(--txt);margin-bottom:8px;text-align:center;}
+.contact-subtitle{font-size:1rem;color:var(--txt2);text-align:center;margin-bottom:32px;}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.contact-info-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:24px;}
+.contact-info-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #eee;}
+.contact-info-row:last-child{border-bottom:none;}
+.contact-ico{width:36px;height:36px;background:#e3f0dc;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gd);font-size:1.1rem;}
+.contact-info-row span{font-size:.9rem;color:#555;}
+.contact-faqs{margin-top:32px;}
+.faq-item{background:#fff;border:1px solid var(--border);border-radius:6px;margin-bottom:12px;overflow:hidden;}
+.faq-q{background:#f5f1eb;padding:12px 16px;font-weight:700;color:var(--txt);cursor:pointer;display:flex;align-items:center;gap:8px;}
+.faq-q i{color:var(--gd);}
+.faq-a{padding:12px 16px;color:#555;font-size:.86rem;border-top:1px solid var(--border);}
+.contact-map{width:100%;height:250px;border-radius:8px;margin:28px 0;border:1px solid var(--border);overflow:hidden;}
 
 /* ══ WHY ══ */
 .why-sec{background:#e3f0dc;border-top:2px solid #bcd8b4;border-bottom:2px solid #bcd8b4;padding:36px 16px;}
@@ -392,6 +448,9 @@ footer p{font-size:.79rem;line-height:1.7;}
   .pcard .c-img{height:160px;}
   .all-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
   .agcard .c-img{height:calc(50vw - 26px);}
+  .products-grid{grid-template-columns:repeat(2,1fr);}
+  .about-mv{grid-template-columns:1fr;}
+  .contact-grid{grid-template-columns:1fr;}
   .fgrid{grid-template-columns:1fr 1fr;}
   .why-grid{grid-template-columns:1fr;}
   .pdp-main{grid-template-columns:1fr;}
@@ -403,6 +462,7 @@ footer p{font-size:.79rem;line-height:1.7;}
   .hero{height:240px;}
   .hero-ci h1{font-size:1.2rem;}
   .pcard{flex:0 0 calc(50% - 5px);width:calc(50% - 5px);margin-right:10px;}
+  .products-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -417,9 +477,9 @@ footer p{font-size:.79rem;line-height:1.7;}
     </div>
     <ul class="nav-links">
       <li><a onclick="goHome()" id="navHome" class="active">হোম</a></li>
-      <li><a onclick="goHome();setTimeout(()=>document.getElementById('sec-products').scrollIntoView({behavior:'smooth'}),100)">পণ্য</a></li>
-      <li><a onclick="goHome();setTimeout(()=>document.getElementById('sec-about').scrollIntoView({behavior:'smooth'}),100)">আমাদের সম্পর্কে</a></li>
-      <li><a onclick="goHome();setTimeout(()=>document.getElementById('sec-contact').scrollIntoView({behavior:'smooth'}),100)">যোগাযোগ</a></li>
+      <li><a onclick="goProductsPage()">পণ্য</a></li>
+      <li><a onclick="goAboutPage()">আমাদের সম্পর্কে</a></li>
+      <li><a onclick="goContactPage()">যোগাযোগ</a></li>
     </ul>
     <div class="nb-right">
       <div class="search-wrap" id="deskSearchWrap">
@@ -554,37 +614,87 @@ footer p{font-size:.79rem;line-height:1.7;}
     </div>
   </div>
 </section>
+</div> <!-- end page-home -->
 
-<footer id="sec-contact">
-  <div class="fin">
-    <div class="fgrid">
-      <div>
-        <div class="logo" onclick="goHome()" style="margin-bottom:12px;display:flex;">
-          <div class="logo-icon">🏡</div>
-          <div class="logo-txt">আসল <span>গ্রামের মজা 🌿</span></div>
+<!-- ═══ PAGE: PRODUCTS LISTING ═══ -->
+<div id="page-products" class="page">
+  <div class="products-page">
+    <div class="products-header">
+      <div class="products-title"><i class="fa-solid fa-box-open" style="color:var(--gd)"></i> সকল পণ্য</div>
+      <div class="products-filters">
+        <select class="filter-select" id="prodCatFilter" onchange="loadProductsPage(1)">
+          <option value="">সব ক্যাটাগরি</option>
+        </select>
+        <div class="search-prod-wrap">
+          <input type="text" class="search-prod-input" id="prodSearchInput" placeholder="পণ্যের নাম লিখুন..." onkeyup="if(event.key==='Enter') loadProductsPage(1)">
+          <button class="search-prod-btn" onclick="loadProductsPage(1)"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
-        <p id="footerDesc">বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়। সরাসরি কৃষক থেকে আপনার কাছে।</p>
-        <div class="soc">
-          <a href="#" id="fbLink" class="sb"><i class="fa-brands fa-facebook-f"></i></a>
-          <a href="#" id="igLink" class="sb"><i class="fa-brands fa-instagram"></i></a>
-        </div>
-      </div>
-      <div><h4>নেভিগেশন</h4><ul class="flinks"><li><a onclick="goHome()">হোম</a></li><li><a onclick="goHome();setTimeout(()=>document.getElementById('sec-products').scrollIntoView({behavior:'smooth'}),100)">পণ্য</a></li></ul></div>
-      <div><h4>পণ্য বিভাগ</h4><ul class="flinks" id="footerCatLinks"></ul></div>
-      <div>
-        <h4>সাহায্য</h4>
-        <ul class="flinks">
-          <li><a>ডেলিভারি তথ্য</a></li>
-          <li><a>রিটার্ন পলিসি</a></li>
-          <li><a>গোপনীয়তা নীতি</a></li>
-          <li><a>যোগাযোগ করুন</a></li>
-        </ul>
-        <div style="margin-top:10px;font-size:.79rem;color:#c8e6b0;" id="footerPhone"></div>
       </div>
     </div>
-    <div class="fbot" id="footerCopyright">&copy; 2024 আসল গ্রামের মজা | সর্বস্বত্ব সংরক্ষিত</div>
+    <div id="productsGrid" class="products-grid"></div>
+    <div id="productsPagination" class="prod-pagination"></div>
   </div>
-</footer>
+  <footer>
+    <div class="fin">
+      <div class="fgrid">
+        <div>
+          <div class="logo" onclick="goHome()" style="margin-bottom:12px;display:flex;">
+            <div class="logo-icon">🏡</div>
+            <div class="logo-txt">আসল <span>গ্রামের মজা 🌿</span></div>
+          </div>
+          <p>বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়।</p>
+        </div>
+        <div><h4>নেভিগেশন</h4><ul class="flinks"><li><a onclick="goHome()">হোম</a></li><li><a onclick="goProductsPage()">পণ্য</a></li></ul></div>
+        <div><h4>পণ্য বিভাগ</h4><ul class="flinks" id="footerCatLinks"></ul></div>
+        <div><h4>সাহায্য</h4><ul class="flinks"><li><a>যোগাযোগ করুন</a></li></ul></div>
+      </div>
+      <div class="fbot">&copy; 2024 আসল গ্রামের মজা</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══ PAGE: ABOUT ═══ -->
+<div id="page-about" class="page">
+  <div class="about-page" id="aboutContent"></div>
+  <footer>
+    <div class="fin">
+      <div class="fgrid">
+        <div>
+          <div class="logo" onclick="goHome()" style="margin-bottom:12px;display:flex;">
+            <div class="logo-icon">🏡</div>
+            <div class="logo-txt">আসল <span>গ্রামের মজা 🌿</span></div>
+          </div>
+          <p>বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়।</p>
+        </div>
+        <div><h4>নেভিগেশন</h4><ul class="flinks"><li><a onclick="goHome()">হোম</a></li><li><a onclick="goAboutPage()">আমাদের সম্পর্কে</a></li></ul></div>
+        <div><h4>পণ্য বিভাগ</h4><ul class="flinks" id="aboutFooterCats"></ul></div>
+        <div><h4>সাহায্য</h4><ul class="flinks"><li><a>যোগাযোগ করুন</a></li></ul></div>
+      </div>
+      <div class="fbot">&copy; 2024 আসল গ্রামের মজা</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══ PAGE: CONTACT ═══ -->
+<div id="page-contact" class="page">
+  <div class="contact-page" id="contactContent"></div>
+  <footer>
+    <div class="fin">
+      <div class="fgrid">
+        <div>
+          <div class="logo" onclick="goHome()" style="margin-bottom:12px;display:flex;">
+            <div class="logo-icon">🏡</div>
+            <div class="logo-txt">আসল <span>গ্রামের মজা 🌿</span></div>
+          </div>
+          <p>বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়।</p>
+        </div>
+        <div><h4>নেভিগেশন</h4><ul class="flinks"><li><a onclick="goHome()">হোম</a></li><li><a onclick="goContactPage()">যোগাযোগ</a></li></ul></div>
+        <div><h4>পণ্য বিভাগ</h4><ul class="flinks" id="contactFooterCats"></ul></div>
+        <div><h4>সাহায্য</h4><ul class="flinks"><li><a>যোগাযোগ করুন</a></li></ul></div>
+      </div>
+      <div class="fbot">&copy; 2024 আসল গ্রামের মজা</div>
+    </div>
+  </footer>
 </div>
 
 <!-- ═══ PAGE: PRODUCT DETAIL ═══ -->
@@ -714,6 +824,13 @@ let deliveryCharges = { inside: 80, outside: 130 };
 let storePhone = '01712345678';
 let dataLoaded = false;
 
+// Products page pagination
+let prodPage = 1;
+let prodTotal = 0;
+let prodLimit = 12;
+let prodCatFilter = '';
+let prodSearchFilter = '';
+
 /* ════ LOAD ALL DATA ════ */
 async function loadAllData() {
   try {
@@ -727,12 +844,10 @@ async function loadAllData() {
     heroSlides = heroRes || [];
     dataLoaded = true;
 
-    // Load settings separately (non-critical)
-    try {
-      // Settings endpoint requires auth — skip for frontend, use defaults
-    } catch {}
-
     buildUI();
+    // Preload about/contact for faster navigation (optional)
+    loadAboutPageContent().catch(()=>{});
+    loadContactPageContent().catch(()=>{});
   } catch (err) {
     console.error('Data load failed:', err);
     // Fallback: show error states
@@ -820,12 +935,16 @@ function goSlide(n) {
 
 /* ════ FOOTER ════ */
 function buildFooter() {
-  // Category links
+  // Category links for all footers
   const catLinks = document.getElementById('footerCatLinks');
-  const pdpCatLinks = document.getElementById('pdpFooterCats');
-  const linksHtml = cats.map(c => `<li><a onclick="goHome();setTimeout(()=>switchCat('${c.id}'),120)">${c.em} ${c.lbl}</a></li>`).join('');
+  const aboutFooter = document.getElementById('aboutFooterCats');
+  const contactFooter = document.getElementById('contactFooterCats');
+  const pdpFooter = document.getElementById('pdpFooterCats');
+  const linksHtml = cats.map(c => `<li><a onclick="goProductsPage('${c.id}')">${c.em} ${c.lbl}</a></li>`).join('');
   if (catLinks) catLinks.innerHTML = linksHtml;
-  if (pdpCatLinks) pdpCatLinks.innerHTML = linksHtml;
+  if (aboutFooter) aboutFooter.innerHTML = linksHtml;
+  if (contactFooter) contactFooter.innerHTML = linksHtml;
+  if (pdpFooter) pdpFooter.innerHTML = linksHtml;
 }
 
 /* ════ IMAGE HELPER ════ */
@@ -836,32 +955,62 @@ function imgTag(src, alt) {
 
 /* ════ ROUTING ════ */
 function goHome() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-home').classList.add('active');
-  document.getElementById('page-product').classList.remove('active');
+  document.getElementById('navHome').classList.add('active');
   window.history.pushState({}, '', '#/');
   window.scrollTo(0, 0);
-  document.getElementById('navHome').classList.add('active');
+}
+
+function goProductsPage(cat = '') {
+  if (cat) {
+    prodCatFilter = cat;
+    document.getElementById('prodCatFilter').value = cat;
+  }
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-products').classList.add('active');
+  document.getElementById('navHome').classList.remove('active');
+  window.history.pushState({}, '', '#/products');
+  window.scrollTo(0, 0);
+  loadProductsPage(1);
+}
+
+function goAboutPage() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-about').classList.add('active');
+  document.getElementById('navHome').classList.remove('active');
+  window.history.pushState({}, '', '#/about');
+  window.scrollTo(0, 0);
+  loadAboutPageContent();
+}
+
+function goContactPage() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-contact').classList.add('active');
+  document.getElementById('navHome').classList.remove('active');
+  window.history.pushState({}, '', '#/contact');
+  window.scrollTo(0, 0);
+  loadContactPageContent();
 }
 
 function goProduct(id) {
   const p = prods.find(x => x._id === id || x.id === id);
   if (!p) {
-    // Try loading from API
     loadProductById(id);
     return;
   }
   buildPdp(p);
-  document.getElementById('page-home').classList.remove('active');
+  document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
   document.getElementById('page-product').classList.add('active');
+  document.getElementById('navHome').classList.remove('active');
   const slug = p.nm.replace(/\s+/g, '-');
   window.history.pushState({ pid: id }, '', `#/product/${slug}-${id}`);
   window.scrollTo(0, 0);
-  document.getElementById('navHome').classList.remove('active');
 }
 
 async function loadProductById(id) {
   document.getElementById('pdpContent').innerHTML = '<div style="padding:60px;text-align:center;"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--gd)"></i></div>';
-  document.getElementById('page-home').classList.remove('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-product').classList.add('active');
   window.scrollTo(0, 0);
   try {
@@ -880,7 +1029,15 @@ window.addEventListener('popstate', e => {
     const parts = h.split('-');
     const id = parts[parts.length - 1];
     if (id) goProduct(id);
-  } else goHome();
+  } else if (h === '#/products') {
+    goProductsPage();
+  } else if (h === '#/about') {
+    goAboutPage();
+  } else if (h === '#/contact') {
+    goContactPage();
+  } else {
+    goHome();
+  }
 });
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -889,6 +1046,15 @@ window.addEventListener('DOMContentLoaded', () => {
     const parts = h.split('-');
     const id = parts[parts.length - 1];
     if (id) { loadProductById(id); return; }
+  } else if (h === '#/products') {
+    loadAllData().then(() => goProductsPage());
+    return;
+  } else if (h === '#/about') {
+    loadAllData().then(() => goAboutPage());
+    return;
+  } else if (h === '#/contact') {
+    loadAllData().then(() => goContactPage());
+    return;
   }
   loadAllData();
 });
@@ -1122,7 +1288,7 @@ function renderPdp(p) {
   <div class="pdp-wrap">
     <div class="pdp-breadcrumb">
       <a onclick="goHome()">হোম</a><span class="bc-sep">›</span>
-      <a onclick="goHome();setTimeout(()=>switchCat('${p.cat}'),100)">${p.cat}</a><span class="bc-sep">›</span>
+      <a onclick="goProductsPage('${p.cat}')">${p.cat}</a><span class="bc-sep">›</span>
       <span class="bc-cur">${p.nm}</span>
     </div>
     <div class="pdp-main">
@@ -1422,6 +1588,134 @@ async function submitOrder() {
     showToast('❌ অর্ডার ব্যর্থ হয়েছে: ' + (err.message || 'সার্ভার সমস্যা'));
     btn.disabled = false;
     btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> অর্ডার কনফার্ম করুন';
+  }
+}
+
+/* ════ PRODUCTS PAGE (dedicated) ════ */
+async function loadProductsPage(page) {
+  prodPage = page;
+  prodCatFilter = document.getElementById('prodCatFilter').value;
+  prodSearchFilter = document.getElementById('prodSearchInput').value.trim();
+  
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.8rem;color:var(--gd)"></i></div>';
+  
+  try {
+    let url = `/api/products?page=${prodPage}&limit=${prodLimit}&active=true`;
+    if (prodCatFilter) url += `&cat=${encodeURIComponent(prodCatFilter)}`;
+    if (prodSearchFilter) url += `&search=${encodeURIComponent(prodSearchFilter)}`;
+    const res = await api(url);
+    const prodsPage = res.products || [];
+    prodTotal = res.total || 0;
+    
+    if (!prodsPage.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa"><i class="fa-solid fa-box-open" style="font-size:2rem;display:block;margin-bottom:8px"></i>কোনো পণ্য পাওয়া যায়নি</div>';
+    } else {
+      grid.innerHTML = prodsPage.map(p => `
+        <div class="prod-card" onclick="goProduct('${p._id}')">
+          <div class="c-img" style="background:${p.bg||'#c8a55a'}22;">
+            ${p.img ? imgTag(p.img, p.nm) : `<span style="font-size:2.5rem;position:absolute">${p.em}</span>`}
+            <span style="position:absolute;bottom:6px;right:8px;font-size:1.2rem;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));pointer-events:none;">${p.em}</span>
+          </div>
+          <div class="c-body">
+            <div class="c-name">${p.nm}</div>
+            <div class="c-prices">
+              <span class="c-price">৳${getBasePrice(p).toLocaleString('en')}</span>
+              ${getBaseOld(p) ? `<span class="c-old">৳${getBaseOld(p).toLocaleString('en')}</span>` : ''}
+            </div>
+          </div>
+          <div class="c-acts">
+            <button class="c-act" onclick="goProduct('${p._id}');event.stopPropagation()"><i class="fa-regular fa-eye"></i></button>
+            <span class="c-div"></span>
+            <button class="c-act ca" onclick="addToCartBase('${p._id}');event.stopPropagation()"><i class="fa-solid fa-cart-shopping"></i></button>
+          </div>
+        </div>`).join('');
+    }
+    renderProdPagination();
+  } catch (err) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa"><i class="fa-solid fa-exclamation-triangle"></i> লোড ব্যর্থ হয়েছে</div>';
+  }
+}
+
+function renderProdPagination() {
+  const pages = Math.ceil(prodTotal / prodLimit);
+  const container = document.getElementById('productsPagination');
+  if (pages <= 1) { container.innerHTML = ''; return; }
+  let html = `<button class="pg-btn" onclick="loadProductsPage(${prodPage-1})" ${prodPage===1?'disabled':''}><i class="fa-solid fa-chevron-left"></i></button>`;
+  for (let i = 1; i <= pages; i++) {
+    if (i === 1 || i === pages || (i >= prodPage-2 && i <= prodPage+2)) {
+      html += `<button class="pg-btn ${i===prodPage?'active':''}" onclick="loadProductsPage(${i})">${i}</button>`;
+    } else if (i === prodPage-3 || i === prodPage+3) {
+      html += `<span class="pg-btn" style="background:none;border:none;width:auto">...</span>`;
+    }
+  }
+  html += `<button class="pg-btn" onclick="loadProductsPage(${prodPage+1})" ${prodPage===pages?'disabled':''}><i class="fa-solid fa-chevron-right"></i></button>`;
+  container.innerHTML = html;
+}
+
+/* ════ ABOUT PAGE ════ */
+async function loadAboutPageContent() {
+  const container = document.getElementById('aboutContent');
+  container.innerHTML = '<div style="text-align:center;padding:40px"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--gd)"></i></div>';
+  try {
+    const data = await api('/api/pages/about');
+    const about = data || {};
+    const stats = about.stats || [];
+    const bannerHtml = about.bannerUrl ? `<div class="about-banner"><img src="${about.bannerUrl}" alt="about banner"></div>` : '';
+    const statsHtml = stats.length ? `<div class="about-stats">${stats.map(s => `<div class="about-stat-item"><div class="about-stat-value">${s.value}</div><div class="about-stat-label">${s.label}</div></div>`).join('')}</div>` : '';
+    container.innerHTML = `
+      ${bannerHtml}
+      <div class="about-title">${about.title || 'আমাদের সম্পর্কে'}</div>
+      ${about.tagline ? `<div class="about-tagline">${about.tagline}</div>` : ''}
+      <div class="about-mv">
+        ${about.mission ? `<div class="about-mv-card"><h3><i class="fa-solid fa-bullseye"></i> আমাদের লক্ষ্য</h3><p>${about.mission}</p></div>` : ''}
+        ${about.vision ? `<div class="about-mv-card"><h3><i class="fa-solid fa-eye"></i> আমাদের স্বপ্ন</h3><p>${about.vision}</p></div>` : ''}
+      </div>
+      ${statsHtml}
+      ${about.content ? `<div class="about-content">${about.content}</div>` : ''}
+    `;
+  } catch (err) {
+    container.innerHTML = '<div class="error-state"><i class="fa-solid fa-circle-exclamation"></i><p>পৃষ্ঠা লোড হয়নি</p></div>';
+  }
+}
+
+/* ════ CONTACT PAGE ════ */
+async function loadContactPageContent() {
+  const container = document.getElementById('contactContent');
+  container.innerHTML = '<div style="text-align:center;padding:40px"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--gd)"></i></div>';
+  try {
+    const data = await api('/api/pages/contact');
+    const contact = data || {};
+    const faqs = contact.faqs || [];
+    const mapHtml = contact.mapUrl ? `<iframe class="contact-map" src="${contact.mapUrl}" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>` : '';
+    container.innerHTML = `
+      <div class="contact-title">${contact.title || 'যোগাযোগ করুন'}</div>
+      ${contact.subtitle ? `<div class="contact-subtitle">${contact.subtitle}</div>` : ''}
+      <div class="contact-grid">
+        <div class="contact-info-card">
+          ${contact.phone1 ? `<div class="contact-info-row"><span class="contact-ico"><i class="fa-solid fa-phone"></i></span><span>${contact.phone1}</span></div>` : ''}
+          ${contact.phone2 ? `<div class="contact-info-row"><span class="contact-ico"><i class="fa-solid fa-phone"></i></span><span>${contact.phone2}</span></div>` : ''}
+          ${contact.email ? `<div class="contact-info-row"><span class="contact-ico"><i class="fa-solid fa-envelope"></i></span><span>${contact.email}</span></div>` : ''}
+          ${contact.hours ? `<div class="contact-info-row"><span class="contact-ico"><i class="fa-regular fa-clock"></i></span><span>${contact.hours}</span></div>` : ''}
+          ${contact.address ? `<div class="contact-info-row"><span class="contact-ico"><i class="fa-solid fa-location-dot"></i></span><span>${contact.address}</span></div>` : ''}
+          ${contact.whatsapp ? `<div class="contact-info-row"><span class="contact-ico"><i class="fa-brands fa-whatsapp"></i></span><span>${contact.whatsapp}</span></div>` : ''}
+        </div>
+        <div class="contact-info-card">
+          ${contact.fb ? `<a href="${contact.fb}" target="_blank" class="contact-info-row" style="text-decoration:none;color:inherit;"><span class="contact-ico"><i class="fa-brands fa-facebook-f"></i></span><span>Facebook</span></a>` : ''}
+          ${contact.ig ? `<a href="${contact.ig}" target="_blank" class="contact-info-row" style="text-decoration:none;color:inherit;"><span class="contact-ico"><i class="fa-brands fa-instagram"></i></span><span>Instagram</span></a>` : ''}
+        </div>
+      </div>
+      ${mapHtml}
+      ${faqs.length ? `<div class="contact-faqs"><h3 style="margin-bottom:16px;">❓ প্রায়শই জিজ্ঞাসিত প্রশ্ন</h3>` + faqs.map(f => `
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='none'?'block':'none'">
+            <i class="fa-regular fa-circle-question"></i> ${f.q}
+          </div>
+          <div class="faq-a" style="display:none;">${f.a}</div>
+        </div>`).join('') + '</div>' : ''}
+    `;
+  } catch (err) {
+    container.innerHTML = '<div class="error-state"><i class="fa-solid fa-circle-exclamation"></i><p>পৃষ্ঠা লোড হয়নি</p></div>';
   }
 }
 
