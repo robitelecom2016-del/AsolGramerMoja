@@ -255,6 +255,8 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
 .icon-btn.star:hover { border-color:var(--yellow); color:var(--yellow2); background:rgba(210,153,34,.1); }
 .icon-btn.active-icon { color:var(--green2); border-color:rgba(46,160,67,.4); }
 .icon-btn.star-active { color:var(--yellow2); border-color:rgba(210,153,34,.4); }
+.icon-btn.warn { color:var(--orange2); border-color:rgba(232,102,10,.3); }
+.icon-btn.warn:hover { border-color:var(--orange); color:#fff; background:var(--orange); }
 
 /* FILTERS */
 .filters-bar { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; width:100%; }
@@ -390,13 +392,18 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .settings-info p { font-size:.74rem; color:var(--txt2); margin-top:2px; }
 
 /* CATEGORIES */
-.cat-cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(170px,1fr)); gap:12px; }
-.cat-card { background:var(--bg2); border:1.5px solid var(--border); border-radius:10px; padding:16px; cursor:pointer; transition:all .2s; display:flex; flex-direction:column; gap:8px; }
+.cat-cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:12px; }
+.cat-card { background:var(--bg2); border:1.5px solid var(--border); border-radius:12px; padding:18px 16px 14px; transition:all .2s; display:flex; flex-direction:column; gap:8px; position:relative; overflow:hidden; }
+.cat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:12px 12px 0 0; background:var(--green); opacity:0; transition:opacity .2s; }
+.cat-card:hover::before { opacity:1; }
 .cat-card:hover { border-color:var(--green); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.3); }
-.cat-em { font-size:2rem; }
-.cat-nm { font-size:.86rem; font-weight:700; color:var(--txt); }
+.cat-card.inactive { opacity:.55; border-style:dashed; }
+.cat-card.inactive::before { background:var(--red); }
+.cat-card.inactive:hover::before { opacity:1; }
+.cat-em { font-size:2.2rem; line-height:1; }
+.cat-nm { font-size:.9rem; font-weight:700; color:var(--txt); }
 .cat-cnt { font-size:.72rem; color:var(--txt2); }
-.cat-actions { display:flex; gap:5px; margin-top:2px; }
+.cat-actions { display:flex; gap:5px; margin-top:4px; padding-top:8px; border-top:1px solid var(--border); }
 
 /* HERO IMAGE UPLOAD */
 .hero-img-preview { margin-top:10px; border-radius:8px; overflow:hidden; border:1px solid var(--border); position:relative; max-height:180px; }
@@ -1684,7 +1691,7 @@ async function loadCategories() {
     document.getElementById('catCount').textContent=`${cats.length} ক্যাটাগরি`;
     if (!cats.length) { document.getElementById('catCards').innerHTML='<div class="empty-state"><i class="fa-solid fa-tags"></i><h3>কোনো ক্যাটাগরি নেই</h3></div>'; return; }
     document.getElementById('catCards').innerHTML=cats.map(c=>`
-      <div class="cat-card" id="catcard-${c._id}">
+      <div class="cat-card${c.active?'':' inactive'}" id="catcard-${c._id}">
         <div class="cat-em">${c.em}</div>
         <div class="cat-nm">${c.lbl}</div>
         <div class="cat-cnt">ID: ${c.id} · ক্রম: ${c.order}</div>
@@ -1708,10 +1715,15 @@ function toggleCatActive() {
 async function toggleCat(id, btn) {
   try {
     const cat = await api('PATCH', `/api/categories/${id}/toggle`);
+    // badge update
     const badge = document.getElementById('catbadge-' + id);
     if (badge) { badge.className = 'badge ' + (cat.active ? 'green' : 'red'); badge.textContent = cat.active ? 'সক্রিয়' : 'নিষ্ক্রিয়'; }
+    // button update
     if (btn) { btn.className = 'icon-btn ' + (cat.active ? 'warn' : 'edit'); btn.title = cat.active ? 'নিষ্ক্রিয় করুন' : 'সক্রিয় করুন'; btn.innerHTML = `<i class="fa-solid ${cat.active ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>`; }
-    toast(`"${cat.lbl}" ${cat.active ? 'সক্রিয়' : 'নিষ্ক্রিয়'} করা হয়েছে`, 'success');
+    // card visual update
+    const card = document.getElementById('catcard-' + id);
+    if (card) { card.classList.toggle('inactive', !cat.active); }
+    toast(`"${cat.lbl}" ${cat.active ? '✅ সক্রিয়' : '⛔ নিষ্ক্রিয়'} করা হয়েছে`, cat.active ? 'success' : 'info');
   } catch { toast('আপডেট ব্যর্থ', 'error'); }
 }
 
