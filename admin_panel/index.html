@@ -1267,13 +1267,12 @@ textarea.form-control { resize:vertical; min-height:80px; }
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-/* ════════════════════
-   ADMIN PANEL CORE v2
-════════════════════ */
-
 let API = localStorage.getItem('adminApiUrl') || 'https://asolgramermoja-jysj.onrender.com';
 let TOKEN = localStorage.getItem('adminToken') || '';
 let FRONTEND_URL = localStorage.getItem('frontendUrl') || '';
+
+let isUploadingMain = false;
+let isUploadingThumbs = false;
 
 const api = async (method, path, body, isFormData = false) => {
   const opts = { method, headers: { 'Authorization': `Bearer ${TOKEN}` } };
@@ -1335,7 +1334,6 @@ function showApp() {
   document.getElementById('appLayout').style.display = 'block';
   loadDashboard(); loadCategoriesForFilter(); checkHealth();
   loadFrontendUrl();
-  // স্বয়ংক্রিয় ডেটা সিড করুন
   autoSeedDefaultData();
 }
 
@@ -1523,7 +1521,6 @@ async function loadProducts() {
 
 function filterProds() { prodPage=1; loadProducts(); }
 
-/* ===== EMOJI PICKER FOR PRODUCT MODAL ===== */
 const COMMON_EMOJIS = ['🍯','🥛','🧈','🐟','🥩','🥚','🌾','🍚','🌶️','🧄','🍌','🥭','🍊','🍎','🫐','🥦','🥕','🧅','🍞','🍪','🍰','🍫','🍬','🍭','☕','🧃','🧴','🌿','🌻','🏡','📦','🎁'];
 
 function addProductEmojiPicker() {
@@ -1560,7 +1557,6 @@ function openProdModal(prod=null) {
   document.getElementById('pBestLbl').textContent='না'; document.getElementById('pActiveLbl').textContent='হ্যাঁ';
   document.getElementById('mainImgPreview').innerHTML=''; document.getElementById('thumbImgPreview').innerHTML='';
   document.getElementById('prodModalTitle').innerHTML='<i class="fa-solid fa-plus" style="color:var(--green)"></i> নতুন পণ্য যোগ করুন';
-  // Ensure emoji picker is added
   addProductEmojiPicker();
   if (prod) {
     document.getElementById('prodModalTitle').innerHTML='<i class="fa-solid fa-pen-to-square" style="color:var(--blue)"></i> পণ্য সম্পাদনা করুন';
@@ -1645,8 +1641,16 @@ function toggleProdField(id) {
 }
 
 async function uploadMainImg(input) {
-  if (!input.files[0]) return;
-  const formData = new FormData(); formData.append('image', input.files[0]);
+  if (isUploadingMain) {
+    toast('আপলোড চলছে, দয়া করে অপেক্ষা করুন', 'info');
+    input.value = '';
+    return;
+  }
+  isUploadingMain = true;
+
+  if (!input.files[0]) { isUploadingMain = false; return; }
+  const formData = new FormData();
+  formData.append('image', input.files[0]);
   const preview = document.getElementById('mainImgPreview');
   preview.innerHTML = '<div style="padding:8px;font-size:.8rem;color:var(--txt2)"><i class="fa-solid fa-spinner fa-spin"></i> আপলোড হচ্ছে...</div>';
   try {
@@ -1655,15 +1659,25 @@ async function uploadMainImg(input) {
     document.getElementById('pImgPid').value = res.publicId;
     preview.innerHTML = `<div class="img-preview" style="margin-top:10px"><div class="img-prev-item"><img src="${res.url}"></div></div>`;
     toast('ছবি আপলোড সফল','success');
-    input.value = ''; // clear input
+    input.value = '';
   } catch(err) {
     preview.innerHTML = '';
     toast('ছবি আপলোড ব্যর্থ: '+err.message,'error');
+    input.value = '';
+  } finally {
+    isUploadingMain = false;
   }
 }
 
 async function uploadThumbImgs(input) {
-  if (!input.files.length) return;
+  if (isUploadingThumbs) {
+    toast('আপলোড চলছে, দয়া করে অপেক্ষা করুন', 'info');
+    input.value = '';
+    return;
+  }
+  isUploadingThumbs = true;
+
+  if (!input.files.length) { isUploadingThumbs = false; return; }
   const formData = new FormData();
   [...input.files].slice(0,4).forEach(f => formData.append('images', f));
   const preview = document.getElementById('thumbImgPreview');
@@ -1675,10 +1689,13 @@ async function uploadThumbImgs(input) {
     document.getElementById('pImgsPids').value = JSON.stringify(pids);
     preview.innerHTML = urls.map(u => `<div class="img-prev-item"><img src="${u}"></div>`).join('');
     toast(`${res.length}টি ছবি আপলোড সফল`,'success');
-    input.value = ''; // clear
+    input.value = '';
   } catch(err) {
     preview.innerHTML = '';
     toast('ছবি আপলোড ব্যর্থ: '+err.message,'error');
+    input.value = '';
+  } finally {
+    isUploadingThumbs = false;
   }
 }
 
@@ -1692,7 +1709,6 @@ async function saveProd() {
   const id=document.getElementById('prodId').value;
   const btn=document.getElementById('saveProdBtn');
   
-  // ✅ FIX: প্রতিরোধ করুন ডাবল ক্লিক থেকে
   if(btn.disabled) return;
   
   btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...'; btn.disabled=true;
@@ -1818,12 +1834,9 @@ function toggleCatActive() {
 async function toggleCat(id, btn) {
   try {
     const cat = await api('PATCH', `/api/categories/${id}/toggle`);
-    // badge update
     const badge = document.getElementById('catbadge-' + id);
     if (badge) { badge.className = 'badge ' + (cat.active ? 'green' : 'red'); badge.textContent = cat.active ? 'সক্রিয়' : 'নিষ্ক্রিয়'; }
-    // button update
     if (btn) { btn.className = 'icon-btn ' + (cat.active ? 'warn' : 'edit'); btn.title = cat.active ? 'নিষ্ক্রিয় করুন' : 'সক্রিয় করুন'; btn.innerHTML = `<i class="fa-solid ${cat.active ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>`; }
-    // card visual update
     const card = document.getElementById('catcard-' + id);
     if (card) { card.classList.toggle('inactive', !cat.active); }
     toast(`"${cat.lbl}" ${cat.active ? '✅ সক্রিয়' : '⛔ নিষ্ক্রিয়'} করা হয়েছে`, cat.active ? 'success' : 'info');
@@ -1845,7 +1858,6 @@ function openCatModal(cat=null) {
   openModal('catModal');
 }
 
-/* ── EMOJI SUGGESTION ENGINE ── */
 const EMOJI_MAP = {
   'মধু':['🍯','🐝','🌻','🌼','🍀'],
   'honey':['🍯','🐝','🌻'],
@@ -2033,7 +2045,7 @@ async function uploadHeroImg(input) {
     document.getElementById('hImgPid').value = res.publicId;
     document.getElementById('heroImgPreview').innerHTML = `<div class="hero-img-preview"><img src="${res.url}" alt="hero"><button class="remove-hero-img" onclick="removeHeroImg()"><i class="fa-solid fa-xmark"></i></button></div>`;
     toast('স্লাইড ছবি আপলোড সফল','success');
-    input.value = ''; // clear
+    input.value = '';
   } catch(err) {
     document.getElementById('heroImgPreview').innerHTML = '';
     toast('ছবি আপলোড ব্যর্থ: '+err.message,'error');
@@ -2118,7 +2130,7 @@ async function uploadPageBanner(page, input) {
     document.getElementById(page+'BannerUrl').value = res.url;
     document.getElementById(page+'BannerPreview').innerHTML = `<div class="img-preview" style="margin-top:10px"><div class="img-prev-item" style="width:120px;height:70px"><img src="${res.url}" style="width:100%;height:100%;object-fit:cover"></div></div>`;
     toast('ছবি আপলোড সফল','success');
-    input.value = ''; // clear
+    input.value = '';
   } catch(err) {
     toast('ছবি আপলোড ব্যর্থ','error');
   }
@@ -2311,14 +2323,8 @@ function saveApiUrl() {
 }
 
 
-// ══════════════════════════════════════════════════════
-//  ৩০টি SEED PRODUCT — "পণ্য সম্পাদনা করুন" modal এর
-//  প্রতিটি field পূরণ করা (nm, cat, sub, em, bg, phone,
-//  desc, highlights, variants, best, active, order)
-// ══════════════════════════════════════════════════════
 const SEED_PRODUCTS = [
 
-  /* ══ মিষ্টি ══ */
   { nm:'রসগোল্লা', cat:'মিষ্টি', sub:'তাজা ছানার রসগোল্লা — মুখে দিলেই গলে যায়', em:'🍬',
     bg:'#e8b4d0', phone:'01712345678', best:true, active:true, order:1,
     desc:'খাঁটি গরুর দুধের ছানা থেকে তৈরি নরম তুলতুলে রসগোল্লা। চিনির হালকা রসে ভেজানো, প্রতিটি কামড়ে অনন্য স্বাদ।',
@@ -2349,7 +2355,6 @@ const SEED_PRODUCTS = [
     highlights:['দেশি ঘিয়ে ভাজা','কোনো ডালডা নেই','এলাচ ও কিশমিশ সহ','পূজার জন্য আদর্শ'],
     variants:[{lbl:'২৫০ গ্রাম',p:100,op:130,disc:'23% ছাড়'},{lbl:'৫০০ গ্রাম',p:190,op:240,disc:'21% ছাড়'}] },
 
-  /* ══ দই ══ */
   { nm:'মিষ্টি দই', cat:'দই', sub:'মাটির পাতিলে তৈরি বগুড়ার মিষ্টি দই', em:'🥛',
     bg:'#fffbe6', phone:'01712345678', best:true, active:true, order:1,
     desc:'বগুড়ার বিখ্যাত মিষ্টি দই। মাটির পাতিলে জমানো হয় বলে স্বাদ ও সুগন্ধ অতুলনীয়। প্রতিটি পাতিল হাতে তৈরি।',
@@ -2380,7 +2385,6 @@ const SEED_PRODUCTS = [
     highlights:['মৌসুমি তাজা ফল','শিশুদের জন্য আদর্শ','প্রাকৃতিক মিষ্টি','কোনো কৃত্রিম ফ্লেভার নেই'],
     variants:[{lbl:'২৫০ গ্রাম',p:70,op:90,disc:'22% ছাড়'},{lbl:'৫০০ গ্রাম',p:130,op:165,disc:'21% ছাড়'}] },
 
-  /* ══ মিঠাই ══ */
   { nm:'খেজুর গুড়', cat:'মিঠাই', sub:'শীতের খেজুর রস থেকে তৈরি আসল গুড়', em:'🍮',
     bg:'#8b4513', phone:'01712345678', best:true, active:true, order:1,
     desc:'শীতের ভোরে সংগ্রহ করা তাজা খেজুর রস জ্বাল দিয়ে তৈরি। কোনো ভেজাল নেই, কোনো রং নেই। খাঁটি খেজুরের স্বাদ।',
@@ -2411,7 +2415,6 @@ const SEED_PRODUCTS = [
     highlights:['ছাঁচে তৈরি শক্ত গুড়','দীর্ঘমেয়াদী সংরক্ষণ','পিঠার জন্য আদর্শ','খাঁটি খেজুর রস'],
     variants:[{lbl:'৫০০ গ্রাম',p:130,op:170,disc:'24% ছাড়'},{lbl:'১ কেজি',p:240,op:320,disc:'25% ছাড়'}] },
 
-  /* ══ তৈল ══ */
   { nm:'সরিষার তৈল', cat:'তৈল', sub:'ঘানি ভাঙা খাঁটি সরিষার তৈল', em:'🫙',
     bg:'#ffd700', phone:'01712345678', best:true, active:true, order:1,
     desc:'সনাতন ঘানি পদ্ধতিতে ভাঙা সরিষার তৈল। কোনো রিফাইনিং নেই, তাই পুষ্টিগুণ ও ঝাঁঝালো স্বাদ সম্পূর্ণ অক্ষুণ্ণ।',
@@ -2442,7 +2445,6 @@ const SEED_PRODUCTS = [
     highlights:['বাষ্প পাতন পদ্ধতি','বাতব্যথায় উপকারী','সর্দি-কাশি নিরাময়','১০০% প্রাকৃতিক'],
     variants:[{lbl:'১০০ মি.লি.',p:120,op:150,disc:'20% ছাড়'},{lbl:'২৫০ মি.লি.',p:280,op:350,disc:'20% ছাড়'}] },
 
-  /* ══ বোরহানী ══ */
   { nm:'পুদিনা বোরহানী', cat:'বোরহানী', sub:'তাজা পুদিনা পাতায় তৈরি সতেজ বোরহানী', em:'🥤',
     bg:'#2ecc71', phone:'01712345678', best:true, active:true, order:1,
     desc:'তাজা পুদিনা পাতা, টক দই ও বিশেষ মশলায় তৈরি। গরমে এক গ্লাস পুদিনা বোরহানী শরীর-মন দুটোই সতেজ করে দেয়।',
@@ -2473,7 +2475,6 @@ const SEED_PRODUCTS = [
     highlights:['ভাজা জিরার ঘ্রাণ','বিরিয়ানির সাথে আদর্শ','শরীর ঠান্ডা রাখে','লো-ক্যালরি পানীয়'],
     variants:[{lbl:'২৫০ মি.লি.',p:45,op:60,disc:'25% ছাড়'},{lbl:'৫০০ মি.লি.',p:85,op:110,disc:'23% ছাড়'}] },
 
-  /* ══ রশমালাই ══ */
   { nm:'ক্লাসিক রশমালাই', cat:'রশমালাই', sub:'ঘন দুধের ক্লাসিক রশমালাই', em:'🍨',
     bg:'#fff0e6', phone:'01712345678', best:true, active:true, order:1,
     desc:'তাজা গরুর দুধ ঘন করে তৈরি ক্ষীরে ছানার চ্যাপ্টা বল ভেজানো। এলাচ ও গোলাপজলের সুগন্ধে অনন্য স্বাদ।',
@@ -2505,23 +2506,18 @@ const SEED_PRODUCTS = [
     variants:[{lbl:'২৫০ গ্রাম (১৫ পিস)',p:120,op:150,disc:'20% ছাড়'},{lbl:'৫০০ গ্রাম (৩০ পিস)',p:220,op:280,disc:'21% ছাড়'}] },
 ];
 
-// ── Auto-seed default data on login ──
+
 async function autoSeedDefaultData() {
   try {
-    // চেক করুন কি ইতিমধ্যে সিড হয়েছে
     const prods = await api('GET','/api/products?limit=1').catch(()=>({total:0}));
-    if (prods.total > 0) return; // ইতিমধ্যে পণ্য আছে, সিড করবেন না
+    if (prods.total > 0) return;
     
-    // ক্যাটাগরি সিড
     await autoSeedCategories();
     
-    // পণ্য সিড
     setTimeout(() => autoSeedProducts(), 500);
     
-    // About পেজ সিড
     await autoSeedAboutPage();
     
-    // Contact পেজ সিড
     await autoSeedContactPage();
   } catch(e) {
     console.log('Auto-seed skipped:', e.message);
@@ -2565,7 +2561,6 @@ async function autoSeedProducts() {
           order: p.order, img:'', imgPublicId:'', imgs:[], imgsPublicIds:[]
         });
       } catch(e) {
-        // পণ্য ইতিমধ্যে থাকতে পারে, সাইলেন্টলি স্কিপ করুন
       }
       await new Promise(r=>setTimeout(r,50));
     }
@@ -2580,7 +2575,7 @@ async function autoSeedProducts() {
 async function autoSeedAboutPage() {
   try {
     const s = await api('GET','/api/settings').catch(()=>({}));
-    if (s.aboutPage && s.aboutPage.content) return; // ইতিমধ্যে সেট আছে
+    if (s.aboutPage && s.aboutPage.content) return;
     
     const aboutPage = {
       title: 'আমাদের সম্পর্কে',
@@ -2606,7 +2601,7 @@ async function autoSeedAboutPage() {
 async function autoSeedContactPage() {
   try {
     const s = await api('GET','/api/settings').catch(()=>({}));
-    if (s.contactPage && s.contactPage.phone1) return; // ইতিমধ্যে সেট আছে
+    if (s.contactPage && s.contactPage.phone1) return;
     
     const contactPage = {
       title: 'যোগাযোগ করুন',
@@ -2704,7 +2699,7 @@ async function autoSeedContactPage() {
           failed++;
         }
 
-        await new Promise(r => setTimeout(r, 80)); // throttle
+        await new Promise(r => setTimeout(r, 80));
       }
 
       if(btn){
