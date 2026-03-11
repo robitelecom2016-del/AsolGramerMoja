@@ -666,12 +666,18 @@ footer p{font-size:.79rem;line-height:1.7;}
   .order-modal{max-height:95vh;}
 }
 @media(max-width:600px){
+  /* মোবাইলে aspect-ratio override করে বড় height দিই */
+  .hero{
+    aspect-ratio:unset;
+    height:220px;
+    min-height:220px;
+  }
   .hero-ci{padding:0 14px;}
-  .hero-ci h1{font-size:1.1rem;margin-bottom:5px;}
-  .hero-ci p{font-size:.75rem;margin-bottom:12px;}
-  .btn-hero{padding:8px 16px;font-size:.78rem;gap:5px;}
+  .hero-ci h1{font-size:1.15rem;margin-bottom:6px;}
+  .hero-ci p{font-size:.78rem;margin-bottom:13px;}
+  .btn-hero{padding:9px 18px;font-size:.8rem;gap:5px;}
   .hero-arrow{display:none;}
-  .slide-dots{bottom:8px;}
+  .slide-dots{bottom:9px;}
   .dot{width:6px;height:6px;}
   .dot.active{width:16px;}
 }
