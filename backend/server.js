@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -187,26 +186,24 @@ const settingsSchema = new mongoose.Schema({
 });
 const Settings = mongoose.model('Settings', settingsSchema);
 
-// ═══ CLOUDINARY STORAGE ═══
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'asolgramer',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 800, height: 800, crop: 'fill', quality: 'auto' }],
-  },
-});
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
+// ═══ MULTER (memory storage — upload to Cloudinary manually to avoid double-upload bug) ═══
+const memStorage = multer.memoryStorage();
+const upload = multer({ storage: memStorage, limits: { fileSize: 5 * 1024 * 1024 } });
+const uploadThumb = multer({ storage: memStorage, limits: { fileSize: 5 * 1024 * 1024 } });
 
-const thumbStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'asolgramer/thumbs',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 400, height: 400, crop: 'fill', quality: 'auto' }],
-  },
-});
-const uploadThumb = multer({ storage: thumbStorage });
+// Helper: upload a buffer to Cloudinary (returns { url, publicId })
+async function uploadToCloudinary(buffer, folder, transformation) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder, transformation, allowed_formats: ['jpg', 'jpeg', 'png', 'webp'] },
+      (err, result) => {
+        if (err) return reject(err);
+        resolve({ url: result.secure_url, publicId: result.public_id });
+      }
+    );
+    stream.end(buffer);
+  });
+}
 
 // ═══ AUTH MIDDLEWARE ═══
 const authMiddleware = async (req, res, next) => {
@@ -405,10 +402,12 @@ app.patch('/api/products/:id/best', authMiddleware, async (req, res) => {
 app.post('/api/upload/product-image', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
-    res.json({
-      url: req.file.path,
-      publicId: req.file.filename,
-    });
+    const { url, publicId } = await uploadToCloudinary(
+      req.file.buffer,
+      'asolgramer',
+      [{ width: 800, height: 800, crop: 'fill', quality: 'auto' }]
+    );
+    res.json({ url, publicId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -417,7 +416,15 @@ app.post('/api/upload/product-image', authMiddleware, upload.single('image'), as
 app.post('/api/upload/product-thumbs', authMiddleware, uploadThumb.array('images', 4), async (req, res) => {
   try {
     if (!req.files?.length) return res.status(400).json({ error: 'No images uploaded' });
-    const results = req.files.map(f => ({ url: f.path, publicId: f.filename }));
+    const results = await Promise.all(
+      req.files.map(f =>
+        uploadToCloudinary(
+          f.buffer,
+          'asolgramer/thumbs',
+          [{ width: 400, height: 400, crop: 'fill', quality: 'auto' }]
+        )
+      )
+    );
     res.json(results);
   } catch (err) {
     res.status(500).json({ error: err.message });
