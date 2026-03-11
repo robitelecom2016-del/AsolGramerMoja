@@ -413,15 +413,16 @@ app.post('/api/upload/product-image', authMiddleware, upload.single('image'), as
   }
 });
 
-// Hero slider image upload — 1600×640 fill crop (16:6.4 ≈ desktop hero ratio)
-// object-fit:cover in CSS ensures perfect display at any screen size
+// Hero slider image upload
+// CSS ratio: 8:3 → Cloudinary তে 1600×600 crop করে সেভ করে
+// object-fit:cover → সব ডিভাইসে একই ইমেজ পারফেক্ট দেখাবে
 app.post('/api/upload/hero-image', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
     const { url, publicId } = await uploadToCloudinary(
       req.file.buffer,
       'asolgramer/hero',
-      [{ width: 1600, height: 640, crop: 'fill', gravity: 'auto', quality: 'auto:best', fetch_format: 'auto' }]
+      [{ width: 1600, height: 600, crop: 'fill', gravity: 'auto', quality: 'auto:best', fetch_format: 'auto' }]
     );
     res.json({ url, publicId });
   } catch (err) {

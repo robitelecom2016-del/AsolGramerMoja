@@ -86,49 +86,62 @@ body{
 .cart-btn:hover{background:var(--orl);}
 .cart-count{background:#fff;color:var(--or);border-radius:50%;width:17px;height:17px;font-size:.65rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
 
-/* ══ HERO ══ */
-/*
-  Desktop : fixed 480px height — প্রশস্ত, চোখ-ধাঁধানো
-  Tablet  : 340px
-  Mobile  : 210px — compact কিন্তু সম্পূর্ণ দেখায়
-  ইমেজ সবসময় object-fit:cover → কোনো ফাঁকা নেই, কোনো কাটা নেই
-*/
+/* ══ HERO ══
+   ─────────────────────────────────────────────────────
+   নীতি: একটি ইমেজ → সব ডিভাইসে পরিপূর্ণ দেখাবে
+   পদ্ধতি: aspect-ratio দিয়ে height auto — ইমেজ কখনো
+           কাটবে না, ফাঁকা জায়গাও থাকবে না।
+
+   Desktop 1200px → height ≈ 450px  (ratio 8:3)
+   Tablet  768px  → height ≈ 288px
+   Mobile  390px  → height ≈ 146px  (min 160px নিশ্চিত)
+   ───────────────────────────────────────────────────── */
 .hero{
   position:relative;
   width:100%;
-  height:480px;
+  /* 8:3 ratio — landscape banner-এর জন্য পারফেক্ট */
+  aspect-ratio:8/3;
+  /* মোবাইলে খুব ছোট না হওয়ার জন্য */
+  min-height:160px;
+  /* ডেস্কটপে অতিরিক্ত লম্বা না হওয়ার জন্য */
+  max-height:480px;
   overflow:hidden;
   background:#1a4010;
   flex-shrink:0;
 }
+/* slide div পুরো hero জুড়ে */
 .slide{
   position:absolute;
   inset:0;
+  width:100%;
+  height:100%;
   opacity:0;
   transition:opacity .75s ease;
 }
 .slide.active{opacity:1;}
 
-/* ── ইমেজ স্লাইড ── */
+/* ── ইমেজ: পুরো slide ভরবে, কোনো অংশ কাটবে না ──
+   যেহেতু ইমেজ ও container দুটোই একই aspect-ratio,
+   object-fit:cover = object-fit:fill এর মতো কাজ করে */
 .hero-slide-img{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
-  object-fit:cover;          /* পুরো এলাকা ভরে, অনুপাত ঠিক থাকে */
-  object-position:center top; /* গুরুত্বপূর্ণ অংশ সবসময় দেখায় */
+  object-fit:cover;
+  object-position:center center;
   z-index:1;
   display:block;
 }
-/* ইমেজের উপর হালকা ওভারলে — টেক্সট পড়া যায় */
+/* টেক্সট পড়ার জন্য হালকা বাম-পাশ ওভারলে */
 .hero-slide-overlay{
   position:absolute;
   inset:0;
   background:linear-gradient(
-    100deg,
-    rgba(0,0,0,.52) 0%,
-    rgba(0,0,0,.22) 45%,
-    rgba(0,0,0,.05) 100%
+    95deg,
+    rgba(0,0,0,.50) 0%,
+    rgba(0,0,0,.18) 40%,
+    rgba(0,0,0,.0)  100%
   );
   z-index:2;
   pointer-events:none;
@@ -164,20 +177,20 @@ body{
   max-width:560px;
 }
 .hero-ci p{
-  color:rgba(255,255,255,.88);
+  color:rgba(255,255,255,.9);
   font-size:1rem;
-  margin-bottom:24px;
+  margin-bottom:22px;
   text-shadow:0 1px 4px rgba(0,0,0,.4);
-  max-width:440px;
+  max-width:420px;
 }
 .btn-hero{
   background:#fff;
   color:var(--gd);
   border:none;
-  padding:12px 30px;
+  padding:11px 28px;
   border-radius:6px;
   font-family:inherit;
-  font-size:.96rem;
+  font-size:.95rem;
   font-weight:700;
   cursor:pointer;
   transition:all .2s;
@@ -185,63 +198,67 @@ body{
   display:inline-flex;
   align-items:center;
   gap:7px;
-  box-shadow:0 4px 16px rgba(0,0,0,.2);
+  box-shadow:0 4px 16px rgba(0,0,0,.22);
 }
 .btn-hero:hover{
   background:var(--cream);
   transform:translateY(-2px);
-  box-shadow:0 8px 20px rgba(0,0,0,.25);
+  box-shadow:0 8px 20px rgba(0,0,0,.26);
 }
 
 /* ── ডট নেভিগেশন ── */
 .slide-dots{
   position:absolute;
-  bottom:18px;
+  bottom:16px;
   left:50%;
   transform:translateX(-50%);
   display:flex;
-  gap:10px;
+  gap:8px;
   z-index:20;
 }
 .dot{
   width:8px;
   height:8px;
   border-radius:50%;
-  background:rgba(255,255,255,.4);
+  background:rgba(255,255,255,.38);
   cursor:pointer;
-  transition:all .3s;
-  border:1.5px solid rgba(255,255,255,.6);
+  transition:all .3s ease;
+  border:1.5px solid rgba(255,255,255,.55);
 }
 .dot.active{
   background:#fff;
-  width:24px;
+  width:22px;
   border-radius:4px;
   border-color:#fff;
 }
 
-/* ── Prev/Next arrow ── */
+/* ── Prev/Next Arrow ── */
 .hero-arrow{
   position:absolute;
   top:50%;
   transform:translateY(-50%);
   z-index:20;
-  background:rgba(255,255,255,.18);
-  backdrop-filter:blur(4px);
-  border:1.5px solid rgba(255,255,255,.3);
+  background:rgba(255,255,255,.16);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  border:1.5px solid rgba(255,255,255,.28);
   color:#fff;
-  width:42px;
-  height:42px;
+  width:40px;
+  height:40px;
   border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
   cursor:pointer;
-  font-size:.9rem;
-  transition:background .2s,transform .2s;
+  font-size:.85rem;
+  transition:background .2s, transform .2s;
 }
-.hero-arrow:hover{background:rgba(255,255,255,.32);transform:translateY(-50%) scale(1.08);}
-.hero-arrow.prev{left:18px;}
-.hero-arrow.next{right:18px;}
+.hero-arrow:hover{
+  background:rgba(255,255,255,.3);
+  transform:translateY(-50%) scale(1.1);
+}
+.hero-arrow.prev{left:16px;}
+.hero-arrow.next{right:16px;}
 
 /* ══ SKELETON LOADER ══ */
 @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
@@ -624,12 +641,12 @@ footer p{font-size:.79rem;line-height:1.7;}
   .search-wrap{display:none;}
   .mob-search-btn{display:flex;}
   .mob-menu-btn{display:flex;}
-  /* tablet hero: 340px */
-  .hero{height:340px;}
-  .hero-ci{padding:0 28px;}
-  .hero-ci h1{font-size:1.65rem;max-width:100%;}
-  .hero-ci p{font-size:.9rem;max-width:100%;}
-  .hero-arrow{width:36px;height:36px;font-size:.8rem;}
+  /* hero: aspect-ratio কাজ করে, height auto */
+  .hero-ci{padding:0 24px;}
+  .hero-ci h1{font-size:1.7rem;max-width:100%;}
+  .hero-ci p{font-size:.88rem;max-width:100%;margin-bottom:16px;}
+  .btn-hero{padding:10px 22px;font-size:.88rem;}
+  .hero-arrow{width:34px;height:34px;font-size:.78rem;}
   .bcard{flex:0 0 50%;width:50%;padding:0 5px;}
   .pcard{flex:0 0 calc(50% - 7px);width:calc(50% - 7px);margin-right:14px;}
   .pcard .c-img{height:160px;}
@@ -649,14 +666,14 @@ footer p{font-size:.79rem;line-height:1.7;}
   .order-modal{max-height:95vh;}
 }
 @media(max-width:600px){
-  /* mobile hero: 210px — compact কিন্তু পরিষ্কার */
-  .hero{height:210px;}
-  .hero-ci{padding:0 16px;}
-  .hero-ci h1{font-size:1.15rem;max-width:100%;margin-bottom:6px;}
-  .hero-ci p{font-size:.78rem;margin-bottom:14px;max-width:100%;}
-  .btn-hero{padding:9px 18px;font-size:.82rem;gap:5px;}
-  .hero-arrow{display:none;} /* মোবাইলে arrow লুকানো — dot দিয়ে navigate */
-  .slide-dots{bottom:10px;}
+  .hero-ci{padding:0 14px;}
+  .hero-ci h1{font-size:1.1rem;margin-bottom:5px;}
+  .hero-ci p{font-size:.75rem;margin-bottom:12px;}
+  .btn-hero{padding:8px 16px;font-size:.78rem;gap:5px;}
+  .hero-arrow{display:none;}
+  .slide-dots{bottom:8px;}
+  .dot{width:6px;height:6px;}
+  .dot.active{width:16px;}
 }
 @media(max-width:480px){
   .cart-sb{width:100%;right:-100%;}
