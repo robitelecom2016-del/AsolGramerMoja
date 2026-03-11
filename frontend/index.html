@@ -87,7 +87,7 @@ body{
 .cart-count{background:#fff;color:var(--or);border-radius:50%;width:17px;height:17px;font-size:.65rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
 
 /* ══ HERO ══ */
-.hero{position:relative;min-height:360px;overflow:hidden;width:100%;}
+.hero{position:relative;width:100%;aspect-ratio:1200/500;max-height:500px;overflow:hidden;}
 .slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;}
 .slide.active{opacity:1;}
 .slide-img-cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:1;}
@@ -508,7 +508,6 @@ footer p{font-size:.79rem;line-height:1.7;}
 }
 @media(max-width:480px){
   .cart-sb{width:100%;right:-100%;}
-  .hero{height:240px;}
   .hero-ci h1{font-size:1.2rem;}
   .pcard{flex:0 0 calc(50% - 5px);width:calc(50% - 5px);margin-right:10px;}
   .products-grid{grid-template-columns:1fr;}
@@ -539,12 +538,12 @@ footer p{font-size:.79rem;line-height:1.7;}
       <button class="mob-search-btn" id="mobSearchBtn" onclick="toggleMobSearch()">
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
-      <button class="mob-menu-btn" id="mobMenuBtn" onclick="toggleMobNav()">
-        <i class="fa-solid fa-bars"></i>
-      </button>
       <button class="cart-btn" onclick="toggleCart()">
         <i class="fa-solid fa-cart-shopping"></i> Cart
         <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <button class="mob-menu-btn" id="mobMenuBtn" onclick="toggleMobNav()">
+        <i class="fa-solid fa-bars"></i>
       </button>
     </div>
   </div>
