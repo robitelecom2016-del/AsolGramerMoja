@@ -34,8 +34,7 @@ body{
 .nb{max-width:var(--mw);margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:14px;height:62px;}
 .nb-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0;cursor:pointer;}
-.logo-icon{width:38px;height:38px;background:var(--cream);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;}
-.logo-icon img{width:100%;height:100%;object-fit:cover;border-radius:7px;}
+.logo-icon{width:38px;height:38px;background:var(--cream);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:18px;}
 .logo-txt{color:#fff;font-size:.95rem;font-weight:700;line-height:1.2;}
 .logo-txt span{display:block;color:#b8e67a;font-size:.78rem;}
 .nav-links{display:flex;align-items:center;list-style:none;flex-shrink:0;}
@@ -719,8 +718,10 @@ footer p{font-size:.79rem;line-height:1.7;}
 <nav class="navbar">
   <div class="nb">
     <div class="logo" onclick="goHome()">
-      <div class="logo-icon"><img src="images/logo.png" alt="গ্রামের আসল মজ"></div>
-      <div class="logo-txt">গ্রামের আসল মজ<span></span></div>
+      <div class="logo-icon">
+    <img src="images/logo.png" alt="Logo" />
+</div>
+      <div class="logo-txt">গ্রামের<span>আসল মজা 🌿</span></div>
     </div>
     <ul class="nav-links">
       <li><a onclick="goHome()" id="navHome" class="active">হোম</a></li>
@@ -754,8 +755,8 @@ footer p{font-size:.79rem;line-height:1.7;}
   <div class="mob-nav-panel">
     <div class="mob-nav-header">
       <div class="mob-nav-logo">
-        <div class="logo-icon"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOjnJAAAFtUlEQVR4nO3av4udRRSH8dnsVQshQUxkCy/CFroGRdAioCA2BiS9hf4tVv5HgiikUBDxN2KTgIE0sQisMSSkUiMWE15e3FXvO+9855wz83y6Cya5d87Dmde7u/fyey8koLYz1m8AfSIsSBAWJAgLEoQFCcKCBGFBgrAgQViQICxIEBYkCAsSG+s34M728KDsD966ebvuOwlt6LCKG9r9bxu2tuHCqhvTon9uqMiGCKtxTP9mqMh6DstJT6ea3luvhXUYlueeTuq1sH7CitXTSZ0V1kNY0ZP6h/xxoucVO6zOkpqLnlfUsDpOai5uXvHCGiSpuYh5RQprwKTmYuUVI6zBk5qLkleA326gqpP8n4nrjeX/+Aw5X11+NxZV7cLtKXncWG4Pyyefq8vdxqKqMt7OzVdY3k4nFlen5+UqdHUocfm5Fl1sLKqqy8N52ofl4RT6Y36qxmGZf/6O2Z6tZVhUpWZ4wmZhUVUbVudsExZVtWRy2gZhUVV77c+8dVhUZaXxyTcNi6pstTz/dmFRlQfNptAoLKryST0X+58VokvasFhXnkmnIwyLqvzTzUgVFlVFIZoUz1iQkITFuopFMa/6YVFVRNWnxlUIicphsa7iqju7mmFRVXQVJ8hVCIlqYbGu+lBrjmwsSKwNi3XVkyrTZGNBYnVYrKt+rZ8pGwsSa8NiXfVq5WTZWJBYGxbrql9r5svGgsTasL+dfPOWDVvwmQ0F8/XeqRQqf/7hxhfIlkz0eWo4v7g+aslNNM/A/eVvvfAVQH61Y9zqE0+3oCBx8rlpuW97RYSR9tE0d2rCQP5EHs+WKyQBklHfqBDLhkGfKdvIB1k23KaKwfaJm2Dx88L4KZrTTtVLz8PYVtOg4RFm1LdQVhH1n1J1T7HkCscHvVVm10PYVxOg4RFm1LdQVhH1n1J1T7HkCscHvVVm10PYZxOc4RFm1LdQVhH1n1J1T7HkCscHvVVm1yMYRwM7/H1X1J1T7HkC/cXvVVm10PYZyMr9LBWJv5sG6GDVn5sG6UY0qRe1gMLLRzh6u3eKNtMgVNPTGKvKy9DJlQRrR7vvEccVQKMqRe1kMLLRzh6u3eKNtMjrNq2pKt72eFwcsVQKZqRe1kMLLRzh6u3eKNtMh5eQ5DJVUfL6jy/dUhvT7hU1ReW77PaIhJqoXtZPByEY7e7h2izdTBEYLK7LIhpqoXtZPByEb7ezh2i3eZBEYLCzKlRMsNVG9rJ8Pxg2AiR6u3uKNtfEA/7/CNHPkZ1Lj7dw6qhO1k8HIRjtdKXHXbvFG2/8Ql0D2+dN3FwT1cvayeDkY5zNKXHXbvFG2j+0q0Ta5k2cXDKw9XLQh3IbLSzh2u3eN9F1hI+0W3yNmyiJqGX9bPByMXLRjt7uHaLNy4zXaXrJq6dxJVVH9bPByMX7ezh2i3epNKxflLGOgU3NVH98BUAFAQFCcKCBGFBgrAgQViQICxIEBYkCAsSiVAA93gQxW5HAH0hQViQICxIEBYkCAsSK8LiSUYHb9xKWJAgLEgQFiQICxKEBQnCggRhQYKwIEFYkCAsUGHyCHm9xg85DL/wy1AxZDg4TwsKEoQFCcKCBGFBgrAgQViQICxIEBYkCAsSrfUbccN1VqPDJV5AiYj0yADMDAuSHjGAhWFB0iMGsDAsSHrEABaGBUmPGMDCsCDpEQPsIpEjGpZJJQPHhvH5Rde3BdnWFtzF3sTZfX8GsW0PzHYD1zdfyAKgY16QICxIEBYkCAsSvusMhAUJwoIEYUGCsCBBWJAgLEj+BymLxlm0DwqnAAAAAElFTkSuQmCC" alt="গ্রামের আসল মজ"></div>
-        <div class="logo-txt">গ্রামের আসল <span>মজ</span></div>
+        <div class="logo-icon">🏡</div>
+        <div class="logo-txt">আসল <span>গ্রামের মজা 🌿</span></div>
       </div>
       <button class="mob-nav-close" onclick="toggleMobNav()"><i class="fa-solid fa-xmark"></i></button>
     </div>
