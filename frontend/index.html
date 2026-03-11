@@ -87,11 +87,28 @@ body{
 .cart-count{background:#fff;color:var(--or);border-radius:50%;width:17px;height:17px;font-size:.65rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
 
 /* ══ HERO ══ */
-.hero{position:relative;width:100%;aspect-ratio:1200/500;max-height:500px;overflow:hidden;}
+.hero{
+  position:relative;
+  width:100%;
+  /* 1200:500 = 12:5 ratio — exact proportion maintained on all screens */
+  aspect-ratio:12/5;
+  max-height:500px;
+  overflow:hidden;
+  background:#1a4a10;
+}
 .slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;}
 .slide.active{opacity:1;}
-.slide-img-cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:1;}
-.slide-img-contain{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:1;background:#000;}
+/* Hero slide image — full cover, never cropped */
+.hero-slide-img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center center;
+  z-index:1;
+  display:block;
+}
 .s1{background:linear-gradient(135deg,#1a4a10,#3d7a2e 45%,#6aab5e 75%,#8bc34a);}
 .s2{background:linear-gradient(135deg,#3d2b1f,#8b5e3c 45%,#c49a6c 75%,#e8c99a);}
 .s3{background:linear-gradient(135deg,#1a3a5c,#2e6da4 45%,#5ba0d4 75%,#90c4e8);}
@@ -508,7 +525,12 @@ footer p{font-size:.79rem;line-height:1.7;}
 }
 @media(max-width:480px){
   .cart-sb{width:100%;right:-100%;}
-  .hero-ci h1{font-size:1.2rem;}
+  /* hero aspect-ratio কাজ করবে, তবে খুব ছোট না হওয়ার জন্য min-height */
+  .hero{min-height:140px;}
+  .hero-ci{padding:0 16px;}
+  .hero-ci h1{font-size:1.1rem;}
+  .hero-ci p{font-size:.8rem;margin-bottom:12px;}
+  .btn-hero{padding:8px 18px;font-size:.82rem;}
   .pcard{flex:0 0 calc(50% - 5px);width:calc(50% - 5px);margin-right:10px;}
   .products-grid{grid-template-columns:1fr;}
 }
@@ -932,18 +954,24 @@ function buildHero() {
   };
 
   const slidesHtml = heroSlides.map((s, i) => {
-    const gradClass = gradMap[s.gradient] || 's1';
+    const gradClass = (s.gradient && ['s1','s2','s3'].includes(s.gradient)) ? s.gradient : 's1';
     const svgBg = svgBgs[s.gradient || 's1'] || svgBgs.s1;
-    const imgHtml = s.img
-      ? `<img src="${s.img}" alt="${s.title||''}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:1;background:transparent;" onerror="this.remove()">`
-      : '';
-    const overlay = s.img
-      ? `<div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.1) 50%,transparent 100%);z-index:2;"></div>`
-      : '';
-    const svgWrap = `<div style="position:relative;z-index:${s.img ? '0' : '3'};">${svgBg}</div>`;
-    return `<div class="slide ${i===0?'active':''} ${gradClass}" data-idx="${i}" style="position:absolute;inset:0;overflow:hidden;">
-      ${svgWrap}${imgHtml}${overlay}
-    </div>`;
+
+    if (s.img) {
+      // ── ইমেজ আছে: পুরো স্লাইড জুড়ে object-fit:cover দিয়ে দেখাবে ──
+      // যেহেতু Cloudinary 1200×500 crop করে দেয়, cover দিলে কোনো অংশ কাটবে না
+      return `<div class="slide ${i===0?'active':''} ${gradClass}" data-idx="${i}">
+        <img class="hero-slide-img" src="${s.img}" alt="${s.title||'স্লাইড '+(i+1)}"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <div style="display:none;position:absolute;inset:0;">${svgBg}</div>
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.42) 0%,rgba(0,0,0,.08) 55%,transparent 100%);z-index:2;pointer-events:none;"></div>
+      </div>`;
+    } else {
+      // ── ইমেজ নেই: gradient + SVG ──
+      return `<div class="slide ${i===0?'active':''} ${gradClass}" data-idx="${i}">
+        ${svgBg}
+      </div>`;
+    }
   }).join('');
 
   // Replace existing slides (keep hero-cw and dots)

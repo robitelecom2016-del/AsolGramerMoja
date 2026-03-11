@@ -413,6 +413,21 @@ app.post('/api/upload/product-image', authMiddleware, upload.single('image'), as
   }
 });
 
+// Hero slider image upload — exactly 1200×500, no crop (fit inside + pad)
+app.post('/api/upload/hero-image', authMiddleware, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
+    const { url, publicId } = await uploadToCloudinary(
+      req.file.buffer,
+      'asolgramer/hero',
+      [{ width: 1200, height: 500, crop: 'pad', background: 'auto', quality: 'auto:best', fetch_format: 'auto' }]
+    );
+    res.json({ url, publicId });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/upload/product-thumbs', authMiddleware, uploadThumb.array('images', 4), async (req, res) => {
   try {
     if (!req.files?.length) return res.status(400).json({ error: 'No images uploaded' });
