@@ -413,14 +413,15 @@ app.post('/api/upload/product-image', authMiddleware, upload.single('image'), as
   }
 });
 
-// Hero slider image upload — exactly 1200×500, no crop (fit inside + pad)
+// Hero slider image upload — 1600×640 fill crop (16:6.4 ≈ desktop hero ratio)
+// object-fit:cover in CSS ensures perfect display at any screen size
 app.post('/api/upload/hero-image', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
     const { url, publicId } = await uploadToCloudinary(
       req.file.buffer,
       'asolgramer/hero',
-      [{ width: 1200, height: 500, crop: 'pad', background: 'auto', quality: 'auto:best', fetch_format: 'auto' }]
+      [{ width: 1600, height: 640, crop: 'fill', gravity: 'auto', quality: 'auto:best', fetch_format: 'auto' }]
     );
     res.json({ url, publicId });
   } catch (err) {

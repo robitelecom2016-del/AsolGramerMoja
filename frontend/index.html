@@ -87,41 +87,161 @@ body{
 .cart-count{background:#fff;color:var(--or);border-radius:50%;width:17px;height:17px;font-size:.65rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
 
 /* ══ HERO ══ */
+/*
+  Desktop : fixed 480px height — প্রশস্ত, চোখ-ধাঁধানো
+  Tablet  : 340px
+  Mobile  : 210px — compact কিন্তু সম্পূর্ণ দেখায়
+  ইমেজ সবসময় object-fit:cover → কোনো ফাঁকা নেই, কোনো কাটা নেই
+*/
 .hero{
   position:relative;
   width:100%;
-  /* 1200:500 = 12:5 ratio — exact proportion maintained on all screens */
-  aspect-ratio:12/5;
-  max-height:500px;
+  height:480px;
   overflow:hidden;
-  background:#1a4a10;
+  background:#1a4010;
+  flex-shrink:0;
 }
-.slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;}
+.slide{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transition:opacity .75s ease;
+}
 .slide.active{opacity:1;}
-/* Hero slide image — full cover, never cropped */
+
+/* ── ইমেজ স্লাইড ── */
 .hero-slide-img{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
-  object-fit:cover;
-  object-position:center center;
+  object-fit:cover;          /* পুরো এলাকা ভরে, অনুপাত ঠিক থাকে */
+  object-position:center top; /* গুরুত্বপূর্ণ অংশ সবসময় দেখায় */
   z-index:1;
   display:block;
 }
-.s1{background:linear-gradient(135deg,#1a4a10,#3d7a2e 45%,#6aab5e 75%,#8bc34a);}
-.s2{background:linear-gradient(135deg,#3d2b1f,#8b5e3c 45%,#c49a6c 75%,#e8c99a);}
-.s3{background:linear-gradient(135deg,#1a3a5c,#2e6da4 45%,#5ba0d4 75%,#90c4e8);}
+/* ইমেজের উপর হালকা ওভারলে — টেক্সট পড়া যায় */
+.hero-slide-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    100deg,
+    rgba(0,0,0,.52) 0%,
+    rgba(0,0,0,.22) 45%,
+    rgba(0,0,0,.05) 100%
+  );
+  z-index:2;
+  pointer-events:none;
+}
+
+/* ── গ্রেডিয়েন্ট স্লাইড (ইমেজ নেই) ── */
+.s1{background:linear-gradient(135deg,#1a4a10 0%,#3d7a2e 40%,#6aab5e 70%,#a8d56e 100%);}
+.s2{background:linear-gradient(135deg,#3d2b1f 0%,#8b5e3c 40%,#c49a6c 70%,#e8c99a 100%);}
+.s3{background:linear-gradient(135deg,#1a3a5c 0%,#2e6da4 40%,#5ba0d4 70%,#90c4e8 100%);}
 .hero-svg{position:absolute;inset:0;width:100%;height:100%;}
-.hero-cw{position:absolute;inset:0;display:flex;align-items:center;z-index:10;}
-.hero-ci{max-width:var(--mw);width:100%;margin:0 auto;padding:0 32px;}
-.hero-ci h1{font-size:2.1rem;font-weight:700;color:#fff;line-height:1.3;text-shadow:1px 2px 6px rgba(0,0,0,.5);margin-bottom:8px;}
-.hero-ci p{color:#d4f0b0;font-size:.95rem;margin-bottom:20px;}
-.btn-hero{background:#fff;color:var(--gd);border:none;padding:10px 26px;border-radius:4px;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
-.btn-hero:hover{background:var(--cream);transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,0,0,.2);}
-.slide-dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:20;}
-.dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.45);cursor:pointer;transition:background .3s;}
-.dot.active{background:#fff;}
+
+/* ── টেক্সট কন্টেন্ট ── */
+.hero-cw{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  z-index:10;
+}
+.hero-ci{
+  max-width:var(--mw);
+  width:100%;
+  margin:0 auto;
+  padding:0 48px;
+}
+.hero-ci h1{
+  font-size:2.4rem;
+  font-weight:700;
+  color:#fff;
+  line-height:1.28;
+  text-shadow:0 2px 10px rgba(0,0,0,.55);
+  margin-bottom:10px;
+  max-width:560px;
+}
+.hero-ci p{
+  color:rgba(255,255,255,.88);
+  font-size:1rem;
+  margin-bottom:24px;
+  text-shadow:0 1px 4px rgba(0,0,0,.4);
+  max-width:440px;
+}
+.btn-hero{
+  background:#fff;
+  color:var(--gd);
+  border:none;
+  padding:12px 30px;
+  border-radius:6px;
+  font-family:inherit;
+  font-size:.96rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .2s;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);
+}
+.btn-hero:hover{
+  background:var(--cream);
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+
+/* ── ডট নেভিগেশন ── */
+.slide-dots{
+  position:absolute;
+  bottom:18px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:10px;
+  z-index:20;
+}
+.dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:rgba(255,255,255,.4);
+  cursor:pointer;
+  transition:all .3s;
+  border:1.5px solid rgba(255,255,255,.6);
+}
+.dot.active{
+  background:#fff;
+  width:24px;
+  border-radius:4px;
+  border-color:#fff;
+}
+
+/* ── Prev/Next arrow ── */
+.hero-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:20;
+  background:rgba(255,255,255,.18);
+  backdrop-filter:blur(4px);
+  border:1.5px solid rgba(255,255,255,.3);
+  color:#fff;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:.9rem;
+  transition:background .2s,transform .2s;
+}
+.hero-arrow:hover{background:rgba(255,255,255,.32);transform:translateY(-50%) scale(1.08);}
+.hero-arrow.prev{left:18px;}
+.hero-arrow.next{right:18px;}
 
 /* ══ SKELETON LOADER ══ */
 @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
@@ -504,7 +624,12 @@ footer p{font-size:.79rem;line-height:1.7;}
   .search-wrap{display:none;}
   .mob-search-btn{display:flex;}
   .mob-menu-btn{display:flex;}
-  .hero-ci h1{font-size:1.5rem;}
+  /* tablet hero: 340px */
+  .hero{height:340px;}
+  .hero-ci{padding:0 28px;}
+  .hero-ci h1{font-size:1.65rem;max-width:100%;}
+  .hero-ci p{font-size:.9rem;max-width:100%;}
+  .hero-arrow{width:36px;height:36px;font-size:.8rem;}
   .bcard{flex:0 0 50%;width:50%;padding:0 5px;}
   .pcard{flex:0 0 calc(50% - 7px);width:calc(50% - 7px);margin-right:14px;}
   .pcard .c-img{height:160px;}
@@ -523,14 +648,18 @@ footer p{font-size:.79rem;line-height:1.7;}
   .pdp-related-grid{grid-template-columns:repeat(2,1fr);}
   .order-modal{max-height:95vh;}
 }
+@media(max-width:600px){
+  /* mobile hero: 210px — compact কিন্তু পরিষ্কার */
+  .hero{height:210px;}
+  .hero-ci{padding:0 16px;}
+  .hero-ci h1{font-size:1.15rem;max-width:100%;margin-bottom:6px;}
+  .hero-ci p{font-size:.78rem;margin-bottom:14px;max-width:100%;}
+  .btn-hero{padding:9px 18px;font-size:.82rem;gap:5px;}
+  .hero-arrow{display:none;} /* মোবাইলে arrow লুকানো — dot দিয়ে navigate */
+  .slide-dots{bottom:10px;}
+}
 @media(max-width:480px){
   .cart-sb{width:100%;right:-100%;}
-  /* hero aspect-ratio কাজ করবে, তবে খুব ছোট না হওয়ার জন্য min-height */
-  .hero{min-height:140px;}
-  .hero-ci{padding:0 16px;}
-  .hero-ci h1{font-size:1.1rem;}
-  .hero-ci p{font-size:.8rem;margin-bottom:12px;}
-  .btn-hero{padding:8px 18px;font-size:.82rem;}
   .pcard{flex:0 0 calc(50% - 5px);width:calc(50% - 5px);margin-right:10px;}
   .products-grid{grid-template-columns:1fr;}
 }
@@ -630,9 +759,11 @@ footer p{font-size:.79rem;line-height:1.7;}
       <div class="hero-ci">
         <h1 id="hTitle">গ্রামীণ সতেজতা ও স্বাদের আসল স্বাদ</h1>
         <p id="hSub">বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়</p>
-        <a onclick="document.getElementById('sec-products').scrollIntoView({behavior:'smooth'})" class="btn-hero" style="cursor:pointer">পণ্য কিনুন</a>
+        <a onclick="document.getElementById('sec-products').scrollIntoView({behavior:'smooth'})" class="btn-hero" style="cursor:pointer"><i class="fa-solid fa-bag-shopping"></i> পণ্য কিনুন</a>
       </div>
     </div>
+    <button class="hero-arrow prev" onclick="goSlide((cur-1+heroSlides.length)%heroSlides.length||0)"><i class="fa-solid fa-chevron-left"></i></button>
+    <button class="hero-arrow next" onclick="goSlide((cur+1)%heroSlides.length||0)"><i class="fa-solid fa-chevron-right"></i></button>
     <div class="slide-dots" id="slideDots">
       <div class="dot active" onclick="goSlide(0)"></div>
       <div class="dot" onclick="goSlide(1)"></div>
@@ -958,16 +1089,12 @@ function buildHero() {
     const svgBg = svgBgs[s.gradient || 's1'] || svgBgs.s1;
 
     if (s.img) {
-      // ── ইমেজ আছে: পুরো স্লাইড জুড়ে object-fit:cover দিয়ে দেখাবে ──
-      // যেহেতু Cloudinary 1200×500 crop করে দেয়, cover দিলে কোনো অংশ কাটবে না
       return `<div class="slide ${i===0?'active':''} ${gradClass}" data-idx="${i}">
         <img class="hero-slide-img" src="${s.img}" alt="${s.title||'স্লাইড '+(i+1)}"
-          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-        <div style="display:none;position:absolute;inset:0;">${svgBg}</div>
-        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.42) 0%,rgba(0,0,0,.08) 55%,transparent 100%);z-index:2;pointer-events:none;"></div>
+          onerror="this.style.display='none'">
+        <div class="hero-slide-overlay"></div>
       </div>`;
     } else {
-      // ── ইমেজ নেই: gradient + SVG ──
       return `<div class="slide ${i===0?'active':''} ${gradClass}" data-idx="${i}">
         ${svgBg}
       </div>`;
@@ -990,7 +1117,8 @@ function buildHero() {
 
 function goSlide(n) {
   if (!heroSlides.length) return;
-  const slides = document.querySelectorAll('.slide');
+  n = ((n % heroSlides.length) + heroSlides.length) % heroSlides.length; // safe wrap
+  const slides = document.querySelectorAll('#heroSection .slide');
   const dots = document.querySelectorAll('.dot');
   slides.forEach((s, i) => s.classList.toggle('active', i === n));
   dots.forEach((d, i) => d.classList.toggle('active', i === n));
@@ -999,9 +1127,11 @@ function goSlide(n) {
     document.getElementById('hTitle').textContent = slide.title || '';
     document.getElementById('hSub').textContent = slide.subtitle || '';
     const ctaBtn = document.querySelector('.btn-hero');
-    if (ctaBtn && slide.ctaText) ctaBtn.textContent = slide.ctaText;
+    if (ctaBtn && slide.ctaText) { ctaBtn.innerHTML = `<i class="fa-solid fa-bag-shopping"></i> ${slide.ctaText}`; }
   }
   cur = n;
+  // manual click → timer reset করি
+  if (heroTimer) { clearInterval(heroTimer); heroTimer = setInterval(() => goSlide(cur+1), 4500); }
 }
 
 /* ════ FOOTER ════ */
