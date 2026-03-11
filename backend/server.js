@@ -355,28 +355,30 @@ app.put('/api/products/:id', authMiddleware, async (req, res) => {
 
 app.delete('/api/products/:id', authMiddleware, async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
-    if (product.imgPublicId) {
-      await cloudinary.uploader.destroy(product.imgPublicId).catch(() => {});
+
+    // Delete images from Cloudinary
+    const imageIds = [product.imgPublicId, ...product.imgsPublicIds].filter(Boolean);
+    for (const id of imageIds) {
+      try {
+        await cloudinary.uploader.destroy(id);
+      } catch (err) {
+        console.error(`Failed to delete image ${id}:`, err.message);
+      }
     }
-    for (const pid of (product.imgsPublicIds || [])) {
-      await cloudinary.uploader.destroy(pid).catch(() => {});
-    }
-    await Product.findByIdAndDelete(req.params.id);
+
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Toggle product active
 app.patch('/api/products/:id/toggle', authMiddleware, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ error: 'Not found' });
+    if (!product) return res.status(404).json({ error: 'Product not found' });
     product.active = !product.active;
-    product.updatedAt = new Date();
     await product.save();
     res.json(product);
   } catch (err) {
@@ -384,13 +386,11 @@ app.patch('/api/products/:id/toggle', authMiddleware, async (req, res) => {
   }
 });
 
-// Toggle best seller
 app.patch('/api/products/:id/best', authMiddleware, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ error: 'Not found' });
+    if (!product) return res.status(404).json({ error: 'Product not found' });
     product.best = !product.best;
-    product.updatedAt = new Date();
     await product.save();
     res.json(product);
   } catch (err) {
@@ -398,7 +398,7 @@ app.patch('/api/products/:id/best', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── IMAGE UPLOAD ───
+// ─── UPLOAD ───
 app.post('/api/upload/product-image', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
@@ -542,8 +542,22 @@ app.post('/api/orders', async (req, res) => {
 
 app.get('/api/orders', authMiddleware, async (req, res) => {
   try {
-    const { status, page = 1, limit = 10 } = req.query;
-    const filter = status && status !== 'all' ? { status } : {};
+    const { status, search, page = 1, limit = 10 } = req.query;
+    let filter = status && status !== 'all' ? { status } : {};
+    
+    // ✅ FIX: যদি search টেক্সট থাকে তাহলে orderNum, customer.name, বা customer.phone সার্চ করবে
+    if (search && search.trim()) {
+      const searchRegex = new RegExp(search.trim(), 'i'); // Case-insensitive search
+      filter = {
+        ...filter,
+        $or: [
+          { orderNum: searchRegex },
+          { 'customer.name': searchRegex },
+          { 'customer.phone': searchRegex }
+        ]
+      };
+    }
+    
     const total = await Order.countDocuments(filter);
     const orders = await Order.find(filter)
       .sort({ createdAt: -1 })
@@ -611,6 +625,7 @@ app.post('/api/hero', authMiddleware, async (req, res) => {
 app.put('/api/hero/:id', authMiddleware, async (req, res) => {
   try {
     const hero = await Hero.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!hero) return res.status(404).json({ error: 'Hero not found' });
     res.json(hero);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -619,8 +634,28 @@ app.put('/api/hero/:id', authMiddleware, async (req, res) => {
 
 app.delete('/api/hero/:id', authMiddleware, async (req, res) => {
   try {
-    await Hero.findByIdAndDelete(req.params.id);
+    const hero = await Hero.findByIdAndDelete(req.params.id);
+    if (!hero) return res.status(404).json({ error: 'Hero not found' });
+    if (hero.imgPublicId) {
+      try {
+        await cloudinary.uploader.destroy(hero.imgPublicId);
+      } catch (err) {
+        console.error('Failed to delete hero image:', err.message);
+      }
+    }
     res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.patch('/api/hero/:id/toggle', authMiddleware, async (req, res) => {
+  try {
+    const hero = await Hero.findById(req.params.id);
+    if (!hero) return res.status(404).json({ error: 'Hero not found' });
+    hero.active = !hero.active;
+    await hero.save();
+    res.json(hero);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -638,47 +673,21 @@ app.get('/api/settings', authMiddleware, async (req, res) => {
   }
 });
 
-app.put('/api/settings', authMiddleware, async (req, res) => {
+app.put('/api/settings/:key', authMiddleware, async (req, res) => {
   try {
-    const updates = req.body;
-    for (const [key, value] of Object.entries(updates)) {
-      await Settings.findOneAndUpdate({ key }, { key, value, updatedAt: new Date() }, { upsert: true });
-    }
-    res.json({ success: true });
+    const { value } = req.body;
+    const setting = await Settings.findOneAndUpdate(
+      { key: req.params.key },
+      { value, updatedAt: new Date() },
+      { upsert: true, new: true }
+    );
+    res.json(setting);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ─── PUBLIC PAGE ENDPOINTS ───
-app.get("/api/pages/about", async (req, res) => {
-  try {
-    const s = await Settings.findOne({ key: "aboutPage" });
-    res.json(s ? s.value : {});
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.get("/api/pages/contact", async (req, res) => {
-  try {
-    const s = await Settings.findOne({ key: "contactPage" });
-    res.json(s ? s.value : {});
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.get("/api/pages/products", async (req, res) => {
-  try {
-    const { cat, page = 1, limit = 24, search } = req.query;
-    const filter = { active: true };
-    if (cat) filter.cat = cat;
-    if (search) filter["$or"] = [{ nm: { "$regex": search, "$options": "i" } }, { sub: { "$regex": search, "$options": "i" } }];
-    const total = await Product.countDocuments(filter);
-    const products = await Product.find(filter).sort({ createdAt: -1 }).skip((parseInt(page) - 1) * parseInt(limit)).limit(parseInt(limit));
-    const cats = await Category.find({ active: true }).sort({ order: 1 });
-    res.json({ products, total, pages: Math.ceil(total / parseInt(limit)), categories: cats });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.get("/api/public/settings", async (req, res) => {
+app.get('/api/public/settings', async (req, res) => {
   try {
     const settings = await Settings.find();
     const obj = {};
@@ -765,43 +774,43 @@ app.post('/api/seed', authMiddleware, async (req, res) => {
         { cat: 'misty', nm: 'সরিষার ফুলের মধু', sub: '१००% খাঁটি এবং আসল মধু', em: '🍯', bg: '#c8a55a', best: true, active: true, phone: '01712345678', desc: 'সরিষার ফুল থেকে সংগৃহীত খাঁটি মধু।', variants: [{ lbl: '०००gm', p: 280, op: 350, disc: '२०%' }, { lbl: '१kg', p: 520, op: 680, disc: '२४%' }], order: 1 },
         { cat: 'misty', nm: 'খেজুরের মধু', sub: 'মিশ্র ফুলের সংমিশ্রণ', em: '🍯', bg: '#8b6914', best: false, active: true, phone: '01712345678', desc: 'খেজুর গাছের ফুল থেকে সংগৃহীত।', variants: [{ lbl: '००००gm', p: 320, op: 400, disc: '२०%' }], order: 2 },
         { cat: 'misty', nm: 'ফুলের মধু মিশ্রণ', sub: 'বহু ফুলের নির্যাস', em: '🌸', bg: '#d4a574', best: false, active: true, phone: '01712345678', variants: [{ lbl: '३००gm', p: 180, op: 250, disc: '२८%' }], order: 3 },
-        { cat: 'misty', nm: 'আম্বাজি মধু', sub: 'স্বর्गीয় স्वाद का मधु', em: '🥭', bg: '#e8b84e', best: false, active: true, phone: '01712345678', variants: [{ lbl: '०२५०gm', p: 200, op: 280, disc: '२८%' }], order: 4 },
-        { cat: 'misty', nm: 'স্থানীয় বন মধু', sub: 'প्राकૃতिक अरण्য from', em: '🌲', bg: '#997744', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 350, op: 500, disc: '३०%' }], order: 5 },
+        { cat: 'misty', nm: 'আম্বাজি মধু', sub: 'স্বর्गীय स्वाद का मधु', em: '🥭', bg: '#e8b84e', best: false, active: true, phone: '01712345678', variants: [{ lbl: '०२५०gm', p: 200, op: 280, disc: '२८%' }], order: 4 },
+        { cat: 'misty', nm: 'স্থানীয় বন মধু', sub: 'प्राकৃतिक अरण्य from', em: '🌲', bg: '#997744', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 350, op: 500, disc: '३०%' }], order: 5 },
 
         // DOI (दोi) - 5
-        { cat: 'doi', nm: 'গ্রामীণ গরুর দই', sub: 'घरे تৈरي खাँति दोi', em: '🥛', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '१ keji', p: 120, op: 150, disc: '२०%' }], order: 1 },
-        { cat: 'doi', nm: 'মিষ্টি মেহেরী দই', sub: 'प्रीमিয়म मानের দोi', em: '🍶', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 70, op: 90, disc: '२२%' }], order: 2 },
+        { cat: 'doi', nm: 'গ্রামীণ গরুর দই', sub: 'घरे تৈरि খাঁति दोi', em: '🥛', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '१ keji', p: 120, op: 150, disc: '२०%' }], order: 1 },
+        { cat: 'doi', nm: 'মিষ্টি মেহেরী দই', sub: 'प्रीमिय्म मानের দোi', em: '🍶', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 70, op: 90, disc: '२२%' }], order: 2 },
         { cat: 'doi', nm: 'ছাগলের দই', sub: 'स्वास्थ्यकर विकल्प', em: '🐐', bg: '#e6d5c8', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 100, op: 140, disc: '२९%' }], order: 3 },
-        { cat: 'doi', nm: 'কুমড়ার দই', sub: 'विশेष স्वाद का दोi', em: '🎃', bg: '#ffa500', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 90, op: 120, disc: '२५%' }], order: 4 },
+        { cat: 'doi', nm: 'কুমড়ার দই', sub: 'विशेष स्वाद का दोi', em: '🎃', bg: '#ffa500', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 90, op: 120, disc: '२५%' }], order: 4 },
         { cat: 'doi', nm: 'স্ট্রবেরি দই', sub: 'फलের सुस्वादु दोi', em: '🍓', bg: '#ffb6c1', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 95, op: 130, disc: '२७%' }], order: 5 },
 
-        // MITHAI (मिತाୟ) - 5
-        { cat: 'mithai', nm: 'সন্দেশ', sub: 'ऐतिहास মিषाई', em: '🍪', bg: '#d4a574', best: true, active: true, phone: '01712345678', variants: [{ lbl: '५टि पिस', p: 150, op: 200, disc: '२५%' }], order: 1 },
-        { cat: 'mithai', nm: 'রসগোল্লা', sub: 'सुस्वादु सादा मिषाई', em: '⚪', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '०५টि पिस', p: 120, op: 160, disc: '२५%' }], order: 2 },
+        // MITHAI (मिତाୟ) - 5
+        { cat: 'mithai', nm: 'সন্দেশ', sub: 'ऐतिहास মिषाई', em: '🍪', bg: '#d4a574', best: true, active: true, phone: '01712345678', variants: [{ lbl: '५टि पिस', p: 150, op: 200, disc: '२५%' }], order: 1 },
+        { cat: 'mithai', nm: 'রসগোল্লা', sub: 'सुस्वादु सादा मिषाई', em: '⚪', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '०५टि पिस', p: 120, op: 160, disc: '२५%' }], order: 2 },
         { cat: 'mithai', nm: 'পায়েস', sub: 'ঐতिহ્যbahi खीर का पायेश्', em: '🥣', bg: '#ffd700', best: false, active: true, phone: '01712345678', variants: [{ lbl: '२००gm', p: 100, op: 140, disc: '२९%' }], order: 3 },
-        { cat: 'mithai', nm: 'গুলাব জামুন', sub: 'मिषाई ভাজар मिષাई', em: '🔴', bg: '#8b4513', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 130, op: 180, disc: '२८%' }], order: 4 },
+        { cat: 'mithai', nm: 'গুলাব জামুন', sub: 'मिषाई ভাজার মिষाই', em: '🔴', bg: '#8b4513', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 130, op: 180, disc: '२८%' }], order: 4 },
         { cat: 'mithai', nm: 'খীর কামান', sub: 'বिशेष खीर का मिषाई', em: '🎀', bg: '#daa520', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 90, op: 130, disc: '३१%' }], order: 5 },
 
-        // TAIL (तैल) - 5
-        { cat: 'tail', nm: 'নারকেল তেল', sub: 'पूरी खाँटि तेल', em: '🥥', bg: '#8b6914', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 250, op: 350, disc: '२९%' }], order: 1 },
+        // TAIL (तैل) - 5
+        { cat: 'tail', nm: 'নারকেল তেল', sub: 'पूरी खाँটि तेल', em: '🥥', bg: '#8b6914', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 250, op: 350, disc: '२९%' }], order: 1 },
         { cat: 'tail', nm: 'তিসি তেল', sub: 'स्वास्थ्य तेल', em: '🌿', bg: '#6b4423', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 180, op: 260, disc: '३१%' }], order: 2 },
         { cat: 'tail', nm: 'সরিষার তেল', sub: 'रसोई का तेल', em: '🌾', bg: '#997744', best: false, active: true, phone: '01712345678', variants: [{ lbl: '१ लiter', p: 320, op: 480, disc: '३३%' }], order: 3 },
         { cat: 'tail', nm: 'জলপাই তেল', sub: 'स्वास्थ्य विकल्प', em: '🫒', bg: '#556b2f', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 320, op: 480, disc: '३३%' }], order: 4 },
         { cat: 'tail', nm: 'সুগন্ধি তেল', sub: 'आयुर्वेदिक मिश्रण', em: '🌸', bg: '#d4a574', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 120, op: 180, disc: '३३%' }], order: 5 },
 
         // BORHANI (बोरहानि) - 5
-        { cat: 'borhani', nm: 'ঘিয়ে বোরহানী', sub: 'ঐতिह্যbahi pिणनiय', em: '🥤', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 80, op: 120, disc: '३३%' }], order: 1 },
-        { cat: 'borhani', nm: 'পুদিনা বোরহানী', sub: 'তাজा पुदиना', em: '🌿', bg: '#e6f5e6', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 60, op: 100, disc: '४०%' }], order: 2 },
+        { cat: 'borhani', nm: 'ঘিয়ে বোরহানী', sub: 'ঐতिह्यbahi pिणनiय', em: '🥤', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 80, op: 120, disc: '३३%' }], order: 1 },
+        { cat: 'borhani', nm: 'পুদিনা বোরহানী', sub: 'তাজা पुदिना', em: '🌿', bg: '#e6f5e6', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 60, op: 100, disc: '४०%' }], order: 2 },
         { cat: 'borhani', nm: 'জিরা বোরহানী', sub: 'पाचन शक्ti', em: '🌾', bg: '#f5deb3', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 70, op: 110, disc: '३६%' }], order: 3 },
         { cat: 'borhani', nm: 'আম্রপালী বোরহানী', sub: 'फल का स्वाद', em: '🥭', bg: '#ffd700', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 90, op: 130, disc: '३१%' }], order: 4 },
         { cat: 'borhani', nm: 'মাল্টি মশলা বোরহানী', sub: 'मसाले का मिश्रण', em: '🌶️', bg: '#ff6347', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 75, op: 120, disc: '३८%' }], order: 5 },
 
         // ROSMALAI (रॉस्मलAই) - 5
         { cat: 'rosmalai', nm: 'খাঁটি রশমালাই', sub: 'छनार मिषाई', em: '🍚', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 200, op: 280, disc: '२९%' }], order: 1 },
-        { cat: 'rosmalai', nm: 'পিস्তা रशमालai', sub: 'शुकno फल', em: '🌰', bg: '#f5deb3', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 280, op: 400, disc: '३०%' }], order: 2 },
+        { cat: 'rosmalai', nm: 'পিস्তा रशमालai', sub: 'शुकno फल', em: '🌰', bg: '#f5deb3', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 280, op: 400, disc: '३०%' }], order: 2 },
         { cat: 'rosmalai', nm: 'গোলাপি রশমালাই', sub: 'गुलाब जल', em: '🌹', bg: '#ffb6c1', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 220, op: 320, disc: '३१%' }], order: 3 },
         { cat: 'rosmalai', nm: 'আখরোট রশমালাই', sub: 'अखरोट शक्ti', em: '🧠', bg: '#daa520', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 240, op: 350, disc: '३१%' }], order: 4 },
-        { cat: 'rosmalai', nm: 'সাদা রশমালাই', sub: 'ঐतिह्य مिषाई', em: '⚪', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 180, op: 250, disc: '२८%' }], order: 5 }
+        { cat: 'rosmalai', nm: 'সাদা রশমালাই', sub: 'ঐতिह्य मिषाई', em: '⚪', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 180, op: 250, disc: '२८%' }], order: 5 }
       ]);
     }
 
@@ -810,9 +819,9 @@ app.post('/api/seed', authMiddleware, async (req, res) => {
     if (heroCount === 0 || force) {
       if (force) await Hero.deleteMany({});
       await Hero.insertMany([
-        { title: 'গ্রामীণ সতেজতা ও স्वাद', subtitle: 'বিशुद्ध গ্রামীণ পণ्य', gradient: 's1', order: 1 },
-        { title: 'বिশुद्ध সरिষার मधु', subtitle: 'प্राकৃতिक মৌমाছি', gradient: 's2', order: 2 },
-        { title: 'তাজা दुध तৈरি दोi', subtitle: 'খाँटि গ्रामीণ ස्वाद', gradient: 's3', order: 3 },
+        { title: 'গ্রামীণ সতেজতা ও स्वाद', subtitle: 'বिशुद्ध গ্রামীণ পণ्य', gradient: 's1', order: 1 },
+        { title: 'बिशुद्ध सरिषार मधु', subtitle: 'प्राকৃতिक মৌমাছি', gradient: 's2', order: 2 },
+        { title: 'তাজা दुध तৈरि दোi', subtitle: 'খাঁটি গ্রামীণ স्वाद', gradient: 's3', order: 3 },
       ]);
     }
 

@@ -484,7 +484,10 @@ textarea.form-control { resize:vertical; min-height:80px; }
 <div id="loginPage">
   <div class="login-box">
     <div class="login-logo">
-      <div class="logo-icon">🏡</div>
+      <div class="logo-icon">
+    <img src="images/logo-g.png" alt="Logo" />
+</div>
+      <div class="logo-txt">গ্রামের<span>আসল মজা 🌿</span></div>
       <h1>আসল গ্রামের মজা</h1>
       <p>Admin Panel — সুরক্ষিত লগইন</p>
     </div>
@@ -510,7 +513,10 @@ textarea.form-control { resize:vertical; min-height:80px; }
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <div class="sl-icon">🏡</div>
+      <div class="logo" onclick="goHome()">
+      <div class="logo-icon">
+    <img src="images/logo-g.png" alt="Logo" />
+</div>
       <div class="sl-text">আসল গ্রামের মজা <span>Admin Panel v2.0</span></div>
     </div>
     <nav class="sidebar-nav">
@@ -1595,6 +1601,10 @@ async function saveProd() {
   const data = { nm, cat, sub:document.getElementById('pSub').value.trim(), em:document.getElementById('pEm').value.trim()||'🛒', bg:document.getElementById('pBg').value.trim(), phone:document.getElementById('pPhone').value.trim(), desc:document.getElementById('pDesc').value.trim(), img:document.getElementById('pImg').value, imgPublicId:document.getElementById('pImgPid').value, imgs:JSON.parse(document.getElementById('pImgs').value||'[]'), imgsPublicIds:JSON.parse(document.getElementById('pImgsPids').value||'[]'), best:document.getElementById('pBest').value==='true', active:document.getElementById('pActive').value==='true', variants, highlights:getHighlights() };
   const id=document.getElementById('prodId').value;
   const btn=document.getElementById('saveProdBtn');
+  
+  // ✅ FIX: প্রতিরোধ করুন ডাবল ক্লিক থেকে
+  if(btn.disabled) return;
+  
   btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...'; btn.disabled=true;
   try {
     if(id) await api('PUT',`/api/products/${id}`,data);
