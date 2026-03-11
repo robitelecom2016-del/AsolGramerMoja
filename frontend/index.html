@@ -337,6 +337,26 @@ body{
 .pcard .c-img{height:200px;}
 .pcard:hover .c-img img{transform:scale(1.07);}
 
+/* ══ ALL PRODUCTS CAT TABS ══ */
+.all-cat-tabs{display:flex;flex-wrap:wrap;gap:0;margin-bottom:14px;border:1px solid var(--border);border-radius:0;overflow:hidden;width:fit-content;}
+.all-cat-tabs button{
+  padding:7px 16px;
+  border:none;
+  border-right:1px solid var(--border);
+  cursor:pointer;
+  font-family:inherit;
+  font-size:.82rem;
+  font-weight:600;
+  border-radius:0 !important;
+  background:#fff;
+  color:#555;
+  transition:background .18s,color .18s;
+  white-space:nowrap;
+}
+.all-cat-tabs button:last-child{border-right:none;}
+.all-cat-tabs button.active-cat{background:var(--gd);color:#fff;}
+.all-cat-tabs button:hover:not(.active-cat){background:#f0f9eb;color:var(--gd);}
+
 /* ══ ALL PRODUCTS GRID (home) ══ */
 .all-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
 .agcard{background:#fff;border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:box-shadow .2s,transform .2s;cursor:pointer;position:relative;}
@@ -355,10 +375,11 @@ body{
 .search-prod-input{padding:8px 36px 8px 14px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:.85rem;width:250px;outline:none;}
 .search-prod-input:focus{border-color:var(--gd);}
 .search-prod-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#888;cursor:pointer;}
-.products-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:20px 0;}
-.prod-card{background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:box-shadow .2s,transform .2s;cursor:pointer;position:relative;}
+.products-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:20px 0;}
+.prod-card{background:#fff;border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:box-shadow .2s,transform .2s;cursor:pointer;position:relative;}
 .prod-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.12);transform:translateY(-2px);}
-.prod-card .c-img{height:180px;}
+.prod-card .c-img{height:200px;}
+.prod-card:hover .c-img img{transform:scale(1.07);}
 .prod-card .c-body{padding:8px 10px 10px;}
 .prod-card .c-name{font-size:.82rem;}
 .prod-pagination{display:flex;justify-content:center;gap:8px;margin:28px 0 10px;flex-wrap:wrap;}
@@ -666,11 +687,10 @@ footer p{font-size:.79rem;line-height:1.7;}
   .order-modal{max-height:95vh;}
 }
 @media(max-width:600px){
-  /* মোবাইলে aspect-ratio override করে বড় height দিই */
   .hero{
     aspect-ratio:unset;
-    height:220px;
-    min-height:220px;
+    height:260px;
+    min-height:260px;
   }
   .hero-ci{padding:0 14px;}
   .hero-ci h1{font-size:1.15rem;margin-bottom:6px;}
@@ -680,11 +700,15 @@ footer p{font-size:.79rem;line-height:1.7;}
   .slide-dots{bottom:9px;}
   .dot{width:6px;height:6px;}
   .dot.active{width:16px;}
+  /* মোবাইলে ক্যাটাগরি ট্যাব লুকানো */
+  .all-cat-tabs{display:none;}
 }
 @media(max-width:480px){
   .cart-sb{width:100%;right:-100%;}
   .pcard{flex:0 0 calc(50% - 5px);width:calc(50% - 5px);margin-right:10px;}
-  .products-grid{grid-template-columns:1fr;}
+  /* পণ্য পেজে মোবাইলে 2 কলাম — হোম পেজের মতো */
+  .products-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .prod-card .c-img{height:calc(50vw - 26px);}
 }
 </style>
 </head>
@@ -841,7 +865,7 @@ footer p{font-size:.79rem;line-height:1.7;}
       <div class="sec-head">
         <h2>📦 সকল পণ্য</h2>
       </div>
-      <div id="allCatTabs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
+      <div id="allCatTabs" class="all-cat-tabs"></div>
       <div class="all-grid" id="allGrid">
         <div class="agcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
         <div class="agcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
@@ -1418,13 +1442,7 @@ function buildAllCatTabs() {
   if (!tabsEl) return;
   const allCats = [{ id: '', lbl: 'সব ক্যাটাগরি', em: '🛒' }, ...cats];
   tabsEl.innerHTML = allCats.map(c => `
-    <button onclick="switchAllCat('${c.id}')" style="
-      padding:6px 14px;border:none;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;border-radius:20px;
-      background:${c.id===allCatFilter?'var(--gd)':'#fff'};
-      color:${c.id===allCatFilter?'#fff':'#555'};
-      border:1.5px solid ${c.id===allCatFilter?'var(--gd)':'var(--border)'};
-      transition:all .2s;white-space:nowrap;
-    ">${c.em} ${c.lbl}</button>`).join('');
+    <button onclick="switchAllCat('${c.id}')" class="${c.id===allCatFilter?'active-cat':''}">${c.em} ${c.lbl}</button>`).join('');
 }
 
 function switchAllCat(catId) {
