@@ -1239,6 +1239,8 @@ function showApp() {
   document.getElementById('appLayout').style.display = 'block';
   loadDashboard(); loadCategoriesForFilter(); checkHealth();
   loadFrontendUrl();
+  // স্বয়ংক্রিয় ডেটা সিড করুন
+  autoSeedDefaultData();
 }
 
 function loadFrontendUrl() {
@@ -2403,43 +2405,218 @@ const SEED_PRODUCTS = [
     variants:[{lbl:'২৫০ গ্রাম (১৫ পিস)',p:120,op:150,disc:'20% ছাড়'},{lbl:'৫০০ গ্রাম (৩০ পিস)',p:220,op:280,disc:'21% ছাড়'}] },
 ];
 
-// ── Bulk Seed function ──
-async function bulkSeedProducts() {
+// ── Auto-seed default data on login ──
+async function autoSeedDefaultData() {
+  try {
+    // চেক করুন কি ইতিমধ্যে সিড হয়েছে
+    const prods = await api('GET','/api/products?limit=1').catch(()=>({total:0}));
+    if (prods.total > 0) return; // ইতিমধ্যে পণ্য আছে, সিড করবেন না
+    
+    // ক্যাটাগরি সিড
+    await autoSeedCategories();
+    
+    // পণ্য সিড
+    setTimeout(() => autoSeedProducts(), 500);
+    
+    // About পেজ সিড
+    await autoSeedAboutPage();
+    
+    // Contact পেজ সিড
+    await autoSeedContactPage();
+  } catch(e) {
+    console.log('Auto-seed skipped:', e.message);
+  }
+}
+
+async function autoSeedCategories() {
+  try {
+    const cats = await api('GET','/api/categories/all').catch(()=>[]);
+    if (cats && cats.length > 0) return;
+    
+    const categories = [
+      { id: 'misty', lbl: 'মিষ্টি', em: '🍯', order: 1, active: true },
+      { id: 'doi', lbl: 'দই', em: '🥛', order: 2, active: true },
+      { id: 'mithai', lbl: 'মিঠাই', em: '🍬', order: 3, active: true },
+      { id: 'tail', lbl: 'তৈল', em: '🌿', order: 4, active: true },
+      { id: 'borhani', lbl: 'বোরহানী', em: '🥤', order: 5, active: true },
+      { id: 'rosmalai', lbl: 'রশমালাই', em: '🍚', order: 6, active: true },
+    ];
+    
+    for (const cat of categories) {
+      await api('POST','/api/categories', cat).catch(()=>{});
+      await new Promise(r=>setTimeout(r,100));
+    }
+  } catch(e) {
+    console.log('Category seed error:', e.message);
+  }
+}
+
+async function autoSeedProducts() {
+  try {
+    const btn = document.getElementById('bulkSeedBtn');
+    if(btn) btn.disabled = true;
+    
+    for (const p of SEED_PRODUCTS) {
+      try {
+        await api('POST','/api/products', {
+          nm: p.nm, cat: p.cat, sub: p.sub, em: p.em, bg: p.bg,
+          phone: p.phone, desc: p.desc, highlights: p.highlights,
+          variants: p.variants, best: p.best, active: p.active,
+          order: p.order, img:'', imgPublicId:'', imgs:[], imgsPublicIds:[]
+        });
+      } catch(e) {
+        // পণ্য ইতিমধ্যে থাকতে পারে, সাইলেন্টলি স্কিপ করুন
+      }
+      await new Promise(r=>setTimeout(r,50));
+    }
+    
+    if(btn) btn.disabled = false;
+    loadProducts();
+  } catch(e) {
+    console.log('Product seed error:', e.message);
+  }
+}
+
+async function autoSeedAboutPage() {
+  try {
+    const s = await api('GET','/api/settings').catch(()=>({}));
+    if (s.aboutPage && s.aboutPage.content) return; // ইতিমধ্যে সেট আছে
+    
+    const aboutPage = {
+      title: 'আমাদের সম্পর্কে',
+      tagline: 'গ্রামীণ পণ্যের বিশ্বস্ত সরবরাহকারী',
+      content: 'আসল গ্রামের মজা একটি বিশ্বস্ত ব্র্যান্ড যা গ্রামীণ এলাকা থেকে সরাসরি সর্বোচ্চ মানের পণ্য সংগ্রহ করে। আমরা বিশ্বাস করি সত্যিকারের খাঁটি পণ্য প্রতিটি পরিবারের জন্য গুরুত্বপূর্ণ।',
+      mission: 'আমাদের লক্ষ্য হল গ্রামের শিল্পীদের সাথে সরাসরি কাজ করে শহরের মানুষের কাছে খাঁটি পণ্য পৌঁছে দেওয়া।',
+      vision: 'একটি সুস্থ এবং টেকসই খাদ্য সিস্টেম তৈরি করা যেখানে গ্রামের উৎপাদকরা যথাযথ মূল্য পান।',
+      bannerUrl: '',
+      active: true,
+      stats: [
+        { label: 'বছরের অভিজ্ঞতা', value: '৫+' },
+        { label: 'সন্তুষ্ট গ্রাহক', value: '১০০০+' },
+        { label: 'পণ্যের ধরন', value: '৬০+' }
+      ]
+    };
+    
+    await api('PUT','/api/settings', {aboutPage}).catch(()=>{});
+  } catch(e) {
+    console.log('About page seed error:', e.message);
+  }
+}
+
+async function autoSeedContactPage() {
+  try {
+    const s = await api('GET','/api/settings').catch(()=>({}));
+    if (s.contactPage && s.contactPage.phone1) return; // ইতিমধ্যে সেট আছে
+    
+    const contactPage = {
+      title: 'যোগাযোগ করুন',
+      subtitle: 'আমরা আপনার প্রশ্ন এবং পরামর্শের জন্য সবসময় প্রস্তুত',
+      phone1: '+8801712345678',
+      phone2: '+8801912345678',
+      email: 'info@asolgramermoja.com',
+      hours: 'সকাল ০৯:০০ - রাত ১০:০০ (প্রতিদিন)',
+      address: 'সাভার, ঢাকা বিভাগ, বাংলাদেশ',
+      fb: 'https://facebook.com/asolgramermoja',
+      ig: 'https://instagram.com/asolgramermoja',
+      whatsapp: '8801712345678',
+      mapUrl: '',
+      active: true,
+      faqs: [
+        { q: 'আপনাদের পণ্য কি খাঁটি?', a: 'হ্যাঁ, আমাদের সকল পণ্য সরাসরি গ্রামীণ উৎস থেকে সংগ্রহ করা হয়। আমরা কোনো মিশ্রন বা কৃত্রিম উপাদান ব্যবহার করি না।' },
+        { q: 'ডেলিভারি কত সময় লাগে?', a: 'ঢাকার মধ্যে ২৪ ঘন্টায় এবং বাইরে ৪৮-৭২ ঘন্টায় ডেলিভারি দেওয়া হয়।' },
+        { q: 'পণ্য ফেরত দিতে পারব?', a: 'পণ্য গ্রহণের ৭ দিনের মধ্যে কোনো প্রশ্ন ছাড়াই ফেরত দিতে পারবেন।' },
+        { q: 'কোনো ছাড় বা অফার আছে?', a: 'নিয়মিত গ্রাহকদের জন্য বিশেষ ছাড় এবং সিজনাল অফার থাকে। আমাদের WhatsApp চ্যানেল ফলো করুন সর্বশেষ খবরের জন্য।' }
+      ]
+    };
+    
+    await api('PUT','/api/settings', {contactPage}).catch(()=>{});
+  } catch(e) {
+    console.log('Contact page seed error:', e.message);
+  }
+}
+
+
+  async function seedProducts() {
   const cats = await api('GET','/api/categories/all').catch(()=>[]);
-  if (!cats.length) { toast('আগে ক্যাটাগরি সিড করুন','error'); return; }
+  if (!cats.length) { 
+    toast('আগে ক্যাটাগরি সিড করুন','error'); 
+    return; 
+  }
+
   const catIds = cats.map(c=>c.id);
-  const missing = [...new Set(SEED_PRODUCTS.map(p=>p.cat))].filter(c=>!catIds.includes(c));
-  if (missing.length) { toast(`ক্যাটাগরি নেই: ${missing.join(', ')} — আগে Seed Data করুন`,'error'); return; }
+  const missing = [...new Set(SEED_PRODUCTS.map(p=>p.cat))]
+    .filter(c=>!catIds.includes(c));
 
-  const existing = await api('GET','/api/products?active=all&limit=200').catch(()=>({products:[]}));
-  const existNames = (existing.products||[]).map(p=>p.nm);
+  if (missing.length) { 
+    toast(`ক্যাটাগরি নেই: ${missing.join(', ')} — আগে Seed Data করুন`,'error'); 
+    return; 
+  }
 
-  showConfirm('🌱','৩০টি পণ্য সব field সহ যোগ করবেন?',
+  const existing = await api('GET','/api/products?active=all&limit=200')
+    .catch(()=>({products:[]}));
+
+  const existNames = (existing.products || []).map(p=>p.nm);
+
+  showConfirm(
+    '🌱',
+    '৩০টি পণ্য সব field সহ যোগ করবেন?',
     'ইতিমধ্যে থাকা পণ্যগুলো skip হবে।',
     async () => {
-      let added=0, skipped=0, failed=0;
+
+      let added = 0, skipped = 0, failed = 0;
+
       const btn = document.getElementById('bulkSeedBtn');
-      if(btn){ btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> যোগ হচ্ছে...'; }
+      if(btn){
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> যোগ হচ্ছে...';
+      }
+
       for (const p of SEED_PRODUCTS) {
-        if (existNames.includes(p.nm)) { skipped++; continue; }
+
+        if (existNames.includes(p.nm)) { 
+          skipped++; 
+          continue; 
+        }
+
         try {
           await api('POST','/api/products', {
-            nm: p.nm, cat: p.cat, sub: p.sub, em: p.em, bg: p.bg,
-            phone: p.phone, desc: p.desc, highlights: p.highlights,
-            variants: p.variants, best: p.best, active: p.active,
-            order: p.order, img:'', imgPublicId:'', imgs:[], imgsPublicIds:[]
+            nm: p.nm,
+            cat: p.cat,
+            sub: p.sub,
+            em: p.em,
+            bg: p.bg,
+            phone: p.phone,
+            desc: p.desc,
+            highlights: p.highlights,
+            variants: p.variants,
+            best: p.best,
+            active: p.active,
+            order: p.order,
+            img:'',
+            imgPublicId:'',
+            imgs:[],
+            imgsPublicIds:[]
           });
+
           added++;
-        } catch { failed++; }
-        await new Promise(r=>setTimeout(r,80)); // throttle
+
+        } catch (err) {
+          failed++;
+        }
+
+        await new Promise(r => setTimeout(r, 80)); // throttle
       }
-      if(btn){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-seedling"></i> পণ্য Seed'; }
+
+      if(btn){
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-seedling"></i> পণ্য Seed';
+      }
+
       toast(`✅ ${added}টি যোগ, ${skipped}টি skip, ${failed}টি ব্যর্থ`,'success');
       loadProducts();
     }
   );
 }
-
 function statusBadge(status) {
   const map={pending:'yellow',confirmed:'blue',processing:'purple',shipped:'orange',delivered:'green',cancelled:'red'};
   const lbl={pending:'⏳ Pending',confirmed:'✅ Confirmed',processing:'⚙️ Processing',shipped:'🚚 Shipped',delivered:'🎉 Delivered',cancelled:'❌ Cancelled'};
