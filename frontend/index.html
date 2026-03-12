@@ -2039,6 +2039,13 @@ function openOrderModal() {
   document.getElementById('omMainContent').style.display = 'block';
   document.getElementById('omSuccess').classList.remove('show');
   
+  // অগ্রীম ডেলিভারি চার্জ যাচাই
+  const advanceChargeCats = ['misty', 'doi', 'borhani', 'rosmalai'];
+  const hasAdvanceChargeProduct = items.some(item => {
+    const product = allProducts.find(p => p._id === item._id);
+    return product && advanceChargeCats.includes(product.cat);
+  });
+  
   const subtotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
   document.getElementById('omItems').innerHTML = items.map(i => `
     <div class="om-item">
@@ -2046,6 +2053,27 @@ function openOrderModal() {
       <div class="om-item-info"><div class="om-item-nm">${i.nm}</div><div class="om-item-var">${i.varLabel} × ${i.qty}</div></div>
       <div class="om-item-price">৳${(i.cartPrice * i.qty).toLocaleString('en')}</div>
     </div>`).join('');
+  
+  // অগ্রীম চার্জ সম্পর্কে নোটিস
+  let noticeHtml = '';
+  if (hasAdvanceChargeProduct) {
+    noticeHtml = `<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:6px;padding:12px;margin-bottom:12px;font-size:.85rem;color:#856404;">
+      <i class="fa-solid fa-info-circle"></i> <strong>নোটিস:</strong> আপনার অর্ডারে বিশেষ পণ্য রয়েছে। অগ্রীম ডেলিভারি চার্জ <strong>৳50</strong> যোগ হবে।
+    </div>`;
+  }
+  
+  const itemsContainer = document.getElementById('omItems');
+  if (itemsContainer.parentElement) {
+    const noticeContainer = itemsContainer.parentElement.querySelector('[data-advance-notice]');
+    if (noticeContainer) {
+      noticeContainer.innerHTML = noticeHtml;
+    } else {
+      const newNotice = document.createElement('div');
+      newNotice.setAttribute('data-advance-notice', 'true');
+      newNotice.innerHTML = noticeHtml;
+      itemsContainer.parentElement.insertBefore(newNotice, itemsContainer);
+    }
+  }
   
   document.getElementById('omSubtotal').textContent = '৳' + subtotal.toLocaleString('en');
   document.getElementById('omSubtotal2').textContent = '৳' + subtotal.toLocaleString('en');
@@ -2069,14 +2097,36 @@ function closeOrderModal() {
 }
 
 function selectDelivery(charge, optId, type) {
-  selectedDelivery = charge;
+  // অগ্রীম ডেলিভারি চার্জ যুক্ত করার ক্যাটাগরি
+  const advanceChargeCats = ['misty', 'doi', 'borhani', 'rosmalai'];
+  
+  // চেক করুন কার্টে এই ক্যাটাগরির কোনো প্রোডাক্ট আছে কিনা
+  const items = Object.values(cart);
+  const hasAdvanceChargeProduct = items.some(item => {
+    const product = allProducts.find(p => p._id === item._id);
+    return product && advanceChargeCats.includes(product.cat);
+  });
+  
+  // অগ্রীম চার্জ (যদি প্রযোজ্য হয়)
+  const advanceCharge = hasAdvanceChargeProduct ? 50 : 0;
+  const totalDeliveryCharge = charge + advanceCharge;
+  
+  selectedDelivery = totalDeliveryCharge;
   selectedDeliveryType = type;
   document.querySelectorAll('.om-del-opt').forEach(o => o.classList.remove('selected'));
   document.getElementById(optId).classList.add('selected');
-  const subtotal = Object.values(cart).reduce((s, i) => s + i.cartPrice * i.qty, 0);
-  const grand = subtotal + charge;
-  document.getElementById('omDeliveryDisplay').textContent = '৳' + charge;
-  document.getElementById('omDelivery2').textContent = '৳' + charge;
+  
+  const subtotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
+  const grand = subtotal + totalDeliveryCharge;
+  
+  // ডেলিভারি চার্জ ডিসপ্লে
+  let deliveryDisplay = '৳' + charge;
+  if (advanceCharge > 0) {
+    deliveryDisplay = '৳' + charge + ' + ৳' + advanceCharge + ' (অগ্রীম) = ৳' + totalDeliveryCharge;
+  }
+  
+  document.getElementById('omDeliveryDisplay').textContent = deliveryDisplay;
+  document.getElementById('omDelivery2').textContent = deliveryDisplay;
   document.getElementById('omGrandTotal').textContent = '৳' + grand.toLocaleString('en');
   document.getElementById('omGrand2').textContent = '৳' + grand.toLocaleString('en');
   document.getElementById('omSubmitTotal').textContent = '৳' + grand.toLocaleString('en');
@@ -2095,7 +2145,16 @@ async function submitOrder() {
 
   const items = Object.values(cart);
   const subtotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
-  const total = subtotal + selectedDelivery;
+  
+  // অগ্রীম ডেলিভারি চার্জ যুক্ত করার ক্যাটাগরি
+  const advanceChargeCats = ['misty', 'doi', 'borhani', 'rosmalai'];
+  const hasAdvanceChargeProduct = items.some(item => {
+    const product = allProducts.find(p => p._id === item._id);
+    return product && advanceChargeCats.includes(product.cat);
+  });
+  
+  const advanceCharge = hasAdvanceChargeProduct ? 50 : 0;
+  const total = subtotal + selectedDelivery + advanceCharge;
 
   const btn = document.getElementById('omSubmitBtn');
   btn.disabled = true;
@@ -2104,7 +2163,7 @@ async function submitOrder() {
   const orderData = {
     items: items.map(i => ({ productId: i._id || i.id, nm: i.nm, varLabel: i.varLabel, qty: i.qty, cartPrice: i.cartPrice, em: i.em, img: i.img || '' })),
     customer: { name, phone, address, note },
-    delivery: { type: selectedDeliveryType, charge: selectedDelivery },
+    delivery: { type: selectedDeliveryType, charge: selectedDelivery, advanceCharge: advanceCharge },
     subtotal, total,
   };
 

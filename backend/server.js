@@ -147,6 +147,7 @@ const orderSchema = new mongoose.Schema({
   delivery: {
     type: { type: String },
     charge: Number,
+    advanceCharge: { type: Number, default: 0 },
   },
   subtotal: Number,
   total: Number,
