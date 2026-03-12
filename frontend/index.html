@@ -1054,12 +1054,6 @@ footer p{font-size:.79rem;line-height:1.7;}
       <div class="sec-head">
         <h2>📦 সকল পণ্য</h2>
       </div>
-      <div style="padding:0 16px;margin-bottom:16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
-        <div style="flex:1;min-width:200px;display:flex;gap:8px;">
-          <input type="text" id="homeSearchInput" placeholder="পণ্যের নাম লিখুন..." style="flex:1;padding:10px 14px;border-radius:20px;border:2px solid var(--border);font-family:inherit;font-size:.9rem;outline:none;transition:border-color .2s;" onkeyup="handleHomeSearch()">
-          <button onclick="searchHomeProducts()" style="padding:10px 16px;background:var(--gd);color:#fff;border:none;border-radius:20px;cursor:pointer;font-family:inherit;font-weight:600;transition:background .2s;" onmouseover="this.style.background='var(--gm)'" onmouseout="this.style.background='var(--gd)'"><i class="fa-solid fa-magnifying-glass"></i> সার্চ</button>
-        </div>
-      </div>
       <div id="allCatTabs" class="all-cat-tabs"></div>
       <div class="all-grid" id="allGrid">
         <div class="agcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
@@ -1094,8 +1088,8 @@ footer p{font-size:.79rem;line-height:1.7;}
           <option value="">সব ক্যাটাগরি</option>
         </select>
         <div class="search-prod-wrap">
-          <input type="text" class="search-prod-input" id="prodSearchInput" placeholder="পণ্যের নাম লিখুন..." onkeyup="handleProdSearch()">
-          <button class="search-prod-btn" id="searchProdBtn" onclick="loadProductsPage(1)"><i class="fa-solid fa-magnifying-glass"></i></button>
+          <input type="text" class="search-prod-input" id="prodSearchInput" placeholder="পণ্যের নাম লিখুন..." onkeyup="if(event.key==='Enter') loadProductsPage(1)">
+          <button class="search-prod-btn" onclick="loadProductsPage(1)"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
       </div>
     </div>
@@ -1686,8 +1680,6 @@ function buildAllCatTabs() {
 function switchAllCat(catId) {
   allCatFilter = catId;
   buildAllCatTabs();
-  const homeSearch = document.getElementById('homeSearchInput');
-  if (homeSearch) homeSearch.value = '';
   renderAll();
 }
 
@@ -1695,45 +1687,6 @@ function renderAll() {
   const active = prods.filter(p => p.active !== false && (allCatFilter === '' || p.cat === allCatFilter));
   if (!active.length) { document.getElementById('allGrid').innerHTML = '<div style="grid-column:1/-1;padding:30px;text-align:center;color:#aaa">কোনো পণ্য পাওয়া যায়নি</div>'; return; }
   document.getElementById('allGrid').innerHTML = active.map(allCard).join('');
-}
-
-let homeSearchTimeout = null;
-
-function handleHomeSearch() {
-  const input = document.getElementById('homeSearchInput');
-  if (!input) return;
-  
-  if (homeSearchTimeout) clearTimeout(homeSearchTimeout);
-  
-  homeSearchTimeout = setTimeout(() => {
-    searchHomeProducts();
-  }, 300);
-}
-
-function searchHomeProducts() {
-  const input = document.getElementById('homeSearchInput');
-  if (!input) return;
-  
-  const query = input.value.trim().toLowerCase();
-  const grid = document.getElementById('allGrid');
-  
-  if (!query) {
-    renderAll();
-    return;
-  }
-  
-  const filtered = prods.filter(p => 
-    p.active !== false && 
-    (allCatFilter === '' || p.cat === allCatFilter) &&
-    (p.nm?.toLowerCase().includes(query) || p.sub?.toLowerCase().includes(query))
-  );
-  
-  if (!filtered.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:#aaa"><i class="fa-solid fa-search" style="font-size:2rem;display:block;margin-bottom:8px"></i>কোনো পণ্য পাওয়া যায়নি</div>';
-    return;
-  }
-  
-  grid.innerHTML = filtered.map(allCard).join('');
 }
 
 /* ════ CAT SCROLL BAR ════ */
@@ -2175,30 +2128,7 @@ async function submitOrder() {
   }
 }
 
-let prodSearchTimeout = null;
-
 /* ════ PRODUCTS PAGE ════ */
-function handleProdSearch() {
-  const searchInput = document.getElementById('prodSearchInput');
-  const searchBtn = document.getElementById('searchProdBtn');
-  
-  // পূর্ববর্তী সার্চ cancel করা
-  if (prodSearchTimeout) clearTimeout(prodSearchTimeout);
-  
-  // বাটনে loading ইঙ্গিত দিতে রং পরিবর্তন
-  if (searchInput.value.trim()) {
-    searchBtn.style.color = 'var(--gm)';
-  } else {
-    searchBtn.style.color = '';
-  }
-  
-  // ৩০০ms পর সার্চ করা (user typing থামার জন্য অপেক্ষা)
-  prodSearchTimeout = setTimeout(() => {
-    loadProductsPage(1);
-    searchBtn.style.color = '';
-  }, 300);
-}
-
 async function loadProductsPage(page) {
   prodPage = page;
   prodCatFilter = document.getElementById('prodCatFilter').value;

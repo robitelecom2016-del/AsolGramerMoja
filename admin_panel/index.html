@@ -727,7 +727,7 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="filters-bar">
         <div class="search-wrap">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" class="search-input" id="prodSearch" placeholder="পণ্য খুঁজুন..." oninput="filterProds()">
+          <input type="text" class="search-input" id="prodSearch" placeholder="পণ্য খুঁজুন..." oninput="debouncedSearch()">
         </div>
         <select class="select-filter" id="prodCatFilter" onchange="filterProds()">
           <option value="">সব ক্যাটাগরি</option>
@@ -1479,7 +1479,7 @@ async function loadCategoriesForFilter() {
 }
 
 async function loadProducts() {
-  const search = document.getElementById('prodSearch').value;
+  const search = document.getElementById('prodSearch').value.trim();
   const cat = document.getElementById('prodCatFilter').value;
   const active = document.getElementById('prodActiveFilter').value;
   const best = document.getElementById('prodBestFilter').value;
@@ -1490,12 +1490,19 @@ async function loadProducts() {
     if (cat) url += `&cat=${encodeURIComponent(cat)}`;
     if (active) url += `&active=${active}`;
     if (best) url += `&best=${best}`;
+    // ✅ সার্চ প্যারামিটার সার্ভারে পাঠানো হচ্ছে
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    
     const res = await api('GET', url);
     allProds = res.products;
     let filtered = allProds;
-    if (search) filtered = allProds.filter(p => p.nm.includes(search) || p.sub?.includes(search));
-    document.getElementById('prodCount').textContent = `${filtered.length} পণ্য`;
-    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>কোনো পণ্য নেই</h3></div></td></tr>'; return; }
+    
+    document.getElementById('prodCount').textContent = `${res.total} পণ্য`;
+    if (!filtered.length) { 
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>কোনো পণ্য পাওয়া যায়নি</h3></div></td></tr>'; 
+      renderPagination('prodPagination', res.total, 15, prodPage, (pg) => { prodPage=pg; loadProducts(); });
+      return; 
+    }
     tbody.innerHTML = filtered.map((p,i) => {
       const bp = p.variants?.[0]?.p || 0;
       const bo = p.variants?.[0]?.op;
@@ -1520,6 +1527,15 @@ async function loadProducts() {
 }
 
 function filterProds() { prodPage=1; loadProducts(); }
+
+// ✅ Debounced সার্চ - দ্রুত টাইপিং এর সময় API কল কমায়
+let searchTimeout;
+function debouncedSearch() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    filterProds();
+  }, 400); // ৪০০ ms পর সার্চ করবে
+}
 
 const COMMON_EMOJIS = ['🍯','🥛','🧈','🐟','🥩','🥚','🌾','🍚','🌶️','🧄','🍌','🥭','🍊','🍎','🫐','🥦','🥕','🧅','🍞','🍪','🍰','🍫','🍬','🍭','☕','🧃','🧴','🌿','🌻','🏡','📦','🎁'];
 
