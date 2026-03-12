@@ -1088,8 +1088,8 @@ footer p{font-size:.79rem;line-height:1.7;}
           <option value="">সব ক্যাটাগরি</option>
         </select>
         <div class="search-prod-wrap">
-          <input type="text" class="search-prod-input" id="prodSearchInput" placeholder="পণ্যের নাম লিখুন..." onkeyup="if(event.key==='Enter') loadProductsPage(1)">
-          <button class="search-prod-btn" onclick="loadProductsPage(1)"><i class="fa-solid fa-magnifying-glass"></i></button>
+          <input type="text" class="search-prod-input" id="prodSearchInput" placeholder="পণ্যের নাম লিখুন..." onkeyup="handleProdSearch()">
+          <button class="search-prod-btn" id="searchProdBtn" onclick="loadProductsPage(1)"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
       </div>
     </div>
@@ -2128,7 +2128,30 @@ async function submitOrder() {
   }
 }
 
+let prodSearchTimeout = null;
+
 /* ════ PRODUCTS PAGE ════ */
+function handleProdSearch() {
+  const searchInput = document.getElementById('prodSearchInput');
+  const searchBtn = document.getElementById('searchProdBtn');
+  
+  // পূর্ববর্তী সার্চ cancel করা
+  if (prodSearchTimeout) clearTimeout(prodSearchTimeout);
+  
+  // বাটনে loading ইঙ্গিত দিতে রং পরিবর্তন
+  if (searchInput.value.trim()) {
+    searchBtn.style.color = 'var(--gm)';
+  } else {
+    searchBtn.style.color = '';
+  }
+  
+  // ৩০০ms পর সার্চ করা (user typing থামার জন্য অপেক্ষা)
+  prodSearchTimeout = setTimeout(() => {
+    loadProductsPage(1);
+    searchBtn.style.color = '';
+  }, 300);
+}
+
 async function loadProductsPage(page) {
   prodPage = page;
   prodCatFilter = document.getElementById('prodCatFilter').value;
