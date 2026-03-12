@@ -29,14 +29,47 @@ body{
 ::-webkit-scrollbar-track{background:#f0ede6;}
 ::-webkit-scrollbar-thumb{background:#c8c0b0;border-radius:3px;}
 
-/* ══ NAVBAR ══ */
+/* ══════════════════════════════════════
+   DESKTOP NAVBAR
+══════════════════════════════════════ */
 .navbar{background:var(--gd);position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,.3);}
 .nb{max-width:var(--mw);margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:14px;height:62px;}
 .nb-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0;cursor:pointer;}
 .logo-icon{width:38px;height:38px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:18px;}
-.logo-txt{color:#fff;font-size:.95rem;font-weight:700;line-height:1.2;}
-.logo-txt span{display:block;color:#b8e67a;font-size:.78rem;}
+.logo-txt{
+  display:inline-table; /* shrink-to-content */
+  color:#fff;
+}
+.logo-txt .lt-main{
+  display:block;
+  font-size:1.22rem;
+  font-weight:700;
+  white-space:nowrap;
+  line-height:1.15;
+  color:#fff;
+  margin:0;padding:0;
+}
+.logo-txt .lt-sub{
+  display:block;
+  font-size:.59rem;
+  font-weight:400;
+  color:#b8e67a;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+  margin:0;padding:0;
+  opacity:.88;
+  letter-spacing:.05px;
+  line-height:1.2;
+}
+.logo-txt span{
+  display:block;font-size:.59rem;font-weight:400;
+  color:#b8e67a;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:100%;
+  margin:0;padding:0;
+}
 .nav-links{display:flex;align-items:center;list-style:none;flex-shrink:0;}
 .nav-links a{color:#d4f0b0;text-decoration:none;font-size:.88rem;padding:0 13px;border-right:1px solid rgba(255,255,255,.15);cursor:pointer;}
 .nav-links li:last-child a{border-right:none;}
@@ -46,30 +79,264 @@ body{
 .search-input::placeholder{color:rgba(255,255,255,.6);}
 .search-input:focus{background:rgba(255,255,255,.25);}
 .search-icon-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.75);font-size:.9rem;cursor:pointer;background:none;border:none;padding:4px;}
-.mob-search-btn{display:none;background:none;border:none;color:#d4f0b0;font-size:1.1rem;cursor:pointer;padding:6px;}
-.mob-search-btn:hover{color:#fff;}
-.mob-menu-btn{display:none;background:none;border:none;color:#d4f0b0;font-size:1.15rem;cursor:pointer;padding:6px;}
-.mob-menu-btn:hover{color:#fff;}
+.cart-btn{background:var(--or);color:#fff;border:none;padding:8px 15px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:.87rem;display:flex;align-items:center;gap:6px;transition:background .2s;flex-shrink:0;white-space:nowrap;}
+.cart-btn:hover{background:var(--orl);}
+.cart-count{background:#fff;color:var(--or);border-radius:50%;width:17px;height:17px;font-size:.65rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
+
+/* ══════════════════════════════════════
+   MOBILE HEADER — ক্লিন মিনিমাল
+══════════════════════════════════════ */
+.mob-header{
+  display:none;
+  position:sticky;top:0;z-index:1000;
+  background:var(--gd);
+  box-shadow:0 2px 8px rgba(0,0,0,.28);
+}
+.mob-header-inner{
+  display:flex;align-items:center;
+  padding:0 14px;height:58px;gap:10px;
+}
+.mob-logo-block{
+  display:flex;align-items:center;gap:10px;
+  cursor:pointer;flex:1;min-width:0;
+  -webkit-tap-highlight-color:transparent;
+}
+.mob-logo-icon{
+  width:36px;height:36px;border-radius:9px;
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;
+}
+.mob-logo-icon img{width:26px;height:26px;object-fit:contain;}
+/* subtitle সবসময় title width-এ সীমাবদ্ধ */
+.mob-logo-text{display:inline-table;} /* shrink-to-fit */
+.mob-logo-name{
+  display:block;color:#fff;font-size:1.22rem;font-weight:700;
+  white-space:nowrap;line-height:1.15;
+  margin:0;padding:0;
+}
+.mob-logo-sub{
+  display:block;color:#b8e67a;font-size:.6rem;font-weight:400;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:100%;margin:0;padding:0;opacity:.88;
+  line-height:1.2;
+}
+.mob-header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+/* সার্চ বাটন */
+.mob-search-pill{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);
+  color:#fff;font-size:.88rem;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:background .15s;
+}
+.mob-search-pill:active{background:rgba(255,255,255,.25);}
+/* কার্ট বাটন */
+.mob-cart-pill{
+  position:relative;
+  display:flex;align-items:center;gap:5px;
+  padding:7px 12px 7px 10px;
+  background:var(--or);border:none;border-radius:20px;
+  color:#fff;font-family:inherit;font-size:.8rem;font-weight:700;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  box-shadow:0 2px 8px rgba(232,102,10,.35);
+  transition:background .15s;white-space:nowrap;
+}
+.mob-cart-pill i{font-size:.85rem;}
+.mob-cart-pill:active{background:var(--orl);}
+.mob-cart-badge{
+  background:#fff;color:var(--or);
+  border-radius:50%;width:17px;height:17px;
+  font-size:.6rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ══ মোবাইল সার্চ ওভারলে ══ */
+.mob-search-overlay{
+  position:fixed;
+  inset:0;
+  z-index:2500;
+  background:rgba(0,0,0,.5);
+  backdrop-filter:blur(4px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s;
+  display:flex;
+  flex-direction:column;
+  padding-top:0;
+}
+.mob-search-overlay.open{opacity:1;pointer-events:all;}
+.mob-search-box{
+  background:var(--gd);
+  padding:14px 14px 10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  transform:translateY(-100%);
+  transition:transform .28s ease;
+}
+.mob-search-overlay.open .mob-search-box{transform:translateY(0);}
+.mob-s-input{
+  flex:1;
+  padding:10px 16px;
+  border-radius:24px;
+  border:none;
+  background:rgba(255,255,255,.18);
+  color:#fff;
+  font-family:inherit;
+  font-size:.9rem;
+  outline:none;
+}
+.mob-s-input::placeholder{color:rgba(255,255,255,.6);}
+.mob-s-input:focus{background:rgba(255,255,255,.28);}
+.mob-s-close{
+  background:none;
+  border:none;
+  color:#fff;
+  font-size:1.1rem;
+  cursor:pointer;
+  width:36px;
+  height:36px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  flex-shrink:0;
+}
+.mob-search-results{
+  background:#fff;
+  flex:1;
+  overflow-y:auto;
+  max-height:60vh;
+  margin:0 12px;
+  border-radius:0 0 12px 12px;
+  box-shadow:0 8px 30px rgba(0,0,0,.2);
+  transform:translateY(-20px);
+  opacity:0;
+  transition:all .28s ease .1s;
+}
+.mob-search-overlay.open .mob-search-results{transform:translateY(0);opacity:1;}
+
+/* ══════════════════════════════════════
+   BOTTOM NAVIGATION BAR (মোবাইল)
+══════════════════════════════════════ */
+.bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  z-index:999;
+  background:#ffffff;
+  border-top:1px solid #ddd;
+  box-shadow:0 -2px 12px rgba(0,0,0,.08);
+  height:64px;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.bottom-nav-inner{
+  display:flex;align-items:stretch;height:100%;
+}
+/* ── সাধারণ ট্যাব ── */
+.bnav-item{
+  flex:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;cursor:pointer;position:relative;
+  border:none;background:none;font-family:inherit;
+  color:#bbb;
+  transition:color .18s;
+  padding:8px 4px 6px;
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+  overflow:hidden;
+}
+/* tap ripple */
+.bnav-item::after{
+  content:'';position:absolute;inset:0;
+  background:var(--gd);opacity:0;
+  transition:opacity .15s;
+}
+.bnav-item:active::after{opacity:.06;}
+.bnav-item.active{color:var(--gd);}
+/* active top bar */
+.bnav-item.active::before{
+  content:'';
+  position:absolute;top:0;left:50%;
+  transform:translateX(-50%);
+  width:24px;height:3px;
+  background:var(--gd);
+  border-radius:0 0 3px 3px;
+}
+.bnav-icon{
+  font-size:1.15rem;line-height:1;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+}
+.bnav-item.active .bnav-icon{
+  transform:translateY(-2px) scale(1.1);
+}
+.bnav-label{
+  font-size:.62rem;font-weight:600;
+  white-space:nowrap;line-height:1;
+}
+/* ── কার্ট — মাঝে ফ্লোটিং বাটন ── */
+.bnav-cart-col{
+  flex:1.2;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  cursor:pointer;position:relative;
+  border:none;background:none;font-family:inherit;
+  padding:0 4px 6px;
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+}
+/* উপরে উঠে আসা circle */
+.bnav-cart-wrap{
+  width:50px;height:50px;border-radius:50%;
+  background:var(--gd);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.2rem;
+  border:3px solid #f0ede6;
+  box-shadow:0 4px 16px rgba(45,90,39,.4);
+  margin-top:-16px;
+  position:relative;
+  transition:transform .18s,box-shadow .18s;
+}
+.bnav-cart-col:active .bnav-cart-wrap{
+  transform:scale(.9);
+  box-shadow:0 2px 8px rgba(45,90,39,.3);
+}
+.bnav-badge{
+  position:absolute;top:-1px;right:-1px;
+  background:var(--or);color:#fff;
+  border-radius:50%;width:17px;height:17px;
+  font-size:.6rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid #f0ede6;
+}
+.bnav-cart-label{
+  font-size:.62rem;font-weight:600;color:#999;
+  line-height:1;margin-top:4px;
+}
+
+
+
+/* ══ MOBILE NAV DRAWER ══ */
 .mob-nav-drawer{display:none;position:fixed;inset:0;z-index:1500;}
 .mob-nav-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);}
-.mob-nav-panel{position:absolute;left:0;top:0;width:260px;height:100%;background:var(--gd);display:flex;flex-direction:column;box-shadow:4px 0 20px rgba(0,0,0,.3);transform:translateX(-100%);transition:transform .3s ease;}
+.mob-nav-panel{position:absolute;left:0;top:0;width:280px;height:100%;background:var(--gd);display:flex;flex-direction:column;box-shadow:4px 0 20px rgba(0,0,0,.3);transform:translateX(-100%);transition:transform .3s ease;}
 .mob-nav-drawer.open{display:block;}
 .mob-nav-drawer.open .mob-nav-panel{transform:translateX(0);}
-.mob-nav-header{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:space-between;}
-.mob-nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
-.mob-nav-close{background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
-.mob-nav-close:hover{background:rgba(255,255,255,.15);}
+.mob-nav-header{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:space-between;}
+.mob-nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.mob-nav-logo-icon{width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.2);}
+.mob-nav-logo-icon img{width:28px;height:28px;object-fit:contain;}
+.mob-nav-logo-text{display:flex;flex-direction:column;line-height:1;}
+.mob-nav-logo-name{color:#fff;font-size:1rem;font-weight:700;}
+.mob-nav-logo-sub{color:#b8e67a;font-size:.68rem;margin-top:3px;}
+.mob-nav-close{background:rgba(255,255,255,.1);border:none;color:#fff;font-size:1rem;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
+.mob-nav-close:hover{background:rgba(255,255,255,.2);}
 .mob-nav-links{list-style:none;padding:12px 0;flex:1;}
-.mob-nav-links li a{display:flex;align-items:center;gap:12px;padding:14px 22px;color:#d4f0b0;text-decoration:none;font-size:.95rem;font-weight:500;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer;transition:background .2s,color .2s;}
+.mob-nav-links li a{display:flex;align-items:center;gap:14px;padding:14px 22px;color:#d4f0b0;text-decoration:none;font-size:.95rem;font-weight:500;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer;transition:background .2s,color .2s;}
 .mob-nav-links li a:hover,.mob-nav-links li a.active{background:rgba(255,255,255,.1);color:#fff;}
-.mob-nav-links li a i{width:20px;text-align:center;font-size:.9rem;}
-.mob-search-bar{display:none;background:var(--gd);padding:10px 16px;border-top:1px solid rgba(255,255,255,.12);}
-.mob-search-bar.open{display:block;}
-.mob-search-inner{position:relative;max-width:var(--mw);margin:0 auto;}
-.mob-search-bar input{width:100%;padding:9px 38px 9px 14px;border-radius:20px;border:none;background:rgba(255,255,255,.18);color:#fff;font-family:inherit;font-size:.88rem;outline:none;}
-.mob-search-bar input::placeholder{color:rgba(255,255,255,.6);}
-.mob-search-bar input:focus{background:rgba(255,255,255,.28);}
-.mob-s-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.7);font-size:.9rem;}
+.mob-nav-links li a i{width:22px;text-align:center;font-size:.9rem;color:#b8e67a;}
+.mob-nav-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,.1);font-size:.75rem;color:rgba(255,255,255,.45);text-align:center;}
+
+/* ══ SEARCH DROPDOWN ══ */
 .search-dropdown{position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:500;display:none;max-height:300px;overflow-y:auto;}
 .search-dropdown.open{display:block;}
 .srch-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #f0ede6;transition:background .15s;}
@@ -82,183 +349,6 @@ body{
 .srch-cat{font-size:.7rem;color:var(--txt2);}
 .srch-price{font-size:.84rem;font-weight:700;color:var(--gd);}
 .srch-empty{padding:18px;text-align:center;color:#aaa;font-size:.84rem;}
-.cart-btn{background:var(--or);color:#fff;border:none;padding:8px 15px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:.87rem;display:flex;align-items:center;gap:6px;transition:background .2s;flex-shrink:0;white-space:nowrap;}
-.cart-btn:hover{background:var(--orl);}
-.cart-count{background:#fff;color:var(--or);border-radius:50%;width:17px;height:17px;font-size:.65rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
-
-/* ══ HERO ══
-   ─────────────────────────────────────────────────────
-   নীতি: একটি ইমেজ → সব ডিভাইসে পরিপূর্ণ দেখাবে
-   পদ্ধতি: aspect-ratio দিয়ে height auto — ইমেজ কখনো
-           কাটবে না, ফাঁকা জায়গাও থাকবে না।
-
-   Desktop 1200px → height ≈ 450px  (ratio 8:3)
-   Tablet  768px  → height ≈ 288px
-   Mobile  390px  → height ≈ 146px  (min 160px নিশ্চিত)
-   ───────────────────────────────────────────────────── */
-.hero{
-  position:relative;
-  width:100%;
-  /* 8:3 ratio — landscape banner-এর জন্য পারফেক্ট */
-  aspect-ratio:8/3;
-  /* মোবাইলে খুব ছোট না হওয়ার জন্য */
-  min-height:160px;
-  /* ডেস্কটপে অতিরিক্ত লম্বা না হওয়ার জন্য */
-  max-height:480px;
-  overflow:hidden;
-  background:#1a4010;
-  flex-shrink:0;
-}
-/* slide div পুরো hero জুড়ে */
-.slide{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  opacity:0;
-  transition:opacity .75s ease;
-}
-.slide.active{opacity:1;}
-
-/* ── ইমেজ: পুরো slide ভরবে, কোনো অংশ কাটবে না ──
-   যেহেতু ইমেজ ও container দুটোই একই aspect-ratio,
-   object-fit:cover = object-fit:fill এর মতো কাজ করে */
-.hero-slide-img{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:center center;
-  z-index:1;
-  display:block;
-}
-/* টেক্সট পড়ার জন্য হালকা বাম-পাশ ওভারলে */
-.hero-slide-overlay{
-  position:absolute;
-  inset:0;
-  background:linear-gradient(
-    95deg,
-    rgba(0,0,0,.50) 0%,
-    rgba(0,0,0,.18) 40%,
-    rgba(0,0,0,.0)  100%
-  );
-  z-index:2;
-  pointer-events:none;
-}
-
-/* ── গ্রেডিয়েন্ট স্লাইড (ইমেজ নেই) ── */
-.s1{background:linear-gradient(135deg,#1a4a10 0%,#3d7a2e 40%,#6aab5e 70%,#a8d56e 100%);}
-.s2{background:linear-gradient(135deg,#3d2b1f 0%,#8b5e3c 40%,#c49a6c 70%,#e8c99a 100%);}
-.s3{background:linear-gradient(135deg,#1a3a5c 0%,#2e6da4 40%,#5ba0d4 70%,#90c4e8 100%);}
-.hero-svg{position:absolute;inset:0;width:100%;height:100%;}
-
-/* ── টেক্সট কন্টেন্ট ── */
-.hero-cw{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  z-index:10;
-}
-.hero-ci{
-  max-width:var(--mw);
-  width:100%;
-  margin:0 auto;
-  padding:0 48px;
-}
-.hero-ci h1{
-  font-size:2.4rem;
-  font-weight:700;
-  color:#fff;
-  line-height:1.28;
-  text-shadow:0 2px 10px rgba(0,0,0,.55);
-  margin-bottom:10px;
-  max-width:560px;
-}
-.hero-ci p{
-  color:rgba(255,255,255,.9);
-  font-size:1rem;
-  margin-bottom:22px;
-  text-shadow:0 1px 4px rgba(0,0,0,.4);
-  max-width:420px;
-}
-.btn-hero{
-  background:#fff;
-  color:var(--gd);
-  border:none;
-  padding:11px 28px;
-  border-radius:6px;
-  font-family:inherit;
-  font-size:.95rem;
-  font-weight:700;
-  cursor:pointer;
-  transition:all .2s;
-  text-decoration:none;
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  box-shadow:0 4px 16px rgba(0,0,0,.22);
-}
-.btn-hero:hover{
-  background:var(--cream);
-  transform:translateY(-2px);
-  box-shadow:0 8px 20px rgba(0,0,0,.26);
-}
-
-/* ── ডট নেভিগেশন ── */
-.slide-dots{
-  position:absolute;
-  bottom:16px;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:8px;
-  z-index:20;
-}
-.dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:rgba(255,255,255,.38);
-  cursor:pointer;
-  transition:all .3s ease;
-  border:1.5px solid rgba(255,255,255,.55);
-}
-.dot.active{
-  background:#fff;
-  width:22px;
-  border-radius:4px;
-  border-color:#fff;
-}
-
-/* ── Prev/Next Arrow ── */
-.hero-arrow{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  z-index:20;
-  background:rgba(255,255,255,.16);
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
-  border:1.5px solid rgba(255,255,255,.28);
-  color:#fff;
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-size:.85rem;
-  transition:background .2s, transform .2s;
-}
-.hero-arrow:hover{
-  background:rgba(255,255,255,.3);
-  transform:translateY(-50%) scale(1.1);
-}
-.hero-arrow.prev{left:16px;}
-.hero-arrow.next{right:16px;}
 
 /* ══ SKELETON LOADER ══ */
 @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
@@ -293,6 +383,39 @@ body{
 .sec-arrows{display:flex;gap:6px;}
 .arr-btn{width:30px;height:30px;border-radius:4px;border:1px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.78rem;color:#555;transition:all .15s;}
 .arr-btn:hover{background:var(--gd);color:#fff;border-color:var(--gd);}
+
+/* ══ HERO ══ */
+.hero{
+  position:relative;
+  width:100%;
+  aspect-ratio:8/3;
+  min-height:160px;
+  max-height:480px;
+  overflow:hidden;
+  background:#1a4010;
+  flex-shrink:0;
+}
+.slide{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .75s ease;}
+.slide.active{opacity:1;}
+.hero-slide-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;z-index:1;display:block;}
+.hero-slide-overlay{position:absolute;inset:0;background:linear-gradient(95deg,rgba(0,0,0,.50) 0%,rgba(0,0,0,.18) 40%,rgba(0,0,0,.0) 100%);z-index:2;pointer-events:none;}
+.s1{background:linear-gradient(135deg,#1a4a10 0%,#3d7a2e 40%,#6aab5e 70%,#a8d56e 100%);}
+.s2{background:linear-gradient(135deg,#3d2b1f 0%,#8b5e3c 40%,#c49a6c 70%,#e8c99a 100%);}
+.s3{background:linear-gradient(135deg,#1a3a5c 0%,#2e6da4 40%,#5ba0d4 70%,#90c4e8 100%);}
+.hero-svg{position:absolute;inset:0;width:100%;height:100%;}
+.hero-cw{position:absolute;inset:0;display:flex;align-items:center;z-index:10;}
+.hero-ci{max-width:var(--mw);width:100%;margin:0 auto;padding:0 48px;}
+.hero-ci h1{font-size:2.4rem;font-weight:700;color:#fff;line-height:1.28;text-shadow:0 2px 10px rgba(0,0,0,.55);margin-bottom:10px;max-width:560px;}
+.hero-ci p{color:rgba(255,255,255,.9);font-size:1rem;margin-bottom:22px;text-shadow:0 1px 4px rgba(0,0,0,.4);max-width:420px;}
+.btn-hero{background:#fff;color:var(--gd);border:none;padding:11px 28px;border-radius:6px;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:7px;box-shadow:0 4px 16px rgba(0,0,0,.22);}
+.btn-hero:hover{background:var(--cream);transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.26);}
+.slide-dots{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:20;}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.38);cursor:pointer;transition:all .3s ease;border:1.5px solid rgba(255,255,255,.55);}
+.dot.active{background:#fff;width:22px;border-radius:4px;border-color:#fff;}
+.hero-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:20;background:rgba(255,255,255,.16);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1.5px solid rgba(255,255,255,.28);color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;transition:background .2s, transform .2s;}
+.hero-arrow:hover{background:rgba(255,255,255,.3);transform:translateY(-50%) scale(1.1);}
+.hero-arrow.prev{left:16px;}
+.hero-arrow.next{right:16px;}
 
 /* ══ CARD SHARED ══ */
 .c-img{display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
@@ -339,20 +462,7 @@ body{
 
 /* ══ ALL PRODUCTS CAT TABS ══ */
 .all-cat-tabs{display:flex;flex-wrap:wrap;gap:0;margin-bottom:14px;border:1px solid var(--border);border-radius:0;overflow:hidden;width:fit-content;}
-.all-cat-tabs button{
-  padding:7px 16px;
-  border:none;
-  border-right:1px solid var(--border);
-  cursor:pointer;
-  font-family:inherit;
-  font-size:.82rem;
-  font-weight:600;
-  border-radius:0 !important;
-  background:#fff;
-  color:#555;
-  transition:background .18s,color .18s;
-  white-space:nowrap;
-}
+.all-cat-tabs button{padding:7px 16px;border:none;border-right:1px solid var(--border);cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;border-radius:0 !important;background:#fff;color:#555;transition:background .18s,color .18s;white-space:nowrap;}
 .all-cat-tabs button:last-child{border-right:none;}
 .all-cat-tabs button.active-cat{background:var(--gd);color:#fff;}
 .all-cat-tabs button:hover:not(.active-cat){background:#f0f9eb;color:var(--gd);}
@@ -452,7 +562,7 @@ body{
 .why-card h3{font-size:.92rem;font-weight:700;color:var(--gd);margin-bottom:5px;}
 .why-card p{font-size:.78rem;color:var(--txt2);line-height:1.6;}
 
-/* ══ FOOTER (global) ══ */
+/* ══ FOOTER ══ */
 footer{background:var(--gd);color:#c8e6b0;padding:32px 16px 16px; flex-shrink:0; }
 .fin{max-width:var(--mw);margin:0 auto;}
 .fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:24px;margin-bottom:20px;}
@@ -496,8 +606,13 @@ footer p{font-size:.79rem;line-height:1.7;}
 .cart-rel-arrows{display:flex;gap:4px;}
 .crel-arr{width:22px;height:22px;border-radius:3px;border:1px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#666;transition:all .15s;}
 .crel-arr:hover{background:var(--gd);color:#fff;border-color:var(--gd);}
-.cart-rel-track{overflow:hidden;padding:0 14px 10px;}
-.cart-rel-row{display:flex;gap:9px;transition:transform .4s ease;}
+.cart-rel-track{overflow:hidden;padding:0 0 10px;}
+.cart-rel-row{
+  display:flex;
+  gap:9px;
+  /* transition বাদ — এখন JS দিয়ে smooth scroll */
+  will-change:transform;
+}
 .crel-card{flex:0 0 80px;width:80px;min-width:80px;border:1px solid var(--border);border-radius:5px;overflow:hidden;cursor:pointer;background:#fff;transition:box-shadow .15s,transform .15s;display:flex;flex-direction:column;}
 .crel-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.13);transform:translateY(-2px);}
 .crel-img{height:60px;min-height:60px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;overflow:hidden;position:relative;}
@@ -526,7 +641,6 @@ footer p{font-size:.79rem;line-height:1.7;}
 .pdp-main-img{border-radius:10px;height:360px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1);}
 .pdp-main-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease;}
 .pdp-main-img:hover img{transform:scale(1.04);}
-.pdp-main-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,.04));pointer-events:none;}
 .pdp-thumbs{display:flex;gap:8px;flex-wrap:wrap;}
 .pdp-thumb{width:68px;height:68px;border-radius:7px;border:2px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:#f5f1eb;transition:border-color .2s,transform .15s,box-shadow .2s;overflow:hidden;}
 .pdp-thumb img{width:100%;height:100%;object-fit:cover;border-radius:5px;}
@@ -589,9 +703,64 @@ footer p{font-size:.79rem;line-height:1.7;}
 .error-state p{font-size:.84rem;}
 .retry-btn{margin-top:12px;background:var(--gd);color:#fff;border:none;padding:9px 20px;border-radius:6px;font-family:inherit;font-size:.84rem;cursor:pointer;}
 
-/* ══ TOAST ══ */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gd);color:#fff;padding:10px 22px;border-radius:28px;font-size:.84rem;font-weight:600;z-index:9999;transition:transform .3s;box-shadow:0 4px 14px rgba(0,0,0,.2);}
-.toast.show{transform:translateX(-50%) translateY(0);}
+/* ══ TOAST — ডান থেকে স্লাইড ইন, স্কয়ার কার্ড ══ */
+/* ══ TOAST — ডানদিক থেকে স্কোয়ার কার্ড স্লাইড ইন ══ */
+.toast{
+  position:fixed;
+  bottom:20px;
+  /* ডানদিক থেকে সম্পূর্ণ বাইরে — translateX দিয়ে */
+  right:16px;
+  left:auto;
+  width:290px;
+  background:#fff;
+  border-radius:12px;
+  z-index:9999;
+  box-shadow:0 8px 32px rgba(0,0,0,.18);
+  border-left:5px solid var(--gd);
+  overflow:hidden;
+  /* hidden state: ডানে সরানো + invisible */
+  transform:translateX(calc(100% + 32px));
+  opacity:0;
+  transition:transform .38s cubic-bezier(.34,1.28,.64,1), opacity .25s ease;
+  pointer-events:none;
+}
+.toast.show{
+  transform:translateX(0);
+  opacity:1;
+  pointer-events:auto;
+}
+.toast-inner{
+  display:flex;align-items:center;gap:11px;
+  padding:13px 14px 13px 12px;
+}
+.toast-icon{
+  width:34px;height:34px;border-radius:8px;flex-shrink:0;
+  background:var(--gd);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.95rem;
+}
+.toast-icon.err{background:#e53935;}
+.toast-msg{
+  flex:1;font-size:.83rem;font-weight:500;
+  color:#222;line-height:1.45;
+}
+/* নিচে progress bar */
+.toast-bar{
+  height:3px;background:var(--gd);
+  transform-origin:left;
+  transform:scaleX(1);
+}
+.toast.show .toast-bar{
+  animation:tbar 2.6s linear forwards;
+}
+@keyframes tbar{to{transform:scaleX(0);}}
+.toast.err-toast{border-left-color:#e53935;}
+.toast.err-toast .toast-icon{background:#e53935;}
+.toast.err-toast .toast-bar{background:#e53935;}
+/* মোবাইলে bottom nav-এর উপরে */
+@media(max-width:900px){
+  .toast{bottom:20px;width:calc(100vw - 32px);max-width:290px;}
+}
 
 /* ══ ORDER MODAL ══ */
 .order-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;align-items:center;justify-content:center;padding:16px;}
@@ -656,17 +825,24 @@ footer p{font-size:.79rem;line-height:1.7;}
 .om-success p{font-size:.85rem;color:#666;line-height:1.7;}
 .om-success .order-num{background:#e8f5e0;color:var(--gd);font-weight:700;padding:8px 20px;border-radius:20px;display:inline-block;margin:12px 0;font-size:.9rem;}
 
-/* ══ RESPONSIVE ══ */
+/* ══ LOGO ICON IMG ══ */
+.logo-icon img{width:50px;height:auto;}
+
+/* ══════════════════════════════════════
+   RESPONSIVE — TABLET (≤900px)
+══════════════════════════════════════ */
 @media(max-width:900px){
-  .nav-links{display:none;}
-  .search-wrap{display:none;}
-  .mob-search-btn{display:flex;}
-  .mob-menu-btn{display:flex;}
-  /* hero: aspect-ratio কাজ করে, height auto */
-  .hero-ci{padding:0 24px;}
-  .hero-ci h1{font-size:1.7rem;max-width:100%;}
-  .hero-ci p{font-size:.88rem;max-width:100%;margin-bottom:16px;}
-  .btn-hero{padding:10px 22px;font-size:.88rem;}
+  /* Desktop navbar লুকানো */
+  .navbar{ display:none; }
+  /* Mobile header দেখানো */
+  .mob-header{ display:block; }
+  /* Bottom nav দেখানো */
+
+  .hero{aspect-ratio:unset;height:220px;min-height:220px;}
+  .hero-ci{padding:0 18px;}
+  .hero-ci h1{font-size:1.5rem;max-width:100%;}
+  .hero-ci p{font-size:.85rem;max-width:100%;margin-bottom:14px;}
+  .btn-hero{padding:9px 20px;font-size:.85rem;}
   .hero-arrow{width:34px;height:34px;font-size:.78rem;}
   .bcard{flex:0 0 50%;width:50%;padding:0 5px;}
   .pcard{flex:0 0 calc(50% - 7px);width:calc(50% - 7px);margin-right:14px;}
@@ -681,51 +857,54 @@ footer p{font-size:.79rem;line-height:1.7;}
   .about-stat-item{padding:16px 20px;min-width:100px;}
   .contact-grid{grid-template-columns:1fr;}
   .fgrid{grid-template-columns:1fr 1fr;}
-  .why-grid{grid-template-columns:1fr;}
+  .why-grid{grid-template-columns:1fr 1fr;}
   .pdp-main{grid-template-columns:1fr;}
   .pdp-related-grid{grid-template-columns:repeat(2,1fr);}
   .order-modal{max-height:95vh;}
 }
+
+/* ══════════════════════════════════════
+   RESPONSIVE — MOBILE (≤600px)
+══════════════════════════════════════ */
 @media(max-width:600px){
-  .hero{
-    aspect-ratio:unset;
-    height:260px;
-    min-height:260px;
-  }
+  .hero{aspect-ratio:unset;height:200px;min-height:200px;}
   .hero-ci{padding:0 14px;}
-  .hero-ci h1{font-size:1.15rem;margin-bottom:6px;}
-  .hero-ci p{font-size:.78rem;margin-bottom:13px;}
-  .btn-hero{padding:9px 18px;font-size:.8rem;gap:5px;}
+  .hero-ci h1{font-size:1.1rem;margin-bottom:5px;}
+  .hero-ci p{font-size:.76rem;margin-bottom:12px;}
+  .btn-hero{padding:8px 16px;font-size:.78rem;gap:5px;}
   .hero-arrow{display:none;}
-  .slide-dots{bottom:9px;}
+  .slide-dots{bottom:8px;}
   .dot{width:6px;height:6px;}
-  .dot.active{width:16px;}
-  /* মোবাইলে ক্যাটাগরি ট্যাব লুকানো */
+  .dot.active{width:14px;}
   .all-cat-tabs{display:none;}
+  .why-grid{grid-template-columns:1fr;}
+  .fgrid{grid-template-columns:1fr;}
+  .main{padding:16px 12px 32px;}
+  .sec-head h2{font-size:1rem;}
 }
+
 @media(max-width:480px){
   .cart-sb{width:100%;right:-100%;}
   .pcard{flex:0 0 calc(50% - 5px);width:calc(50% - 5px);margin-right:10px;}
-  /* পণ্য পেজে মোবাইলে 2 কলাম — হোম পেজের মতো */
   .products-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
   .prod-card .c-img{height:calc(50vw - 26px);}
+  /* ক্যাট ট্যাব সেকশন বড় হেডার */
+  #catTabs button{font-size:.76rem;padding:5px 11px;}
 }
-.logo-icon img {
-    width: 50px;  /* আপনার পছন্দমত আকার */
-    height: auto; /* প্রপোর্টন ঠিক রাখে */
-}
-</style> 
+</style>
 </head>
 <body>
 
-<!-- NAVBAR -->
+<!-- ══════════════════════════════════════
+   DESKTOP NAVBAR (≥900px এ দেখাবে)
+══════════════════════════════════════ -->
 <nav class="navbar">
   <div class="nb">
     <div class="logo" onclick="goHome()">
       <div class="logo-icon">
-    <img src="images/logo-g.png" alt="Logo" />
-</div>
-      <div class="logo-txt">গ্রামের<span>আসল মজা 🌿</span></div>
+        <img src="images/logo-g.png" alt="Logo" />
+      </div>
+      <div class="logo-txt"><span class="lt-main">আসল গ্রামের মজা</span><span class="lt-sub">বিশুদ্ধ পণ্য · সরাসরি কৃষক থেকে</span></div>
     </div>
     <ul class="nav-links">
       <li><a onclick="goHome()" id="navHome" class="active">হোম</a></li>
@@ -739,50 +918,53 @@ footer p{font-size:.79rem;line-height:1.7;}
         <button class="search-icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
         <div class="search-dropdown" id="deskDrop"></div>
       </div>
-      <button class="mob-search-btn" id="mobSearchBtn" onclick="toggleMobSearch()">
-        <i class="fa-solid fa-magnifying-glass"></i>
-      </button>
       <button class="cart-btn" onclick="toggleCart()">
         <i class="fa-solid fa-cart-shopping"></i> Cart
-        <span class="cart-count" id="cartCount">0</span>
-      </button>
-      <button class="mob-menu-btn" id="mobMenuBtn" onclick="toggleMobNav()">
-        <i class="fa-solid fa-bars"></i>
+        <span class="cart-count" id="cartCountDesk">0</span>
       </button>
     </div>
   </div>
 </nav>
 
-<!-- MOBILE NAV DRAWER -->
-<div class="mob-nav-drawer" id="mobNavDrawer">
-  <div class="mob-nav-overlay" onclick="toggleMobNav()"></div>
-  <div class="mob-nav-panel">
-    <div class="mob-nav-header">
-      <div class="mob-nav-logo">
-        <div class="logo-icon">
-    <img src="images/logo-g.png" alt="Logo" />
-</div>
-              <div class="logo-txt">গ্রামের<span>আসল মজা 🌿</span></div>
+<!-- ══════════════════════════════════════
+   MOBILE HEADER (≤900px এ দেখাবে)
+══════════════════════════════════════ -->
+<header class="mob-header">
+  <div class="mob-header-inner">
+    <!-- লোগো + নাম -->
+    <div class="mob-logo-block" onclick="goHome()">
+      <div class="mob-logo-icon">
+        <img src="images/logo-g.png" alt="Logo" />
       </div>
-      <button class="mob-nav-close" onclick="toggleMobNav()"><i class="fa-solid fa-xmark"></i></button>
+      <div class="mob-logo-text">
+        <span class="mob-logo-name">আসল গ্রামের মজা</span>
+        <span class="mob-logo-sub">বিশুদ্ধ পণ্য · সরাসরি কৃষক থেকে</span>
+      </div>
     </div>
-    <ul class="mob-nav-links">
-      <li><a onclick="toggleMobNav();goHome()" id="mobNavHome" class="active"><i class="fa-solid fa-house"></i> হোম</a></li>
-      <li><a onclick="toggleMobNav();goProductsPage()" id="mobNavProducts"><i class="fa-solid fa-box-open"></i> পণ্য</a></li>
-      <li><a onclick="toggleMobNav();goAboutPage()" id="mobNavAbout"><i class="fa-solid fa-circle-info"></i> আমাদের সম্পর্কে</a></li>
-      <li><a onclick="toggleMobNav();goContactPage()" id="mobNavContact"><i class="fa-solid fa-phone"></i> যোগাযোগ</a></li>
-    </ul>
+    <!-- রাইট বাটন -->
+    <div class="mob-header-actions">
+      <button class="mob-search-pill" onclick="openMobSearch()" aria-label="খুঁজুন">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+      <button class="mob-cart-pill" onclick="toggleCart()" aria-label="কার্ট">
+        <i class="fa-solid fa-cart-shopping"></i>
+        কার্ট
+        <span class="mob-cart-badge" id="cartCountMob">0</span>
+      </button>
+    </div>
   </div>
-</div>
-<div class="mob-search-bar" id="mobSearchBar">
-  <div class="mob-search-inner">
-    <input type="text" id="mobSearch" placeholder="পণ্য খুঁজুন..." autocomplete="off" oninput="doSearch(this.value,'mobDrop')">
-    <i class="fa-solid fa-magnifying-glass mob-s-icon"></i>
-    <div class="search-dropdown" id="mobDrop"></div>
+</header>
+
+<!-- ══ মোবাইল সার্চ ওভারলে ══ -->
+<div class="mob-search-overlay" id="mobSearchOverlay" onclick="closeMobSearchOutside(event)">
+  <div class="mob-search-box">
+    <input class="mob-s-input" id="mobSearchInput" type="text" placeholder="পণ্য খুঁজুন..." autocomplete="off" oninput="doSearch(this.value,'mobSearchResults')">
+    <button class="mob-s-close" onclick="closeMobSearch()"><i class="fa-solid fa-xmark"></i></button>
   </div>
+  <div class="mob-search-results" id="mobSearchResults"></div>
 </div>
 
-<!-- PAGE CONTAINER (dynamic pages) -->
+<!-- ══ PAGE CONTAINER ══ -->
 <div class="page active" id="page-home">
   <!-- HERO -->
   <div class="hero" id="heroSection">
@@ -844,7 +1026,6 @@ footer p{font-size:.79rem;line-height:1.7;}
         </div>
       </div>
       <div class="best-wrap"><div class="best-slider" id="slider-best">
-        <!-- skeleton -->
         <div class="bcard"><div class="skeleton-card"><div class="sk-img skeleton"></div><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div><div class="sk-line shorter skeleton" style="margin-bottom:14px"></div></div></div>
         <div class="bcard"><div class="skeleton-card"><div class="sk-img skeleton"></div><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div><div class="sk-line shorter skeleton" style="margin-bottom:14px"></div></div></div>
         <div class="bcard"><div class="skeleton-card"><div class="sk-img skeleton"></div><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div><div class="sk-line shorter skeleton" style="margin-bottom:14px"></div></div></div>
@@ -895,7 +1076,7 @@ footer p{font-size:.79rem;line-height:1.7;}
       </div>
     </div>
   </section>
-</div> <!-- end page-home -->
+</div>
 
 <!-- ═══ PAGE: PRODUCTS LISTING ═══ -->
 <div class="page" id="page-products">
@@ -932,16 +1113,16 @@ footer p{font-size:.79rem;line-height:1.7;}
   <div id="pdpContent"></div>
 </div>
 
-<!-- GLOBAL FOOTER (outside pages) -->
+<!-- GLOBAL FOOTER -->
 <footer>
   <div class="fin">
     <div class="fgrid">
       <div>
         <div class="logo" onclick="goHome()" style="margin-bottom:12px;display:flex;">
-         <div class="logo-icon">
-    <img src="images/logo-g.png" alt="Logo" />
-</div>
-                <div class="logo-txt">গ্রামের<span>আসল মজা 🌿</span></div>
+          <div class="logo-icon">
+            <img src="images/logo-g.png" alt="Logo" />
+          </div>
+          <div class="logo-txt"><span class="lt-main">আসল গ্রামের মজা</span><span class="lt-sub">বিশুদ্ধ পণ্য · সরাসরি কৃষক থেকে</span></div>
         </div>
         <p id="footerDesc">বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়। সরাসরি কৃষক থেকে আপনার কাছে।</p>
         <div class="soc">
@@ -965,6 +1146,32 @@ footer p{font-size:.79rem;line-height:1.7;}
     <div class="fbot" id="footerCopyright">&copy; 2024 আসল গ্রামের মজা | সর্বস্বত্ব সংরক্ষিত</div>
   </div>
 </footer>
+
+
+
+<!-- BOTTOM NAV — hidden visually, JS functional -->
+<nav class="bottom-nav" id="bottomNav" style="display:none !important;">
+  <div class="bottom-nav-inner">
+    <button class="bnav-item active" id="bnavHome" onclick="goHome()">
+      <div class="bnav-icon"><div class="bnav-icon-bg"></div><i class="fa-solid fa-house"></i></div>
+    </button>
+    <button class="bnav-item" id="bnavProducts" onclick="goProductsPage()">
+      <div class="bnav-icon"><div class="bnav-icon-bg"></div><i class="fa-solid fa-box-open"></i></div>
+    </button>
+    <button class="bnav-cart-col" id="bnavCart" onclick="toggleCart()">
+      <div class="bnav-cart-wrap">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span class="bnav-badge" id="cartCountBnav">0</span>
+      </div>
+    </button>
+    <button class="bnav-item" id="bnavAbout" onclick="goAboutPage()">
+      <div class="bnav-icon"><div class="bnav-icon-bg"></div><i class="fa-solid fa-circle-info"></i></div>
+    </button>
+    <button class="bnav-item" id="bnavContact" onclick="goContactPage()">
+      <div class="bnav-icon"><div class="bnav-icon-bg"></div><i class="fa-solid fa-phone"></i></div>
+    </button>
+  </div>
+</nav>
 
 <!-- CART SIDEBAR -->
 <div class="cart-ov" id="cartOv" onclick="toggleCart()"></div>
@@ -1047,13 +1254,13 @@ footer p{font-size:.79rem;line-height:1.7;}
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast"><div class="toast-inner"><div class="toast-icon" id="toastIcon"><i class="fa-solid fa-check"></i></div><span class="toast-msg" id="toastMsg"></span></div><div class="toast-bar" id="toastBar"></div></div>
 
 <script>
 /* ════════════════════════════════
    CONFIGURATION
 ════════════════════════════════ */
-const API_BASE = 'https://asolgramermoja-jysj.onrender.com'; // ← Render deploy করার পর URL দিন
+const API_BASE = 'https://asolgramermoja-jysj.onrender.com';
 
 /* ════ API HELPER ════ */
 const api = async (path, opts = {}) => {
@@ -1071,7 +1278,6 @@ let deliveryCharges = { inside: 80, outside: 130 };
 let storePhone = '01712345678';
 let dataLoaded = false;
 
-// Products page pagination
 let prodPage = 1;
 let prodTotal = 0;
 let prodLimit = 12;
@@ -1090,14 +1296,11 @@ async function loadAllData() {
     cats = catsRes || [];
     heroSlides = heroRes || [];
     dataLoaded = true;
-
     buildUI();
-    // Preload about/contact for faster navigation (optional)
     loadAboutPageContent().catch(()=>{});
     loadContactPageContent().catch(()=>{});
   } catch (err) {
     console.error('Data load failed:', err);
-    // Fallback: show error states
     document.getElementById('slider-best').innerHTML = `<div style="padding:30px;text-align:center;color:#aaa;width:100%"><i class="fa-solid fa-wifi" style="font-size:1.5rem;display:block;margin-bottom:8px"></i>পণ্য লোড হয়নি। পেজ রিলোড করুন।<br><button class="retry-btn" onclick="location.reload()">পুনরায় লোড করুন</button></div>`;
     document.getElementById('allGrid').innerHTML = '';
   }
@@ -1116,7 +1319,6 @@ function buildUI() {
   renderAll();
   buildHero();
   buildFooter();
-  // Populate products page category filter
   const catSel = document.getElementById('prodCatFilter');
   if (catSel && cats.length) {
     catSel.innerHTML = '<option value="">সব ক্যাটাগরি</option>' + cats.map(c => `<option value="${c.id}">${c.em} ${c.lbl}</option>`).join('');
@@ -1129,44 +1331,28 @@ let heroTimer = null;
 
 function buildHero() {
   if (!heroSlides.length) return;
-  
   const section = document.getElementById('heroSection');
   const dots = document.getElementById('slideDots');
-  
-  // Build slides
-  const gradMap = { s1: 's1', s2: 's2', s3: 's3' };
   const svgBgs = {
     s1: `<svg class="hero-svg" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><rect width="700" height="360" fill="url(#hg1s)"/><ellipse cx="1050" cy="360" rx="580" ry="220" fill="#2d5a22" opacity=".62"/><circle cx="1220" cy="60" r="54" fill="#FFD700" opacity=".4"/><defs><linearGradient id="hg1s" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1a4010" stop-opacity=".86"/><stop offset="100%" stop-color="#1a4010" stop-opacity="0"/></linearGradient></defs></svg>`,
     s2: `<svg class="hero-svg" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><rect width="700" height="360" fill="url(#hg2s)"/><circle cx="1050" cy="180" r="150" fill="#f5a623" opacity=".15"/><ellipse cx="1020" cy="260" rx="90" ry="110" fill="#f5a623" opacity=".5"/><defs><linearGradient id="hg2s" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#3d2b1f" stop-opacity=".86"/><stop offset="100%" stop-color="#3d2b1f" stop-opacity="0"/></linearGradient></defs></svg>`,
     s3: `<svg class="hero-svg" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><rect width="700" height="360" fill="url(#hg3s)"/><circle cx="1100" cy="180" r="130" fill="#4a9e6f" opacity=".2"/><defs><linearGradient id="hg3s" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1a3a5c" stop-opacity=".86"/><stop offset="100%" stop-color="#1a3a5c" stop-opacity="0"/></linearGradient></defs></svg>`,
   };
-
   const slidesHtml = heroSlides.map((s, i) => {
     const gradClass = (s.gradient && ['s1','s2','s3'].includes(s.gradient)) ? s.gradient : 's1';
     const svgBg = svgBgs[s.gradient || 's1'] || svgBgs.s1;
-
     if (s.img) {
       return `<div class="slide ${i===0?'active':''} ${gradClass}" data-idx="${i}">
-        <img class="hero-slide-img" src="${s.img}" alt="${s.title||'স্লাইড '+(i+1)}"
-          onerror="this.style.display='none'">
+        <img class="hero-slide-img" src="${s.img}" alt="${s.title||'স্লাইড '+(i+1)}" onerror="this.style.display='none'">
         <div class="hero-slide-overlay"></div>
       </div>`;
     } else {
-      return `<div class="slide ${i===0?'active':''} ${gradClass}" data-idx="${i}">
-        ${svgBg}
-      </div>`;
+      return `<div class="slide ${i===0?'active':''} ${gradClass}" data-idx="${i}">${svgBg}</div>`;
     }
   }).join('');
-
-  // Replace existing slides (keep hero-cw and dots)
-  const heroCw = section.querySelector('.hero-cw');
-  const dotsEl = section.querySelector('.slide-dots');
   [...section.querySelectorAll('.slide')].forEach(s => s.remove());
   section.insertAdjacentHTML('afterbegin', slidesHtml);
-
-  // Dots
   dots.innerHTML = heroSlides.map((_, i) => `<div class="dot ${i===0?'active':''}" onclick="goSlide(${i})"></div>`).join('');
-
   goSlide(0);
   if (heroTimer) clearInterval(heroTimer);
   heroTimer = setInterval(() => goSlide((cur+1) % heroSlides.length), 4500);
@@ -1174,7 +1360,7 @@ function buildHero() {
 
 function goSlide(n) {
   if (!heroSlides.length) return;
-  n = ((n % heroSlides.length) + heroSlides.length) % heroSlides.length; // safe wrap
+  n = ((n % heroSlides.length) + heroSlides.length) % heroSlides.length;
   const slides = document.querySelectorAll('#heroSection .slide');
   const dots = document.querySelectorAll('.dot');
   slides.forEach((s, i) => s.classList.toggle('active', i === n));
@@ -1187,17 +1373,14 @@ function goSlide(n) {
     if (ctaBtn && slide.ctaText) { ctaBtn.innerHTML = `<i class="fa-solid fa-bag-shopping"></i> ${slide.ctaText}`; }
   }
   cur = n;
-  // manual click → timer reset করি
   if (heroTimer) { clearInterval(heroTimer); heroTimer = setInterval(() => goSlide(cur+1), 4500); }
 }
 
 /* ════ FOOTER ════ */
 function buildFooter() {
-  // Category links for footers
   const catLinks = document.getElementById('footerCatLinks');
   const linksHtml = cats.map(c => `<li><a onclick="goProductsPage('${c.id}')">${c.em} ${c.lbl}</a></li>`).join('');
   if (catLinks) catLinks.innerHTML = linksHtml;
-  // Update phone from settings later
 }
 
 /* ════ IMAGE HELPER ════ */
@@ -1206,29 +1389,35 @@ function imgTag(src, alt) {
   return `<img src="${src}" alt="${alt}" loading="lazy" onerror="this.style.display='none'">`;
 }
 
-/* ════ ROUTING AND ACTIVE NAV ════ */
-function setActiveNav(page) {
-  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-  document.querySelectorAll('.mob-nav-links a').forEach(a => a.classList.remove('active'));
-  if (page === 'home') {
-    document.getElementById('navHome').classList.add('active');
-    document.getElementById('mobNavHome').classList.add('active');
-  } else if (page === 'products') {
-    document.getElementById('navProducts').classList.add('active');
-    document.getElementById('mobNavProducts').classList.add('active');
-  } else if (page === 'about') {
-    document.getElementById('navAbout').classList.add('active');
-    document.getElementById('mobNavAbout').classList.add('active');
-  } else if (page === 'contact') {
-    document.getElementById('navContact').classList.add('active');
-    document.getElementById('mobNavContact').classList.add('active');
-  }
+/* ════ MOBILE SEARCH ════ */
+function openMobSearch() {
+  const ov = document.getElementById('mobSearchOverlay');
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('mobSearchInput').focus(), 200);
+}
+function closeMobSearch() {
+  const ov = document.getElementById('mobSearchOverlay');
+  ov.classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('mobSearchInput').value = '';
+  document.getElementById('mobSearchResults').innerHTML = '';
+}
+function closeMobSearchOutside(e) {
+  if (e.target === document.getElementById('mobSearchOverlay')) closeMobSearch();
 }
 
-function toggleMobNav() {
-  const drawer = document.getElementById('mobNavDrawer');
-  drawer.classList.toggle('open');
-  document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : '';
+/* ════ ROUTING AND ACTIVE NAV ════ */
+function setActiveNav(page) {
+  // Desktop
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  // Bottom nav
+  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+
+  const map = { home: ['navHome','bnavHome'], products: ['navProducts','bnavProducts'], about: ['navAbout','bnavAbout'], contact: ['navContact','bnavContact'] };
+  if (map[page]) {
+    map[page].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('active'); });
+  }
 }
 
 function goHome() {
@@ -1272,14 +1461,11 @@ function goContactPage() {
 
 function goProduct(id) {
   const p = prods.find(x => x._id === id || x.id === id);
-  if (!p) {
-    loadProductById(id);
-    return;
-  }
+  if (!p) { loadProductById(id); return; }
   buildPdp(p);
   document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
   document.getElementById('page-product').classList.add('active');
-  setActiveNav(''); // product page has no nav highlight
+  setActiveNav('');
   const slug = p.nm.replace(/\s+/g, '-');
   window.history.pushState({ pid: id }, '', `#/product/${slug}-${id}`);
   window.scrollTo(0, 0);
@@ -1304,36 +1490,22 @@ async function loadProductById(id) {
 window.addEventListener('popstate', e => {
   const h = location.hash;
   if (h.startsWith('#/product/')) {
-    const parts = h.split('-');
-    const id = parts[parts.length - 1];
+    const parts = h.split('-'); const id = parts[parts.length - 1];
     if (id) goProduct(id);
-  } else if (h === '#/products') {
-    goProductsPage();
-  } else if (h === '#/about') {
-    goAboutPage();
-  } else if (h === '#/contact') {
-    goContactPage();
-  } else {
-    goHome();
-  }
+  } else if (h === '#/products') { goProductsPage(); }
+  else if (h === '#/about') { goAboutPage(); }
+  else if (h === '#/contact') { goContactPage(); }
+  else { goHome(); }
 });
 
 window.addEventListener('DOMContentLoaded', () => {
   const h = location.hash;
   if (h.startsWith('#/product/')) {
-    const parts = h.split('-');
-    const id = parts[parts.length - 1];
+    const parts = h.split('-'); const id = parts[parts.length - 1];
     if (id) { loadProductById(id); return; }
-  } else if (h === '#/products') {
-    loadAllData().then(() => goProductsPage());
-    return;
-  } else if (h === '#/about') {
-    loadAllData().then(() => goAboutPage());
-    return;
-  } else if (h === '#/contact') {
-    loadAllData().then(() => goContactPage());
-    return;
-  }
+  } else if (h === '#/products') { loadAllData().then(() => goProductsPage()); return; }
+  else if (h === '#/about') { loadAllData().then(() => goAboutPage()); return; }
+  else if (h === '#/contact') { loadAllData().then(() => goContactPage()); return; }
   loadAllData();
 });
 
@@ -1353,6 +1525,56 @@ function slideRow(id, dir) {
     el.style.transform = `translateX(-${s.idx * (cardEl.offsetWidth + 14)}px)`;
   }
 }
+
+/* ══ বেস্ট সেলার — সিমলেস ইনফিনিট লুপ ══
+   কৌশল: মূল কার্ডগুলো clone করে শেষে জুড়ে দেওয়া হয়।
+   শেষ clone-এ পৌঁছালে transition=none দিয়ে মূল শুরুতে
+   চলে যাওয়া হয় — চোখে ধরা পড়ে না।
+*/
+let bestAutoTimer = null;
+let bestCloned = false;
+
+function cloneBestCards() {
+  const el = document.getElementById('slider-best');
+  if (!el || bestCloned) return;
+  const origCards = Array.from(el.children);
+  origCards.forEach(c => { el.appendChild(c.cloneNode(true)); });
+  bestCloned = true;
+}
+
+function startBestAutoSlide() {
+  if (bestAutoTimer) clearInterval(bestAutoTimer);
+  cloneBestCards();
+  const s = sState['best']; if (!s) return;
+  const origTotal = s.total; // মূল কার্ড সংখ্যা
+  bestAutoTimer = setInterval(() => {
+    const el = document.getElementById('slider-best'); if (!el) return;
+    const pct = window.innerWidth <= 900 ? 50 : 25;
+    s.idx += 1;
+    el.style.transition = 'transform .5s ease';
+    el.style.transform = `translateX(-${s.idx * pct}%)`;
+    // clone শেষে পৌঁছালে — transition শেষ হলে silently reset
+    if (s.idx >= origTotal) {
+      setTimeout(() => {
+        el.style.transition = 'none';
+        s.idx = 0;
+        el.style.transform = 'translateX(0)';
+        void el.offsetWidth;
+        el.style.transition = 'transform .5s ease';
+      }, 520);
+    }
+  }, 3000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const wrap = document.querySelector('.best-wrap');
+  if (wrap) {
+    wrap.addEventListener('mouseenter', () => { if (bestAutoTimer) { clearInterval(bestAutoTimer); bestAutoTimer = null; } });
+    wrap.addEventListener('mouseleave', () => startBestAutoSlide());
+    wrap.addEventListener('touchstart', () => { if (bestAutoTimer) { clearInterval(bestAutoTimer); bestAutoTimer = null; } }, {passive:true});
+    wrap.addEventListener('touchend', () => { setTimeout(startBestAutoSlide, 2000); });
+  }
+});
 
 /* ════ CARD HELPERS ════ */
 function getBasePrice(p) { return p.variants?.[0]?.p || 0; }
@@ -1417,7 +1639,9 @@ function renderBest() {
   const best = prods.filter(p => p.best && p.active !== false);
   if (!best.length) { document.getElementById('slider-best').innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;width:100%">কোনো বেস্ট সেলার পণ্য নেই</div>'; return; }
   document.getElementById('slider-best').innerHTML = best.map(bestCard).join('');
+  bestCloned = false; // reset so clone happens fresh
   regSlider('best', best.length, window.innerWidth <= 900 ? 2 : 4);
+  startBestAutoSlide();
 }
 
 let activeCatRow = '';
@@ -1446,10 +1670,8 @@ function switchCat(catId) {
 }
 
 let allCatFilter = '';
-
 function buildAllCatTabs() {
-  const tabsEl = document.getElementById('allCatTabs');
-  if (!tabsEl) return;
+  const tabsEl = document.getElementById('allCatTabs'); if (!tabsEl) return;
   const allCats = [{ id: '', lbl: 'সব ক্যাটাগরি', em: '🛒' }, ...cats];
   tabsEl.innerHTML = allCats.map(c => `
     <button onclick="switchAllCat('${c.id}')" class="${c.id===allCatFilter?'active-cat':''}">${c.em} ${c.lbl}</button>`).join('');
@@ -1472,20 +1694,15 @@ function buildCatBar() {
   const scrollCats = [{ id: 'all', lbl: 'সব পণ্য', em: '🛒' }, ...cats];
   const one = scrollCats.map(c => `
     <a class="cat-item" data-cat="${c.id}" onclick="filterScrollCat('${c.id}');return false;">
-      <span class="cat-emoji">${c.em}</span>
-      <span class="cat-lbl">${c.lbl}</span>
+      <span class="cat-emoji">${c.em}</span><span class="cat-lbl">${c.lbl}</span>
     </a>`).join('');
   document.getElementById('catTrack').innerHTML = one + one + one + one;
 }
 
 function filterScrollCat(catId) {
   document.querySelectorAll('.cat-item').forEach(c => c.classList.toggle('active', c.getAttribute('data-cat') === catId));
-  if (catId === 'all') {
-    if (cats.length) switchCat(activeCatRow || cats[0]?.id);
-  } else {
-    switchCat(catId);
-    setTimeout(() => document.getElementById('sec-catrow').scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
-  }
+  if (catId === 'all') { if (cats.length) switchCat(activeCatRow || cats[0]?.id); }
+  else { switchCat(catId); setTimeout(() => document.getElementById('sec-catrow').scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }
 }
 
 /* ════ SEARCH ════ */
@@ -1493,9 +1710,7 @@ function doSearch(q, dropId) {
   const drop = document.getElementById(dropId);
   q = q.trim();
   if (!q) { drop.classList.remove('open'); drop.innerHTML = ''; return; }
-  const res = prods.filter(p =>
-    p.nm?.includes(q) || p.sub?.toLowerCase().includes(q.toLowerCase()) || p.cat?.includes(q)
-  ).slice(0, 8);
+  const res = prods.filter(p => p.nm?.includes(q) || p.sub?.toLowerCase().includes(q.toLowerCase()) || p.cat?.includes(q)).slice(0, 8);
   if (!res.length) drop.innerHTML = '<div class="srch-empty">কোনো পণ্য পাওয়া যায়নি</div>';
   else drop.innerHTML = res.map(p => `
     <div class="srch-item" onclick="searchGo('${p._id}')">
@@ -1508,21 +1723,13 @@ function doSearch(q, dropId) {
 
 function searchGo(id) {
   document.getElementById('deskSearch').value = '';
-  document.getElementById('mobSearch').value = '';
   document.getElementById('deskDrop').classList.remove('open');
-  document.getElementById('mobDrop').classList.remove('open');
+  closeMobSearch();
   goProduct(id);
-}
-
-function toggleMobSearch() {
-  const bar = document.getElementById('mobSearchBar');
-  bar.classList.toggle('open');
-  if (bar.classList.contains('open')) document.getElementById('mobSearch').focus();
 }
 
 document.addEventListener('click', e => {
   if (!e.target.closest('.search-wrap')) document.getElementById('deskDrop').classList.remove('open');
-  if (!e.target.closest('#mobSearchBar') && !e.target.closest('#mobSearchBtn')) document.getElementById('mobDrop').classList.remove('open');
 });
 
 /* ════ PRODUCT DETAIL PAGE ════ */
@@ -1538,20 +1745,16 @@ function renderPdp(p) {
   const price = v.p * pdpState.qty;
   const discPct = v.op ? Math.round((1 - v.p / v.op) * 100) : 0;
   const oldHtml = v.op ? `<span class="pdp-oldp">৳${(v.op * pdpState.qty).toLocaleString('en')}</span><span class="pdp-badge">${discPct}% ছাড়</span>` : '';
-  
   const variants = (p.variants || []).map((vt, i) => `
     <button class="pdp-variant${i === pdpState.varIdx ? ' active' : ''}" onclick="setPdpVar('${p._id||p.id}',${i})">
       ${vt.lbl}${vt.disc ? `<span class="v-disc">${vt.disc}</span>` : ''}
     </button>`).join('');
-
   const highlights = (p.highlights || []).map(h => `<div class="pdp-highlight"><i class="fa-solid fa-circle-check"></i>${h}</div>`).join('');
-
   const thumbImgs = p.imgs?.length ? p.imgs : (p.img ? [p.img] : []);
   const thumbs = thumbImgs.map((imgUrl, i) => `
     <div class="pdp-thumb${i === 0 ? ' active' : ''}" onclick="pdpSetThumb(this,'${imgUrl.replace(/'/g, "\\'")}')">
       <img src="${imgUrl}" alt="thumb ${i+1}" onerror="this.style.display='none';this.parentElement.innerHTML='${p.em}'">
     </div>`).join('');
-
   const related = prods.filter(rp => (rp._id || rp.id) !== (p._id || p.id) && rp.cat === p.cat && rp.active !== false).slice(0, 5);
   const relHtml = related.length ? `
     <div class="pdp-related-title"><i class="fa-solid fa-layer-group" style="color:var(--gd)"></i> সম্পর্কিত পণ্য</div>
@@ -1697,13 +1900,21 @@ function deleteFromCart(cartKey) { delete cart[cartKey]; updateCart(); }
 function updateCart() {
   const items = Object.values(cart);
   const tot = items.reduce((s, i) => s + i.qty, 0);
-  document.getElementById('cartCount').textContent = tot;
+  // Update all cart counts
+  document.getElementById('cartCountDesk').textContent = tot;
+  document.getElementById('cartCountMob').textContent = tot;
+  document.getElementById('cartCountBnav').textContent = tot;
+  document.getElementById('cartCountBnav').textContent = tot;
+  // Hide mob badge if 0
+  const mobBadge = document.getElementById('cartCountMob');
+  mobBadge.style.display = tot > 0 ? 'flex' : 'none';
+  
   const iel = document.getElementById('cartIts'), fel = document.getElementById('cartFt'), relSec = document.getElementById('cartRelSection');
   
   if (!items.length) {
     iel.innerHTML = '<div class="empty-c"><span>🛒</span>আপনার কার্ট খালি</div>';
     fel.style.display = 'none'; relSec.style.display = 'none';
-    if (relTimer) { clearInterval(relTimer); relTimer = null; }
+    stopRelScroll();
     return;
   }
   
@@ -1723,35 +1934,77 @@ function updateCart() {
       <div class="ci-price">৳${(i.cartPrice * i.qty).toLocaleString('en')}</div>
     </div>`).join('') + `</div>`;
 
-  // Related products
   const cartPids = new Set(items.map(i => i._id || i.id));
   const cartCats = [...new Set(items.map(i => i.cat))];
   relItems = prods.filter(p => cartCats.includes(p.cat) && !cartPids.has(p._id || p.id) && p.active !== false);
   if (relItems.length) {
-    relSec.style.display = 'block'; relIdx = 0; renderRelRow();
-    if (relTimer) clearInterval(relTimer);
-    relTimer = setInterval(() => { relIdx = (relIdx + 1) % relItems.length; renderRelRow(); }, 2500);
+    relSec.style.display = 'block'; relIdx = 0;
+    startRelScroll();
   } else {
     relSec.style.display = 'none';
-    if (relTimer) { clearInterval(relTimer); relTimer = null; }
+    stopRelScroll();
   }
   
   document.getElementById('cartTotal').textContent = '৳' + items.reduce((s, i) => s + i.cartPrice * i.qty, 0).toLocaleString('en');
   fel.style.display = 'block';
 }
 
+let relScrollX = 0, relScrollTimer = null, relScrollRAF = null;
+const REL_CARD_W = 80 + 9; // card + gap
+
+function crelCardHTML(rp) {
+  return `<div class="crel-card" onclick="goProduct('${rp._id||rp.id}');toggleCart()">
+    <div class="crel-img" style="background:${rp.bg||'#c8a55a'}22;">
+      ${rp.img ? `<img src="${rp.img}" alt="${rp.nm}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">` : `<span style="font-size:1.8rem">${rp.em}</span>`}
+    </div>
+    <div class="crel-nm">${rp.nm}</div>
+    <div class="crel-pr">৳${getBasePrice(rp).toLocaleString('en')}</div>
+    <button class="crel-add" onclick="addToCartBase('${rp._id||rp.id}');event.stopPropagation()">+ যোগ</button>
+  </div>`;
+}
+
 function renderRelRow() {
   const row = document.getElementById('cartRelRow'); if (!row || !relItems.length) return;
-  row.innerHTML = relItems.map(rp => `
-    <div class="crel-card" onclick="goProduct('${rp._id||rp.id}');toggleCart()">
-      <div class="crel-img" style="background:${rp.bg||'#c8a55a'}22;">
-        ${rp.img ? `<img src="${rp.img}" alt="${rp.nm}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">` : `<span style="font-size:1.8rem">${rp.em}</span>`}
-      </div>
-      <div class="crel-nm">${rp.nm}</div>
-      <div class="crel-pr">৳${getBasePrice(rp).toLocaleString('en')}</div>
-      <button class="crel-add" onclick="addToCartBase('${rp._id||rp.id}');event.stopPropagation()">+ যোগ</button>
-    </div>`).join('');
-  row.style.transform = `translateX(-${relIdx * (80 + 9)}px)`;
+  // মূল কার্ড + ক্লোন = seamless loop
+  const html = relItems.map(crelCardHTML).join('');
+  row.innerHTML = html + html; // double for infinite loop
+  relScrollX = 0;
+  row.style.transform = 'translateX(0)';
+}
+
+function startRelScroll() {
+  stopRelScroll();
+  renderRelRow();
+  const row = document.getElementById('cartRelRow'); if (!row || !relItems.length) return;
+  const halfWidth = relItems.length * REL_CARD_W; // মূল অর্ধেকের width
+  let lastTime = null;
+  const SPEED = 38; // px/sec
+  function step(ts) {
+    if (!lastTime) lastTime = ts;
+    const dt = (ts - lastTime) / 1000;
+    lastTime = ts;
+    relScrollX += SPEED * dt;
+    // half-point এ silently reset
+    if (relScrollX >= halfWidth) relScrollX -= halfWidth;
+    row.style.transform = `translateX(-${relScrollX}px)`;
+    relScrollRAF = requestAnimationFrame(step);
+  }
+  relScrollRAF = requestAnimationFrame(step);
+
+  // hover pause
+  const track = document.querySelector('.cart-rel-track');
+  if (track) {
+    track.onmouseenter = () => { if (relScrollRAF) { cancelAnimationFrame(relScrollRAF); relScrollRAF = null; } };
+    track.onmouseleave = () => {
+      if (!relScrollRAF) { lastTime = null; relScrollRAF = requestAnimationFrame(step); }
+    };
+  }
+}
+
+function stopRelScroll() {
+  if (relScrollRAF) { cancelAnimationFrame(relScrollRAF); relScrollRAF = null; }
+  if (relTimer) { clearInterval(relTimer); relTimer = null; }
+  relScrollX = 0;
 }
 
 function slideRelated(dir) {
@@ -1765,6 +2018,8 @@ function slideRelated(dir) {
 function toggleCart() {
   document.getElementById('cartSb').classList.toggle('open');
   document.getElementById('cartOv').classList.toggle('open');
+  const isOpen = document.getElementById('cartSb').classList.contains('open');
+  document.body.style.overflow = isOpen ? 'hidden' : '';
 }
 
 /* ════ ORDER MODAL ════ */
@@ -1799,8 +2054,6 @@ function openOrderModal() {
   document.getElementById('omGrandTotal').textContent = '৳' + subtotal.toLocaleString('en');
   document.getElementById('omGrand2').textContent = '৳' + subtotal.toLocaleString('en');
   document.getElementById('omSubmitTotal').textContent = '৳' + subtotal.toLocaleString('en');
-
-  // Update delivery charges from settings
   document.getElementById('delCharge1').textContent = '৳' + deliveryCharges.inside;
   document.getElementById('delCharge2').textContent = '৳' + deliveryCharges.outside;
 
@@ -1849,19 +2102,10 @@ async function submitOrder() {
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> অর্ডার হচ্ছে...';
 
   const orderData = {
-    items: items.map(i => ({
-      productId: i._id || i.id,
-      nm: i.nm,
-      varLabel: i.varLabel,
-      qty: i.qty,
-      cartPrice: i.cartPrice,
-      em: i.em,
-      img: i.img || '',
-    })),
+    items: items.map(i => ({ productId: i._id || i.id, nm: i.nm, varLabel: i.varLabel, qty: i.qty, cartPrice: i.cartPrice, em: i.em, img: i.img || '' })),
     customer: { name, phone, address, note },
     delivery: { type: selectedDeliveryType, charge: selectedDelivery },
-    subtotal,
-    total,
+    subtotal, total,
   };
 
   try {
@@ -1872,7 +2116,6 @@ async function submitOrder() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Order failed');
-    
     document.getElementById('omOrderNum').textContent = 'অর্ডার নম্বর: ' + data.orderNum;
     document.getElementById('omMainContent').style.display = 'none';
     document.getElementById('omSuccess').classList.add('show');
@@ -1885,15 +2128,13 @@ async function submitOrder() {
   }
 }
 
-/* ════ PRODUCTS PAGE (dedicated) ════ */
+/* ════ PRODUCTS PAGE ════ */
 async function loadProductsPage(page) {
   prodPage = page;
   prodCatFilter = document.getElementById('prodCatFilter').value;
   prodSearchFilter = document.getElementById('prodSearchInput').value.trim();
-  
   const grid = document.getElementById('productsGrid');
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.8rem;color:var(--gd)"></i></div>';
-  
   try {
     let url = `/api/products?page=${prodPage}&limit=${prodLimit}&active=true`;
     if (prodCatFilter) url += `&cat=${encodeURIComponent(prodCatFilter)}`;
@@ -1901,7 +2142,6 @@ async function loadProductsPage(page) {
     const res = await api(url);
     const prodsPage = res.products || [];
     prodTotal = res.total || 0;
-    
     if (!prodsPage.length) {
       grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa"><i class="fa-solid fa-box-open" style="font-size:2rem;display:block;margin-bottom:8px"></i>কোনো পণ্য পাওয়া যায়নি</div>';
     } else {
@@ -1973,9 +2213,8 @@ async function loadAboutPageContent() {
         </div>
         ${statsHtml}
         ${about.content ? `<div class="about-content">${about.content}</div>` : ''}
-      </div>
-    `;
-  } catch (err) {
+      </div>`;
+  } catch {
     container.innerHTML = '<div class="error-state"><i class="fa-solid fa-circle-exclamation"></i><p>পৃষ্ঠা লোড হয়নি</p></div>';
   }
 }
@@ -1988,7 +2227,6 @@ async function loadContactPageContent() {
     const data = await api('/api/pages/contact');
     const contact = data || {};
     const faqs = contact.faqs || [];
-    // Only show map if URL looks valid (starts with http)
     let mapHtml = '';
     if (contact.mapUrl && contact.mapUrl.startsWith('http')) {
       mapHtml = `<iframe class="contact-map" src="${contact.mapUrl}" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
@@ -2024,24 +2262,44 @@ async function loadContactPageContent() {
             </div>
             <div class="faq-a" style="display:none;">${f.a}</div>
           </div>`).join('') + '</div>' : ''}
-      </div>
-    `;
-  } catch (err) {
+      </div>`;
+  } catch {
     container.innerHTML = '<div class="error-state"><i class="fa-solid fa-circle-exclamation"></i><p>পৃষ্ঠা লোড হয়নি</p></div>';
   }
 }
 
 /* ════ TOAST ════ */
+let toastTimer = null;
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  const icon = document.getElementById('toastIcon');
+  const msgEl = document.getElementById('toastMsg');
+  const isErr = msg.startsWith('❌');
+  // ইমোজি বাদ দিয়ে clean message
+  const cleanMsg = msg.replace(/^[✅❌⚠️]\s*/, '');
+  msgEl.textContent = cleanMsg;
+  if (isErr) {
+    t.classList.add('err-toast');
+    icon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+    icon.className = 'toast-icon err';
+  } else {
+    t.classList.remove('err-toast');
+    icon.innerHTML = '<i class="fa-solid fa-check"></i>';
+    icon.className = 'toast-icon';
+  }
+  // reset animation
+  t.classList.remove('show');
+  void t.offsetWidth; // reflow
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    t.classList.remove('show');
+    toastTimer = null;
+  }, 2600);
 }
 
 /* ════ INIT ════ */
 updateCart();
-// Hero fallback timer (for static slides before API loads)
 if (!heroTimer) {
   heroTimer = setInterval(() => {
     const slides = document.querySelectorAll('.slide');
