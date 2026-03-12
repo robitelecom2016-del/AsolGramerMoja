@@ -1333,15 +1333,22 @@ let settings = {};
 let deliveryCharges = { inside: 80, outside: 130 };
 let storePhone = '01712345678';
 
-/* ════ অগ্রিম ডেলিভারি চার্জ প্রযোজ্য ক্যাটাগরি ════
-   এই ক্যাটাগরির পণ্য অর্ডারে ডেলিভারি চার্জ অগ্রিম দিতে হবে
-   (বিকাশ/নগদে পাঠিয়ে ট্রানজেকশন ID দিতে হবে)
+/* ════ অগ্রিম ডেলিভারি চার্জ — এডমিন প্যানেল থেকে কনফিগার করা হয়
+   Settings key: advanceDeliveryCats (array)
+   Settings key: advancePaymentInfo  { bkash, nagad }
 */
-const ADVANCE_DELIVERY_CATS = ['মিষ্টি', 'দই', 'গ্রীষ্মকালীন পানীয়', 'রশমালাই'];
-const ADVANCE_PAYMENT_INFO = {
-  bkash: '01XXXXXXXXX',   // ← আপনার বিকাশ নম্বর দিন
-  nagad: '01XXXXXXXXX',   // ← আপনার নগদ নম্বর দিন
-};
+let ADVANCE_DELIVERY_CATS = [];
+let ADVANCE_PAYMENT_INFO = { bkash: '', nagad: '' };
+
+async function loadAdvanceDeliverySettings() {
+  try {
+    const data = await api('/api/public/advance-delivery-settings');
+    if (data.cats?.length) ADVANCE_DELIVERY_CATS = data.cats;
+    if (data.payment) ADVANCE_PAYMENT_INFO = data.payment;
+  } catch (e) {
+    console.warn('Advance delivery settings not loaded:', e.message);
+  }
+}
 
 let dataLoaded = false;
 
@@ -1363,6 +1370,8 @@ async function loadAllData() {
     cats = catsRes || [];
     heroSlides = heroRes || [];
     dataLoaded = true;
+    // অগ্রিম ডেলিভারি সেটিংস ব্যাকগ্রাউন্ডে লোড
+    loadAdvanceDeliverySettings().catch(() => {});
     buildUI();
     loadAboutPageContent().catch(()=>{});
     loadContactPageContent().catch(()=>{});
@@ -2094,13 +2103,19 @@ let selectedDelivery = null;
 let selectedDeliveryType = '';
 let requiresAdvanceDelivery = false;
 
-/* কার্টে অগ্রিম-প্রযোজ্য পণ্য আছে কিনা চেক */
+/* কার্টে অগ্রিম-প্রযোজ্য পণ্য আছে কিনা চেক
+   ADVANCE_DELIVERY_CATS হলো category id বা lbl-এর array
+   যেমন: ['misty','doi','rosmalai','borhani']
+*/
 function checkAdvanceDelivery(items) {
-  const found = items.filter(i => {
-    const cat = (i.cat || '').trim();
-    return ADVANCE_DELIVERY_CATS.some(ac => cat.includes(ac) || ac.includes(cat));
+  if (!ADVANCE_DELIVERY_CATS.length) return [];
+  return items.filter(i => {
+    const itemCat = (i.cat || '').trim().toLowerCase();
+    return ADVANCE_DELIVERY_CATS.some(ac => {
+      const acLow = (ac || '').trim().toLowerCase();
+      return itemCat === acLow || itemCat.includes(acLow) || acLow.includes(itemCat);
+    });
   });
-  return found;
 }
 
 function openOrderModal() {
@@ -2142,10 +2157,15 @@ function openOrderModal() {
   const advBox = document.getElementById('omAdvanceBox');
   const legalEl = document.getElementById('omLegalText');
   if (requiresAdvanceDelivery) {
-    const catNames = [...new Set(advItems.map(i => i.cat))].join(', ');
-    document.getElementById('omAdvanceCatList').textContent = catNames;
-    document.getElementById('omBkashNum').textContent = ADVANCE_PAYMENT_INFO.bkash;
-    document.getElementById('omNagadNum').textContent = ADVANCE_PAYMENT_INFO.nagad;
+    // category id থেকে lbl বের করা
+    const advCatIds = [...new Set(advItems.map(i => i.cat))];
+    const catLabels = advCatIds.map(cid => {
+      const found = cats.find(c => c.id === cid);
+      return found ? `${found.em} ${found.lbl}` : cid;
+    }).join(', ');
+    document.getElementById('omAdvanceCatList').textContent = catLabels;
+    document.getElementById('omBkashNum').textContent = ADVANCE_PAYMENT_INFO.bkash || 'নম্বর সেট হয়নি';
+    document.getElementById('omNagadNum').textContent = ADVANCE_PAYMENT_INFO.nagad || 'নম্বর সেট হয়নি';
     advBox.style.display = 'block';
     if (legalEl) legalEl.innerHTML = '⚠️ এই অর্ডারে <strong>ডেলিভারি চার্জ অগ্রিম</strong> পরিশোধ করতে হবে। বাকি পণ্যমূল্য ডেলিভারিতে দিন।';
   } else {
