@@ -150,12 +150,6 @@ const orderSchema = new mongoose.Schema({
   },
   subtotal: Number,
   total: Number,
-  advanceDelivery: {
-    paid: { type: Boolean, default: false },
-    trxId: { type: String, default: '' },
-    amount: { type: Number, default: 0 },
-    verified: { type: Boolean, default: false },
-  },
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
@@ -526,7 +520,7 @@ app.patch('/api/categories/:id/toggle', authMiddleware, async (req, res) => {
 // ─── ORDERS ───
 app.post('/api/orders', async (req, res) => {
   try {
-    const { items, customer, delivery, subtotal, total, advanceDelivery } = req.body;
+    const { items, customer, delivery, subtotal, total } = req.body;
     if (!items?.length || !customer?.name || !customer?.phone || !customer?.address) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -538,7 +532,6 @@ app.post('/api/orders', async (req, res) => {
       delivery,
       subtotal,
       total,
-      advanceDelivery: advanceDelivery || { paid: false, trxId: '', amount: 0, verified: false },
       statusHistory: [{ status: 'pending', note: 'Order placed', time: new Date() }],
     });
     res.status(201).json(order);
@@ -593,22 +586,6 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
     if (!order) return res.status(404).json({ error: 'Order not found' });
     order.status = status;
     order.statusHistory.push({ status, note, time: new Date() });
-    order.updatedAt = new Date();
-    await order.save();
-    res.json(order);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// অগ্রিম ডেলিভারি চার্জ — admin verify করবে
-app.patch('/api/orders/:id/advance-verify', authMiddleware, async (req, res) => {
-  try {
-    const { verified } = req.body;
-    const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).json({ error: 'Order not found' });
-    if (!order.advanceDelivery?.paid) return res.status(400).json({ error: 'No advance delivery for this order' });
-    order.advanceDelivery.verified = !!verified;
     order.updatedAt = new Date();
     await order.save();
     res.json(order);
@@ -716,20 +693,6 @@ app.get('/api/public/settings', async (req, res) => {
     const obj = {};
     settings.forEach(s => { if (!["aboutPage","contactPage"].includes(s.key)) obj[s.key] = s.value; });
     res.json(obj);
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-// অগ্রিম ডেলিভারি সেটিংস — public (frontend লোড করবে)
-app.get('/api/public/advance-delivery-settings', async (req, res) => {
-  try {
-    const [catsSetting, paymentSetting] = await Promise.all([
-      Settings.findOne({ key: 'advanceDeliveryCats' }),
-      Settings.findOne({ key: 'advancePaymentInfo' }),
-    ]);
-    res.json({
-      cats: catsSetting?.value || [],
-      payment: paymentSetting?.value || { bkash: '', nagad: '' },
-    });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
