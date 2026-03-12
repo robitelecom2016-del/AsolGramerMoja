@@ -762,6 +762,26 @@ footer p{font-size:.79rem;line-height:1.7;}
   .toast{bottom:20px;width:calc(100vw - 32px);max-width:290px;}
 }
 
+.om-advance-box{background:#fff8e6;border:1.5px solid #f0a500;border-radius:10px;padding:14px 16px;margin:0 0 4px;}
+.om-advance-title{font-size:.85rem;font-weight:700;color:#b45000;display:flex;align-items:center;gap:7px;margin-bottom:10px;}
+.om-advance-title i{color:#e67e00;}
+.om-advance-alert{font-size:.78rem;color:#7a4500;background:#ffefc2;border-radius:6px;padding:8px 12px;margin-bottom:12px;line-height:1.6;}
+.om-pay-methods{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.om-pay-method{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:1.5px solid #e0d0b0;background:#fffaf0;}
+.om-pay-logo{width:38px;height:38px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#fff;flex-shrink:0;}
+.om-pay-logo.bk{background:#e2136e;}
+.om-pay-logo.ng{background:#f4821f;}
+.om-pay-details{flex:1;}
+.om-pay-type{font-size:.78rem;font-weight:700;color:#555;margin-bottom:1px;}
+.om-pay-num{font-size:.98rem;font-weight:700;color:#222;letter-spacing:.5px;}
+.om-pay-copy{background:none;border:1.5px solid #ccc;border-radius:5px;padding:4px 9px;font-size:.72rem;font-weight:600;color:#666;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.om-pay-copy:hover{border-color:var(--gd);color:var(--gd);}
+.om-pay-copy.copied{border-color:#4caf50;color:#4caf50;}
+.om-trx-label{font-size:.78rem;font-weight:700;color:#444;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.om-trx-input{width:100%;padding:10px 13px;border:1.5px solid #e0c070;border-radius:7px;font-family:inherit;font-size:.9rem;font-weight:600;color:var(--txt);background:#fffdf5;outline:none;transition:border-color .2s;}
+.om-trx-input:focus{border-color:#e8a000;box-shadow:0 0 0 3px rgba(240,160,0,.12);}
+.om-trx-input::placeholder{color:#bbb;font-weight:400;}
+.om-advance-amt{font-size:.8rem;color:#7a4500;background:#fff0cc;padding:7px 12px;border-radius:6px;margin-top:6px;text-align:center;font-weight:600;}
 /* ══ ORDER MODAL ══ */
 .order-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;align-items:center;justify-content:center;padding:16px;}
 .order-ov.open{opacity:1;pointer-events:all;}
@@ -1227,6 +1247,42 @@ footer p{font-size:.79rem;line-height:1.7;}
             <div class="om-del-price" id="delCharge2">৳130</div>
           </div>
         </div>
+
+        <!-- অগ্রিম ডেলিভারি চার্জ বক্স — শুধু নির্দিষ্ট ক্যাটাগরির পণ্যে দেখাবে -->
+        <div class="om-advance-box" id="omAdvanceBox" style="display:none;margin-top:14px;">
+          <div class="om-advance-title">
+            <i class="fa-solid fa-money-bill-wave"></i>
+            অগ্রিম ডেলিভারি চার্জ প্রযোজ্য
+          </div>
+          <div class="om-advance-alert">
+            ⚠️ আপনার অর্ডারে <strong id="omAdvanceCatList"></strong> পণ্য রয়েছে।
+            এই পণ্যগুলোর জন্য <strong>ডেলিভারি চার্জ অগ্রিম পাঠাতে হবে</strong>।
+            নিচের যেকোনো একটি মাধ্যমে ডেলিভারি চার্জ সেন্ড করুন, তারপর ট্রানজেকশন ID দিন।
+          </div>
+          <div class="om-pay-methods">
+            <div class="om-pay-method">
+              <div class="om-pay-logo bk">বি</div>
+              <div class="om-pay-details">
+                <div class="om-pay-type">বিকাশ — Send Money</div>
+                <div class="om-pay-num" id="omBkashNum"></div>
+              </div>
+              <button class="om-pay-copy" onclick="copyPayNum('bkash',this)">কপি</button>
+            </div>
+            <div class="om-pay-method">
+              <div class="om-pay-logo ng">ন</div>
+              <div class="om-pay-details">
+                <div class="om-pay-type">নগদ — Send Money</div>
+                <div class="om-pay-num" id="omNagadNum"></div>
+              </div>
+              <button class="om-pay-copy" onclick="copyPayNum('nagad',this)">কপি</button>
+            </div>
+          </div>
+          <div class="om-advance-amt" id="omAdvanceAmtText"></div>
+          <div style="margin-top:12px;">
+            <div class="om-trx-label"><i class="fa-solid fa-receipt" style="color:#e67e00"></i> ট্রানজেকশন ID <span style="color:#e00;margin-left:2px;">*</span></div>
+            <input type="text" class="om-trx-input" id="omTrxId" placeholder="বিকাশ/নগদ ট্রানজেকশন ID লিখুন (যেমন: 8F3K9X2P)">
+          </div>
+        </div>
       </div>
       <div class="om-total-bar">
         <div class="om-total-row"><span>পণ্যের মূল্য</span><span id="omSubtotal2">৳0</span></div>
@@ -1237,7 +1293,7 @@ footer p{font-size:.79rem;line-height:1.7;}
         <button class="om-submit" id="omSubmitBtn" onclick="submitOrder()">
           <i class="fa-solid fa-check-circle"></i> অর্ডার কনফার্ম করুন <span id="omSubmitTotal"></span>
         </button>
-        <div class="om-legal">ক্যাশ অন ডেলিভারি — পণ্য পেলে টাকা দিন। কোনো অগ্রিম পেমেন্ট নেই।</div>
+        <div class="om-legal" id="omLegalText">ক্যাশ অন ডেলিভারি — পণ্য পেলে টাকা দিন। কোনো অগ্রিম পেমেন্ট নেই।</div>
       </div>
     </div>
     <div class="om-success" id="omSuccess">
@@ -1245,6 +1301,9 @@ footer p{font-size:.79rem;line-height:1.7;}
       <h3>অর্ডার সম্পন্ন হয়েছে!</h3>
       <p>আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে।<br>শীঘ্রই আমাদের টিম আপনার সাথে যোগাযোগ করবে।</p>
       <div class="order-num" id="omOrderNum"></div>
+      <div id="omSuccessAdvanceNote" style="display:none;background:#fff8e6;border:1px solid #f0a500;border-radius:8px;padding:10px 14px;font-size:.8rem;color:#7a4500;margin:10px 0;line-height:1.7;">
+        💳 আপনার অগ্রিম ডেলিভারি চার্জ পেমেন্ট যাচাই করা হবে এবং কনফার্মেশন SMS পাবেন।
+      </div>
       <p style="font-size:.8rem;color:#aaa;margin-top:8px;">ধন্যবাদ আমাদের সাথে কেনাকাটা করার জন্য 🙏</p>
       <button onclick="closeOrderModal()" style="margin-top:20px;background:var(--gd);color:#fff;border:none;padding:11px 30px;border-radius:7px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;">বাড়িতে ফিরে যান</button>
     </div>
@@ -1273,6 +1332,17 @@ let heroSlides = [];
 let settings = {};
 let deliveryCharges = { inside: 80, outside: 130 };
 let storePhone = '01712345678';
+
+/* ════ অগ্রিম ডেলিভারি চার্জ প্রযোজ্য ক্যাটাগরি ════
+   এই ক্যাটাগরির পণ্য অর্ডারে ডেলিভারি চার্জ অগ্রিম দিতে হবে
+   (বিকাশ/নগদে পাঠিয়ে ট্রানজেকশন ID দিতে হবে)
+*/
+const ADVANCE_DELIVERY_CATS = ['মিষ্টি', 'দই', 'গ্রীষ্মকালীন পানীয়', 'রশমালাই'];
+const ADVANCE_PAYMENT_INFO = {
+  bkash: '01XXXXXXXXX',   // ← আপনার বিকাশ নম্বর দিন
+  nagad: '01XXXXXXXXX',   // ← আপনার নগদ নম্বর দিন
+};
+
 let dataLoaded = false;
 
 let prodPage = 1;
@@ -2022,6 +2092,16 @@ function toggleCart() {
 /* ════ ORDER MODAL ════ */
 let selectedDelivery = null;
 let selectedDeliveryType = '';
+let requiresAdvanceDelivery = false;
+
+/* কার্টে অগ্রিম-প্রযোজ্য পণ্য আছে কিনা চেক */
+function checkAdvanceDelivery(items) {
+  const found = items.filter(i => {
+    const cat = (i.cat || '').trim();
+    return ADVANCE_DELIVERY_CATS.some(ac => cat.includes(ac) || ac.includes(cat));
+  });
+  return found;
+}
 
 function openOrderModal() {
   const items = Object.values(cart);
@@ -2032,6 +2112,8 @@ function openOrderModal() {
   document.getElementById('omPhone').value = '';
   document.getElementById('omAddress').value = '';
   document.getElementById('omNote').value = '';
+  const trxEl = document.getElementById('omTrxId');
+  if (trxEl) trxEl.value = '';
   document.querySelectorAll('.om-del-opt').forEach(o => o.classList.remove('selected'));
   document.getElementById('omMainContent').style.display = 'block';
   document.getElementById('omSuccess').classList.remove('show');
@@ -2053,6 +2135,23 @@ function openOrderModal() {
   document.getElementById('omSubmitTotal').textContent = '৳' + subtotal.toLocaleString('en');
   document.getElementById('delCharge1').textContent = '৳' + deliveryCharges.inside;
   document.getElementById('delCharge2').textContent = '৳' + deliveryCharges.outside;
+
+  /* অগ্রিম ডেলিভারি চার্জ চেক */
+  const advItems = checkAdvanceDelivery(items);
+  requiresAdvanceDelivery = advItems.length > 0;
+  const advBox = document.getElementById('omAdvanceBox');
+  const legalEl = document.getElementById('omLegalText');
+  if (requiresAdvanceDelivery) {
+    const catNames = [...new Set(advItems.map(i => i.cat))].join(', ');
+    document.getElementById('omAdvanceCatList').textContent = catNames;
+    document.getElementById('omBkashNum').textContent = ADVANCE_PAYMENT_INFO.bkash;
+    document.getElementById('omNagadNum').textContent = ADVANCE_PAYMENT_INFO.nagad;
+    advBox.style.display = 'block';
+    if (legalEl) legalEl.innerHTML = '⚠️ এই অর্ডারে <strong>ডেলিভারি চার্জ অগ্রিম</strong> পরিশোধ করতে হবে। বাকি পণ্যমূল্য ডেলিভারিতে দিন।';
+  } else {
+    advBox.style.display = 'none';
+    if (legalEl) legalEl.textContent = 'ক্যাশ অন ডেলিভারি — পণ্য পেলে টাকা দিন। কোনো অগ্রিম পেমেন্ট নেই।';
+  }
 
   document.getElementById('cartSb').classList.remove('open');
   document.getElementById('cartOv').classList.remove('open');
@@ -2077,6 +2176,12 @@ function selectDelivery(charge, optId, type) {
   document.getElementById('omGrandTotal').textContent = '৳' + grand.toLocaleString('en');
   document.getElementById('omGrand2').textContent = '৳' + grand.toLocaleString('en');
   document.getElementById('omSubmitTotal').textContent = '৳' + grand.toLocaleString('en');
+
+  /* অগ্রিম পরিমাণ আপডেট */
+  const advAmt = document.getElementById('omAdvanceAmtText');
+  if (advAmt && requiresAdvanceDelivery) {
+    advAmt.innerHTML = `📌 অগ্রিম পাঠাতে হবে: <strong>৳${charge.toLocaleString('en')}</strong> (ডেলিভারি চার্জ মাত্র)`;
+  }
 }
 
 async function submitOrder() {
@@ -2089,6 +2194,23 @@ async function submitOrder() {
   if (!phone || phone.length < 11) { showToast('❌ সঠিক মোবাইল নম্বর দিন'); document.getElementById('omPhone').focus(); return; }
   if (!address) { showToast('❌ ঠিকানা লিখুন'); document.getElementById('omAddress').focus(); return; }
   if (selectedDelivery === null) { showToast('❌ ডেলিভারি পদ্ধতি নির্বাচন করুন'); return; }
+
+  /* অগ্রিম পেমেন্ট ট্রানজেকশন ID চেক */
+  let trxId = '';
+  if (requiresAdvanceDelivery) {
+    trxId = (document.getElementById('omTrxId')?.value || '').trim();
+    if (!trxId) {
+      showToast('❌ বিকাশ/নগদ ট্রানজেকশন ID দিন');
+      document.getElementById('omTrxId')?.focus();
+      document.getElementById('omAdvanceBox')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    if (trxId.length < 6) {
+      showToast('❌ সঠিক ট্রানজেকশন ID দিন (কমপক্ষে ৬ অক্ষর)');
+      document.getElementById('omTrxId')?.focus();
+      return;
+    }
+  }
 
   const items = Object.values(cart);
   const subtotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
@@ -2103,6 +2225,7 @@ async function submitOrder() {
     customer: { name, phone, address, note },
     delivery: { type: selectedDeliveryType, charge: selectedDelivery },
     subtotal, total,
+    advanceDelivery: requiresAdvanceDelivery ? { paid: true, trxId, amount: selectedDelivery } : null,
   };
 
   try {
@@ -2114,6 +2237,8 @@ async function submitOrder() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Order failed');
     document.getElementById('omOrderNum').textContent = 'অর্ডার নম্বর: ' + data.orderNum;
+    const advNote = document.getElementById('omSuccessAdvanceNote');
+    if (advNote) advNote.style.display = requiresAdvanceDelivery ? 'block' : 'none';
     document.getElementById('omMainContent').style.display = 'none';
     document.getElementById('omSuccess').classList.add('show');
     cart = {};
@@ -2263,6 +2388,25 @@ async function loadContactPageContent() {
   } catch {
     container.innerHTML = '<div class="error-state"><i class="fa-solid fa-circle-exclamation"></i><p>পৃষ্ঠা লোড হয়নি</p></div>';
   }
+}
+
+/* ════ COPY PAYMENT NUMBER ════ */
+function copyPayNum(method, btn) {
+  const num = ADVANCE_PAYMENT_INFO[method];
+  if (!num) return;
+  navigator.clipboard.writeText(num).then(() => {
+    btn.textContent = '✓ কপি';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'কপি'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    /* fallback for older browsers */
+    const el = document.createElement('textarea');
+    el.value = num; document.body.appendChild(el);
+    el.select(); document.execCommand('copy');
+    document.body.removeChild(el);
+    btn.textContent = '✓ কপি'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'কপি'; btn.classList.remove('copied'); }, 2000);
+  });
 }
 
 /* ════ TOAST ════ */
