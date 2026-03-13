@@ -126,7 +126,7 @@ const productSchema = new mongoose.Schema({
 });
 const Product = mongoose.model('Product', productSchema);
 
-// Order Schema
+// Order Schema (updated with advanceDelivery)
 const orderSchema = new mongoose.Schema({
   orderNum: { type: String, required: true, unique: true },
   items: [{
@@ -148,17 +148,13 @@ const orderSchema = new mongoose.Schema({
     type: { type: String },
     charge: Number,
   },
+  advanceDelivery: {
+    paid: { type: Boolean, default: false },
+    trxId: { type: String, default: '' },
+    amount: { type: Number, default: 0 },
+  },
   subtotal: Number,
   total: Number,
-  payment: {
-    method: { type: String, default: 'cod' },
-    advanceAmount: { type: Number, default: 0 },
-    trxId: { type: String, default: '' },
-    phone: { type: String, default: '' },
-    status: { type: String, enum: ['unpaid', 'partial', 'paid'], default: 'unpaid' },
-    verifiedAt: { type: Date },
-    note: { type: String, default: '' },
-  },
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
@@ -423,8 +419,6 @@ app.post('/api/upload/product-image', authMiddleware, upload.single('image'), as
 });
 
 // Hero slider image upload
-// CSS ratio: 8:3 → Cloudinary তে 1600×600 crop করে সেভ করে
-// object-fit:cover → সব ডিভাইসে একই ইমেজ পারফেক্ট দেখাবে
 app.post('/api/upload/hero-image', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
@@ -527,21 +521,14 @@ app.patch('/api/categories/:id/toggle', authMiddleware, async (req, res) => {
 });
 
 // ─── ORDERS ───
+// Updated POST /api/orders to accept advanceDelivery
 app.post('/api/orders', async (req, res) => {
   try {
-    const { items, customer, delivery, subtotal, total, payment } = req.body;
+    const { items, customer, delivery, subtotal, total, advanceDelivery } = req.body;
     if (!items?.length || !customer?.name || !customer?.phone || !customer?.address) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
     const orderNum = 'ORD-' + Date.now();
-    const paymentData = {
-      method: payment?.method || 'cod',
-      advanceAmount: payment?.advanceAmount || 0,
-      trxId: payment?.trxId || '',
-      phone: payment?.phone || '',
-      status: (payment?.advanceAmount > 0) ? 'partial' : 'unpaid',
-      note: payment?.note || '',
-    };
     const order = await Order.create({
       orderNum,
       items,
@@ -549,7 +536,7 @@ app.post('/api/orders', async (req, res) => {
       delivery,
       subtotal,
       total,
-      payment: paymentData,
+      advanceDelivery: advanceDelivery || { paid: false, trxId: '', amount: 0 },
       statusHistory: [{ status: 'pending', note: 'Order placed', time: new Date() }],
     });
     res.status(201).json(order);
@@ -563,9 +550,8 @@ app.get('/api/orders', authMiddleware, async (req, res) => {
     const { status, search, page = 1, limit = 10 } = req.query;
     let filter = status && status !== 'all' ? { status } : {};
     
-    // ✅ FIX: যদি search টেক্সট থাকে তাহলে orderNum, customer.name, বা customer.phone সার্চ করবে
     if (search && search.trim()) {
-      const searchRegex = new RegExp(search.trim(), 'i'); // Case-insensitive search
+      const searchRegex = new RegExp(search.trim(), 'i');
       filter = {
         ...filter,
         $or: [
@@ -604,23 +590,6 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
     if (!order) return res.status(404).json({ error: 'Order not found' });
     order.status = status;
     order.statusHistory.push({ status, note, time: new Date() });
-    order.updatedAt = new Date();
-    await order.save();
-    res.json(order);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.patch('/api/orders/:id/payment', authMiddleware, async (req, res) => {
-  try {
-    const { status, note, verifiedAt } = req.body;
-    const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).json({ error: 'Order not found' });
-    if (!order.payment) order.payment = {};
-    order.payment.status = status;
-    if (note !== undefined) order.payment.note = note;
-    if (status === 'paid') order.payment.verifiedAt = verifiedAt ? new Date(verifiedAt) : new Date();
     order.updatedAt = new Date();
     await order.save();
     res.json(order);
@@ -809,43 +778,43 @@ app.post('/api/seed', authMiddleware, async (req, res) => {
         { cat: 'misty', nm: 'সরিষার ফুলের মধু', sub: '१००% খাঁটি এবং আসল মধু', em: '🍯', bg: '#c8a55a', best: true, active: true, phone: '01712345678', desc: 'সরিষার ফুল থেকে সংগৃহীত খাঁটি মধু।', variants: [{ lbl: '०००gm', p: 280, op: 350, disc: '२०%' }, { lbl: '१kg', p: 520, op: 680, disc: '२४%' }], order: 1 },
         { cat: 'misty', nm: 'খেজুরের মধু', sub: 'মিশ্র ফুলের সংমিশ্রণ', em: '🍯', bg: '#8b6914', best: false, active: true, phone: '01712345678', desc: 'খেজুর গাছের ফুল থেকে সংগৃহীত।', variants: [{ lbl: '००००gm', p: 320, op: 400, disc: '२०%' }], order: 2 },
         { cat: 'misty', nm: 'ফুলের মধু মিশ্রণ', sub: 'বহু ফুলের নির্যাস', em: '🌸', bg: '#d4a574', best: false, active: true, phone: '01712345678', variants: [{ lbl: '३००gm', p: 180, op: 250, disc: '२८%' }], order: 3 },
-        { cat: 'misty', nm: 'আম্বাজি মধু', sub: 'স্বর्गীय स्वाद का मधु', em: '🥭', bg: '#e8b84e', best: false, active: true, phone: '01712345678', variants: [{ lbl: '०२५०gm', p: 200, op: 280, disc: '२८%' }], order: 4 },
-        { cat: 'misty', nm: 'স্থানীয় বন মধু', sub: 'प्राकৃतिक अरण्य from', em: '🌲', bg: '#997744', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 350, op: 500, disc: '३०%' }], order: 5 },
+        { cat: 'misty', nm: 'আম্বাজি মধু', sub: 'স্বর্গীয় स्वाद का मधु', em: '🥭', bg: '#e8b84e', best: false, active: true, phone: '01712345678', variants: [{ lbl: '०२५०gm', p: 200, op: 280, disc: '२८%' }], order: 4 },
+        { cat: 'misty', nm: 'স্থানীয় বন মধু', sub: 'প্রাকৃতিক অরণ্য from', em: '🌲', bg: '#997744', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 350, op: 500, disc: '३०%' }], order: 5 },
 
-        // DOI (दोi) - 5
-        { cat: 'doi', nm: 'গ্রামীণ গরুর দই', sub: 'घरे تৈरि খাঁति दोi', em: '🥛', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '१ keji', p: 120, op: 150, disc: '२०%' }], order: 1 },
-        { cat: 'doi', nm: 'মিষ্টি মেহেরী দই', sub: 'प्रीमिय्म मानের দোi', em: '🍶', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 70, op: 90, disc: '२२%' }], order: 2 },
-        { cat: 'doi', nm: 'ছাগলের দই', sub: 'स्वास्थ्यकर विकल्प', em: '🐐', bg: '#e6d5c8', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 100, op: 140, disc: '२९%' }], order: 3 },
-        { cat: 'doi', nm: 'কুমড়ার দই', sub: 'विशेष स्वाद का दोi', em: '🎃', bg: '#ffa500', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 90, op: 120, disc: '२५%' }], order: 4 },
-        { cat: 'doi', nm: 'স্ট্রবেরি দই', sub: 'फलের सुस्वादु दोi', em: '🍓', bg: '#ffb6c1', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 95, op: 130, disc: '२७%' }], order: 5 },
+        // DOI (দই) - 5
+        { cat: 'doi', nm: 'গ্রামীণ গরুর দই', sub: 'ঘরে তৈরি খাঁটি দই', em: '🥛', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '१ keji', p: 120, op: 150, disc: '२०%' }], order: 1 },
+        { cat: 'doi', nm: 'মিষ্টি মেহেরী দই', sub: 'প্রিমিয়াম মানের দই', em: '🍶', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 70, op: 90, disc: '२२%' }], order: 2 },
+        { cat: 'doi', nm: 'ছাগলের দই', sub: 'স্বাস্থ্যকর বিকল্প', em: '🐐', bg: '#e6d5c8', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 100, op: 140, disc: '२९%' }], order: 3 },
+        { cat: 'doi', nm: 'কুমড়ার দই', sub: 'বিশেষ স্বাদের দই', em: '🎃', bg: '#ffa500', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 90, op: 120, disc: '२५%' }], order: 4 },
+        { cat: 'doi', nm: 'স্ট্রবেরি দই', sub: 'ফলের সুস্বাদু দই', em: '🍓', bg: '#ffb6c1', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 95, op: 130, disc: '२७%' }], order: 5 },
 
-        // MITHAI (मिତाୟ) - 5
-        { cat: 'mithai', nm: 'সন্দেশ', sub: 'ऐतिहास মिषाई', em: '🍪', bg: '#d4a574', best: true, active: true, phone: '01712345678', variants: [{ lbl: '५टि पिस', p: 150, op: 200, disc: '२५%' }], order: 1 },
-        { cat: 'mithai', nm: 'রসগোল্লা', sub: 'सुस्वादु सादा मिषाई', em: '⚪', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '०५टि पिस', p: 120, op: 160, disc: '२५%' }], order: 2 },
-        { cat: 'mithai', nm: 'পায়েস', sub: 'ঐতिহ્যbahi खीर का पायेश्', em: '🥣', bg: '#ffd700', best: false, active: true, phone: '01712345678', variants: [{ lbl: '२००gm', p: 100, op: 140, disc: '२९%' }], order: 3 },
-        { cat: 'mithai', nm: 'গুলাব জামুন', sub: 'मिषाई ভাজার মिষाই', em: '🔴', bg: '#8b4513', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 130, op: 180, disc: '२८%' }], order: 4 },
-        { cat: 'mithai', nm: 'খীর কামান', sub: 'বिशेष खीर का मिषाई', em: '🎀', bg: '#daa520', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 90, op: 130, disc: '३१%' }], order: 5 },
+        // MITHAI (মিঠাই) - 5
+        { cat: 'mithai', nm: 'সন্দেশ', sub: 'ঐতিহ্য মিঠাই', em: '🍪', bg: '#d4a574', best: true, active: true, phone: '01712345678', variants: [{ lbl: '५टि पिस', p: 150, op: 200, disc: '२५%' }], order: 1 },
+        { cat: 'mithai', nm: 'রসগোল্লা', sub: 'সুস্বাদু সাদা মিঠাই', em: '⚪', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '०५टि पिस', p: 120, op: 160, disc: '२५%' }], order: 2 },
+        { cat: 'mithai', nm: 'পায়েস', sub: 'ঐতিহ্যবাহী খীরের পায়েস', em: '🥣', bg: '#ffd700', best: false, active: true, phone: '01712345678', variants: [{ lbl: '२००gm', p: 100, op: 140, disc: '२९%' }], order: 3 },
+        { cat: 'mithai', nm: 'গুলাব জামুন', sub: 'মিঠাই ভাজার মিঠাই', em: '🔴', bg: '#8b4513', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 130, op: 180, disc: '२८%' }], order: 4 },
+        { cat: 'mithai', nm: 'খীর কামান', sub: 'বিশেষ খীরের মিঠাই', em: '🎀', bg: '#daa520', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 90, op: 130, disc: '३१%' }], order: 5 },
 
-        // TAIL (तैل) - 5
-        { cat: 'tail', nm: 'নারকেল তেল', sub: 'पूरी खाँটि तेल', em: '🥥', bg: '#8b6914', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 250, op: 350, disc: '२९%' }], order: 1 },
-        { cat: 'tail', nm: 'তিসি তেল', sub: 'स्वास्थ्य तेल', em: '🌿', bg: '#6b4423', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 180, op: 260, disc: '३१%' }], order: 2 },
-        { cat: 'tail', nm: 'সরিষার তেল', sub: 'रसोई का तेल', em: '🌾', bg: '#997744', best: false, active: true, phone: '01712345678', variants: [{ lbl: '१ लiter', p: 320, op: 480, disc: '३३%' }], order: 3 },
-        { cat: 'tail', nm: 'জলপাই তেল', sub: 'स्वास्थ्य विकल्प', em: '🫒', bg: '#556b2f', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 320, op: 480, disc: '३३%' }], order: 4 },
-        { cat: 'tail', nm: 'সুগন্ধি তেল', sub: 'आयुर्वेदिक मिश्रण', em: '🌸', bg: '#d4a574', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 120, op: 180, disc: '३३%' }], order: 5 },
+        // TAIL (তৈল) - 5
+        { cat: 'tail', nm: 'নারকেল তেল', sub: 'পূর্ণ খাঁটি তেল', em: '🥥', bg: '#8b6914', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 250, op: 350, disc: '२९%' }], order: 1 },
+        { cat: 'tail', nm: 'তিসি তেল', sub: 'স্বাস্থ্য তেল', em: '🌿', bg: '#6b4423', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 180, op: 260, disc: '३१%' }], order: 2 },
+        { cat: 'tail', nm: 'সরিষার তেল', sub: 'রসোই তেল', em: '🌾', bg: '#997744', best: false, active: true, phone: '01712345678', variants: [{ lbl: '१ लiter', p: 320, op: 480, disc: '३३%' }], order: 3 },
+        { cat: 'tail', nm: 'জলপাই তেল', sub: 'স্বাস্থ্য বিকল্প', em: '🫒', bg: '#556b2f', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 320, op: 480, disc: '३३%' }], order: 4 },
+        { cat: 'tail', nm: 'সুগন্ধি তেল', sub: 'আয়ুর্বেদিক মিশ্রণ', em: '🌸', bg: '#d4a574', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 120, op: 180, disc: '३३%' }], order: 5 },
 
-        // BORHANI (बोरहानि) - 5
-        { cat: 'borhani', nm: 'ঘিয়ে বোরহানী', sub: 'ঐতिह्यbahi pिणनiय', em: '🥤', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 80, op: 120, disc: '३३%' }], order: 1 },
-        { cat: 'borhani', nm: 'পুদিনা বোরহানী', sub: 'তাজা पुदिना', em: '🌿', bg: '#e6f5e6', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 60, op: 100, disc: '४०%' }], order: 2 },
-        { cat: 'borhani', nm: 'জিরা বোরহানী', sub: 'पाचन शक्ti', em: '🌾', bg: '#f5deb3', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 70, op: 110, disc: '३६%' }], order: 3 },
-        { cat: 'borhani', nm: 'আম্রপালী বোরহানী', sub: 'फल का स्वाद', em: '🥭', bg: '#ffd700', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 90, op: 130, disc: '३१%' }], order: 4 },
-        { cat: 'borhani', nm: 'মাল্টি মশলা বোরহানী', sub: 'मसाले का मिश्रण', em: '🌶️', bg: '#ff6347', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 75, op: 120, disc: '३८%' }], order: 5 },
+        // BORHANI (বোরহানী) - 5
+        { cat: 'borhani', nm: 'ঘিয়ে বোরহানী', sub: 'ঐতিহ্যবাহী পানীয়', em: '🥤', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 80, op: 120, disc: '३३%' }], order: 1 },
+        { cat: 'borhani', nm: 'পুদিনা বোরহানী', sub: 'তাজা পুদিনা', em: '🌿', bg: '#e6f5e6', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 60, op: 100, disc: '४०%' }], order: 2 },
+        { cat: 'borhani', nm: 'জিরা বোরহানী', sub: 'পাচন শক্তি', em: '🌾', bg: '#f5deb3', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 70, op: 110, disc: '३६%' }], order: 3 },
+        { cat: 'borhani', nm: 'আম্রপালী বোরহানী', sub: 'ফলের স্বাদ', em: '🥭', bg: '#ffd700', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 90, op: 130, disc: '३१%' }], order: 4 },
+        { cat: 'borhani', nm: 'মাল্টি মশলা বোরহানী', sub: 'মশলার মিশ্রণ', em: '🌶️', bg: '#ff6347', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 75, op: 120, disc: '३८%' }], order: 5 },
 
-        // ROSMALAI (रॉस्मलAই) - 5
-        { cat: 'rosmalai', nm: 'খাঁটি রশমালাই', sub: 'छनार मिषाई', em: '🍚', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 200, op: 280, disc: '२९%' }], order: 1 },
-        { cat: 'rosmalai', nm: 'পিস्তा रशमालai', sub: 'शुकno फल', em: '🌰', bg: '#f5deb3', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 280, op: 400, disc: '३०%' }], order: 2 },
-        { cat: 'rosmalai', nm: 'গোলাপি রশমালাই', sub: 'गुलाब जल', em: '🌹', bg: '#ffb6c1', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 220, op: 320, disc: '३१%' }], order: 3 },
-        { cat: 'rosmalai', nm: 'আখরোট রশমালাই', sub: 'अखरोट शक्ti', em: '🧠', bg: '#daa520', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 240, op: 350, disc: '३१%' }], order: 4 },
-        { cat: 'rosmalai', nm: 'সাদা রশমালাই', sub: 'ঐতिह्य मिषाई', em: '⚪', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 180, op: 250, disc: '२८%' }], order: 5 }
+        // ROSMALAI (রশমালাই) - 5
+        { cat: 'rosmalai', nm: 'খাঁটি রশমালাই', sub: 'ছানার মিঠাই', em: '🍚', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 200, op: 280, disc: '२९%' }], order: 1 },
+        { cat: 'rosmalai', nm: 'পিস্তা রশমালাই', sub: 'শুকনো ফল', em: '🌰', bg: '#f5deb3', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 280, op: 400, disc: '३०%' }], order: 2 },
+        { cat: 'rosmalai', nm: 'গোলাপি রশমালাই', sub: 'গোলাপ জল', em: '🌹', bg: '#ffb6c1', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 220, op: 320, disc: '३१%' }], order: 3 },
+        { cat: 'rosmalai', nm: 'আখরোট রশমালাই', sub: 'আখরোট শক্তি', em: '🧠', bg: '#daa520', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 240, op: 350, disc: '३१%' }], order: 4 },
+        { cat: 'rosmalai', nm: 'সাদা রশমালাই', sub: 'ঐতিহ্য মিঠাই', em: '⚪', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 180, op: 250, disc: '२८%' }], order: 5 }
       ]);
     }
 
@@ -854,9 +823,9 @@ app.post('/api/seed', authMiddleware, async (req, res) => {
     if (heroCount === 0 || force) {
       if (force) await Hero.deleteMany({});
       await Hero.insertMany([
-        { title: 'গ্রামীণ সতেজতা ও स्वाद', subtitle: 'বिशुद्ध গ্রামীণ পণ्य', gradient: 's1', order: 1 },
-        { title: 'बिशुद्ध सरिषार मधु', subtitle: 'प्राকৃতिक মৌমাছি', gradient: 's2', order: 2 },
-        { title: 'তাজা दुध तৈरि दোi', subtitle: 'খাঁটি গ্রামীণ স्वाद', gradient: 's3', order: 3 },
+        { title: 'গ্রামীণ সতেজতা ও স্বাদ', subtitle: 'বিশুদ্ধ গ্রামীণ পণ্য', gradient: 's1', order: 1 },
+        { title: 'বিশুদ্ধ সরিষার মধু', subtitle: 'প্রাকৃতিক মৌমাছি', gradient: 's2', order: 2 },
+        { title: 'তাজা দুধ তৈরী দই', subtitle: 'খাঁটি গ্রামীণ স্বাদ', gradient: 's3', order: 3 },
       ]);
     }
 
