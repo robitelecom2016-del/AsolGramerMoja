@@ -148,6 +148,11 @@ const orderSchema = new mongoose.Schema({
     type: { type: String },
     charge: Number,
   },
+  payment: {
+    method: { type: String, default: '' },
+    transactionId: { type: String, default: '' },
+    amount: { type: Number, default: 0 },
+  },
   subtotal: Number,
   total: Number,
   status: {
@@ -520,7 +525,7 @@ app.patch('/api/categories/:id/toggle', authMiddleware, async (req, res) => {
 // ─── ORDERS ───
 app.post('/api/orders', async (req, res) => {
   try {
-    const { items, customer, delivery, subtotal, total } = req.body;
+    const { items, customer, delivery, payment, subtotal, total } = req.body;
     if (!items?.length || !customer?.name || !customer?.phone || !customer?.address) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -530,6 +535,7 @@ app.post('/api/orders', async (req, res) => {
       items,
       customer,
       delivery,
+      payment: payment || {},
       subtotal,
       total,
       statusHistory: [{ status: 'pending', note: 'Order placed', time: new Date() }],
@@ -553,7 +559,8 @@ app.get('/api/orders', authMiddleware, async (req, res) => {
         $or: [
           { orderNum: searchRegex },
           { 'customer.name': searchRegex },
-          { 'customer.phone': searchRegex }
+          { 'customer.phone': searchRegex },
+          { 'payment.transactionId': searchRegex },
         ]
       };
     }
