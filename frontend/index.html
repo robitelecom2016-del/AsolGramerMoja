@@ -488,23 +488,12 @@ body{
 .products-header{margin-bottom:24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;}
 .products-title{font-size:1.4rem;font-weight:700;color:var(--gd);display:flex;align-items:center;gap:8px;}
 .products-filters{display:flex;flex-wrap:wrap;gap:10px;}
-.search-prod-wrap{position:relative;}
-.search-prod-input{
-  padding:8px 36px 8px 14px;
-  border:1.5px solid var(--border);
-  border-radius:6px;
-  font-family:inherit;
-  font-size:.85rem;
-  width:250px;
-  outline:none;
-}
-.search-prod-input:focus{border-color:var(--gd);}
-.search-prod-btn{
-  position:absolute;right:8px;top:50%;transform:translateY(-50%);
-  background:none;border:none;color:#888;cursor:pointer;
-}
 .filter-select{padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:.85rem;background:#fff;color:var(--txt);outline:none;cursor:pointer;}
 .filter-select:focus{border-color:var(--gd);}
+.search-prod-wrap{position:relative;}
+.search-prod-input{padding:8px 36px 8px 14px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:.85rem;width:250px;outline:none;}
+.search-prod-input:focus{border-color:var(--gd);}
+.search-prod-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#888;cursor:pointer;}
 .products-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:20px 0;}
 .prod-card{background:#fff;border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:box-shadow .2s,transform .2s;cursor:pointer;position:relative;}
 .prod-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.12);transform:translateY(-2px);}
@@ -931,7 +920,7 @@ footer p{font-size:.79rem;line-height:1.7;}
   /* ক্যাট ট্যাব সেকশন বড় হেডার */
   #catTabs button{font-size:.76rem;padding:5px 11px;}
 }
-</style> 
+</style>
 </head>
 <body>
 
@@ -1124,11 +1113,10 @@ footer p{font-size:.79rem;line-height:1.7;}
     <div class="products-header">
       <div class="products-title"><i class="fa-solid fa-box-open" style="color:var(--gd)"></i> সকল পণ্য</div>
       <div class="products-filters">
-        <!-- 🔍 সার্চ ইনপুট -->
-        <input type="text" class="search-prod-input" id="prodSearchInput" placeholder="পণ্যের নাম লিখুন..." onkeyup="debounceSearch()">
         <select class="filter-select" id="prodCatFilter" onchange="loadProductsPage(1)">
           <option value="">সব ক্যাটাগরি</option>
         </select>
+        
       </div>
     </div>
     <div id="productsGrid" class="products-grid"></div>
@@ -1184,6 +1172,8 @@ footer p{font-size:.79rem;line-height:1.7;}
     <div class="fbot" id="footerCopyright">&copy; 2024 আসল গ্রামের মজা | সর্বস্বত্ব সংরক্ষিত</div>
   </div>
 </footer>
+
+
 
 <!-- BOTTOM NAV — hidden visually, JS functional -->
 <nav class="bottom-nav" id="bottomNav" style="display:none !important;">
@@ -1990,6 +1980,7 @@ function updateCart() {
   document.getElementById('cartCountDesk').textContent = tot;
   document.getElementById('cartCountMob').textContent = tot;
   document.getElementById('cartCountBnav').textContent = tot;
+  document.getElementById('cartCountBnav').textContent = tot;
   // Hide mob badge if 0
   const mobBadge = document.getElementById('cartCountMob');
   mobBadge.style.display = tot > 0 ? 'flex' : 'none';
@@ -2034,7 +2025,7 @@ function updateCart() {
   fel.style.display = 'block';
 }
 
-let relScrollX = 0, relScrollRAF = null;
+let relScrollX = 0, relScrollTimer = null, relScrollRAF = null;
 const REL_CARD_W = 80 + 9; // card + gap
 
 function crelCardHTML(rp) {
@@ -2305,7 +2296,7 @@ async function loadProductsPage(page) {
           </div>
         </div>`).join('');
     }
-       renderProdPagination();
+    renderProdPagination();
   } catch (err) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa"><i class="fa-solid fa-exclamation-triangle"></i> লোড ব্যর্থ হয়েছে</div>';
   }
@@ -2457,13 +2448,6 @@ function showToast(msg) {
   }, 2600);
 }
 
-/* ════ DEBOUNCE SEARCH ════ */
-let searchTimeout;
-function debounceSearch() {
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => loadProductsPage(1), 400);
-}
-
 /* ════ INIT ════ */
 updateCart();
 if (!heroTimer) {
@@ -2477,3 +2461,6 @@ if (!heroTimer) {
     }
   }, 4500);
 }
+</script>
+</body>
+</html>
