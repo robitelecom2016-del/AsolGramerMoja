@@ -148,13 +148,17 @@ const orderSchema = new mongoose.Schema({
     type: { type: String },
     charge: Number,
   },
-  payment: {
-    method: { type: String, default: '' },
-    transactionId: { type: String, default: '' },
-    amount: { type: Number, default: 0 },
-  },
   subtotal: Number,
   total: Number,
+  payment: {
+    method: { type: String, default: 'cod' },
+    advanceAmount: { type: Number, default: 0 },
+    trxId: { type: String, default: '' },
+    phone: { type: String, default: '' },
+    status: { type: String, enum: ['unpaid', 'partial', 'paid'], default: 'unpaid' },
+    verifiedAt: { type: Date },
+    note: { type: String, default: '' },
+  },
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
@@ -525,19 +529,27 @@ app.patch('/api/categories/:id/toggle', authMiddleware, async (req, res) => {
 // ─── ORDERS ───
 app.post('/api/orders', async (req, res) => {
   try {
-    const { items, customer, delivery, payment, subtotal, total } = req.body;
+    const { items, customer, delivery, subtotal, total, payment } = req.body;
     if (!items?.length || !customer?.name || !customer?.phone || !customer?.address) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
     const orderNum = 'ORD-' + Date.now();
+    const paymentData = {
+      method: payment?.method || 'cod',
+      advanceAmount: payment?.advanceAmount || 0,
+      trxId: payment?.trxId || '',
+      phone: payment?.phone || '',
+      status: (payment?.advanceAmount > 0) ? 'partial' : 'unpaid',
+      note: payment?.note || '',
+    };
     const order = await Order.create({
       orderNum,
       items,
       customer,
       delivery,
-      payment: payment || {},
       subtotal,
       total,
+      payment: paymentData,
       statusHistory: [{ status: 'pending', note: 'Order placed', time: new Date() }],
     });
     res.status(201).json(order);
@@ -559,8 +571,7 @@ app.get('/api/orders', authMiddleware, async (req, res) => {
         $or: [
           { orderNum: searchRegex },
           { 'customer.name': searchRegex },
-          { 'customer.phone': searchRegex },
-          { 'payment.transactionId': searchRegex },
+          { 'customer.phone': searchRegex }
         ]
       };
     }
@@ -593,6 +604,23 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
     if (!order) return res.status(404).json({ error: 'Order not found' });
     order.status = status;
     order.statusHistory.push({ status, note, time: new Date() });
+    order.updatedAt = new Date();
+    await order.save();
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.patch('/api/orders/:id/payment', authMiddleware, async (req, res) => {
+  try {
+    const { status, note, verifiedAt } = req.body;
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    if (!order.payment) order.payment = {};
+    order.payment.status = status;
+    if (note !== undefined) order.payment.note = note;
+    if (status === 'paid') order.payment.verifiedAt = verifiedAt ? new Date(verifiedAt) : new Date();
     order.updatedAt = new Date();
     await order.save();
     res.json(order);

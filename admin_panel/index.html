@@ -618,6 +618,10 @@ textarea.form-control { resize:vertical; min-height:80px; }
         <i class="fa-solid fa-bag-shopping"></i> অর্ডার
         <span class="nav-badge" id="pendingBadge">0</span>
       </div>
+      <div class="nav-item" onclick="navTo('payments')" data-page="payments">
+        <i class="fa-solid fa-money-bill-transfer"></i> পেমেন্ট যাচাই
+        <span class="nav-badge green" id="unverifiedBadge" style="display:none">0</span>
+      </div>
       <div class="nav-section-label">কনটেন্ট</div>
       <div class="nav-item" onclick="navTo('products')" data-page="products">
         <i class="fa-solid fa-box-open"></i> পণ্য ম্যানেজ
@@ -778,7 +782,7 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="card">
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>অর্ডার নং</th><th>গ্রাহক</th><th>পণ্য</th><th>মোট</th><th>ডেলিভারি</th><th>ট্রান্সজেকশন আইডি</th><th>স্ট্যাটাস</th><th>তারিখ</th><th>দেখুন</th></tr></thead>
+            <thead><tr><th>অর্ডার নং</th><th>গ্রাহক</th><th>পণ্য</th><th>মোট</th><th>অগ্রিম/পেমেন্ট</th><th>ডেলিভারি</th><th>স্ট্যাটাস</th><th>তারিখ</th><th>দেখুন</th></tr></thead>
             <tbody id="orderTableBody"></tbody>
           </table>
         </div>
@@ -961,6 +965,64 @@ textarea.form-control { resize:vertical; min-height:80px; }
           <div id="faqList" style="display:flex;flex-direction:column;gap:10px"></div>
         </div>
       </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="page-view" id="page-payments">
+      <div class="filters-bar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" id="paySearch" placeholder="অর্ডার নং / ট্রানজেকশন ID / ফোন..." oninput="debounce(loadPayments,400)()">
+        </div>
+        <select class="select-filter" id="payMethodFilter" onchange="loadPayments()">
+          <option value="all">সব পদ্ধতি</option>
+          <option value="bkash">bKash</option>
+          <option value="nagad">Nagad</option>
+          <option value="rocket">Rocket</option>
+          <option value="upay">uPay</option>
+          <option value="cod">Cash on Delivery</option>
+        </select>
+        <select class="select-filter" id="payStatusFilter" onchange="loadPayments()">
+          <option value="all">সব স্ট্যাটাস</option>
+          <option value="unpaid">অপরিশোধিত</option>
+          <option value="partial">আংশিক পেমেন্ট</option>
+          <option value="paid">সম্পূর্ণ পেমেন্ট</option>
+        </select>
+        <span class="filter-count" id="payCount">0 রেকর্ড</span>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-chart-pie" style="color:var(--green)"></i> পেমেন্ট সারসংক্ষেপ</h3>
+        </div>
+        <div class="card-body" style="padding:14px">
+          <div class="stats-grid" id="payStatCards" style="margin-bottom:0">
+            <div class="loader"><i class="fa-solid fa-spinner"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>অর্ডার নং</th>
+                <th>গ্রাহক</th>
+                <th>পদ্ধতি</th>
+                <th>ট্রানজেকশন ID</th>
+                <th>পেমেন্ট ফোন</th>
+                <th>অগ্রিম</th>
+                <th>মোট</th>
+                <th>বকেয়া</th>
+                <th>স্ট্যাটাস</th>
+                <th>তারিখ</th>
+                <th>যাচাই</th>
+              </tr>
+            </thead>
+            <tbody id="payTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="pagination" id="payPagination"></div>
     </div>
 
     <!-- SETTINGS -->
@@ -1335,6 +1397,21 @@ function showApp() {
   loadDashboard(); loadCategoriesForFilter(); checkHealth();
   loadFrontendUrl();
   autoSeedDefaultData();
+  setTimeout(loadUnverifiedBadge, 2000);
+  setInterval(loadUnverifiedBadge, 60000);
+}
+
+async function loadUnverifiedBadge() {
+  try {
+    const res = await api('GET', '/api/orders?page=1&limit=200&status=all');
+    const orders = res.orders || [];
+    const unverified = orders.filter(o => o.payment?.trxId && o.payment?.status !== 'paid').length;
+    const badge = document.getElementById('unverifiedBadge');
+    if (badge) {
+      badge.textContent = unverified;
+      badge.style.display = unverified > 0 ? 'inline-flex' : 'none';
+    }
+  } catch {}
 }
 
 function loadFrontendUrl() {
@@ -1372,6 +1449,7 @@ function navTo(page) {
     dashboard:['ড্যাশবোর্ড','সামগ্রিক পরিসংখ্যান'],
     products:['পণ্য ম্যানেজ','সকল পণ্য দেখুন ও সম্পাদনা করুন'],
     orders:['অর্ডার','সকল অর্ডার ট্র্যাক করুন'],
+    payments:['পেমেন্ট যাচাই','অর্ডারের অগ্রিম পেমেন্ট ও ট্রানজেকশন যাচাই করুন'],
     categories:['ক্যাটাগরি','পণ্যের বিভাগ পরিচালনা করুন'],
     hero:['হিরো স্লাইড','হোমপেজের ব্যানার স্লাইডার পরিচালনা করুন'],
     about:['আমাদের সম্পর্কে','পেজ কনটেন্ট পরিচালনা করুন'],
@@ -1389,6 +1467,7 @@ function navTo(page) {
   if (page === 'hero') loadHero();
   if (page === 'about') loadAboutPage();
   if (page === 'contact') loadContactPage();
+  if (page === 'payments') loadPayments();
   if (page === 'settings') loadSettings();
 }
 
@@ -1758,8 +1837,15 @@ async function loadOrders() {
         <td><div class="td-name">${o.customer.name}</div><div class="td-sub">${o.customer.phone}</div></td>
         <td><div class="td-sub">${(o.items||[]).length} আইটেম</div></td>
         <td><strong>৳${(o.total||0).toLocaleString('en')}</strong></td>
+        <td>
+          <div style="font-size:.76rem">
+            <span class="badge ${o.payment?.method==='cod'?'gray':o.payment?.method?'blue':'gray'}" style="margin-bottom:3px;display:inline-flex">${(o.payment?.method||'cod').toUpperCase()}</span><br>
+            ${o.payment?.trxId?`<span style="font-family:'JetBrains Mono',monospace;color:var(--orange2);font-size:.7rem">${o.payment.trxId}</span><br>`:''}
+            ${(o.payment?.advanceAmount||0)>0?`<span style="color:var(--green2);font-weight:700">৳${o.payment.advanceAmount.toLocaleString('en')}</span>`:'<span style="color:var(--txt3)">—</span>'}
+          </div>
+          ${payStatusBadge(o.payment?.status||'unpaid')}
+        </td>
         <td style="font-size:.78rem;color:var(--txt2)">${o.delivery?.type||'—'}<br>${o.delivery?.charge?`৳${o.delivery.charge}`:''}</td>
-        <td>${o.payment?.transactionId?`<span style="font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--yellow2);background:rgba(210,153,34,.12);padding:2px 7px;border-radius:5px;border:1px solid rgba(210,153,34,.25)">${o.payment.transactionId}</span><br><span style="font-size:.7rem;color:var(--txt3)">${o.payment.method||''}</span>`:`<span style="color:var(--txt3);font-size:.74rem">—</span>`}</td>
         <td><select class="status-select" onchange="updateOrderStatus('${o._id}',this.value)" style="border-color:${statusColor(o.status)}">${['pending','confirmed','processing','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
         <td style="font-size:.74rem;color:var(--txt2)">${timeAgo(o.createdAt)}</td>
         <td><button class="icon-btn edit" onclick="viewOrder('${o._id}')"><i class="fa-solid fa-eye"></i></button></td>
@@ -1791,13 +1877,29 @@ async function viewOrder(id) {
             <div><span style="color:var(--txt2)">পণ্য মূল্য:</span> <strong>৳${o.subtotal?.toLocaleString('en')}</strong></div>
             <div><span style="color:var(--txt2)">ডেলিভারি:</span> <strong>৳${o.delivery?.charge||0}</strong> (${o.delivery?.type||'—'})</div>
             <div style="border-top:1px solid var(--border);padding-top:7px"><span style="color:var(--txt2)">সর্বমোট:</span> <strong style="color:var(--green2);font-size:1rem">৳${o.total?.toLocaleString('en')}</strong></div>
-            ${o.payment?.transactionId?`<div style="border-top:1px solid var(--border);padding-top:7px;background:rgba(210,153,34,.07);border-radius:6px;padding:8px;margin-top:4px"><div style="font-size:.7rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">অগ্রিম পেমেন্ট</div><div><span style="color:var(--txt2)">পদ্ধতি:</span> <strong>${o.payment.method||'—'}</strong></div><div style="margin-top:4px"><span style="color:var(--txt2)">ট্রান্সজেকশন আইডি:</span> <span style="font-family:'JetBrains Mono',monospace;color:var(--yellow2);font-weight:700;font-size:.9rem">${o.payment.transactionId}</span></div>${o.payment.amount?`<div style="margin-top:4px"><span style="color:var(--txt2)">পরিমাণ:</span> <strong style="color:var(--yellow2)">৳${o.payment.amount?.toLocaleString('en')}</strong></div>`:''}</div>`:`<div style="font-size:.74rem;color:var(--txt3);border-top:1px solid var(--border);padding-top:7px">অগ্রিম পেমেন্ট নেই</div>`}
           </div></div></div>
       </div>
       <div class="card" style="border-radius:8px;margin-bottom:14px"><div class="card-header"><h3><i class="fa-solid fa-box" style="color:var(--purple)"></i> পণ্য তালিকা</h3></div>
         <div class="card-body" style="padding:12px"><div class="order-items-list">
           ${(o.items||[]).map(item=>`<div class="order-item-row">${item.img?`<img class="order-item-img" src="${item.img}" onerror="this.style.display='none'">`:`<div class="order-item-em">${item.em||'📦'}</div>`}<div style="flex:1"><div style="font-size:.86rem;font-weight:700">${item.nm}</div><div style="font-size:.74rem;color:var(--txt2)">${item.varLabel} × ${item.qty}</div></div><div style="font-weight:700;color:var(--green2)">৳${(item.cartPrice*item.qty).toLocaleString('en')}</div></div>`).join('')}
         </div></div></div>
+      <div class="card" style="border-radius:8px;margin-bottom:14px"><div class="card-header"><h3><i class="fa-solid fa-money-bill-transfer" style="color:var(--green)"></i> পেমেন্ট তথ্য</h3><div style="margin-left:auto">${payStatusBadge(o.payment?.status||'unpaid')}</div></div>
+        <div class="card-body" style="padding:14px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:.83rem;margin-bottom:12px">
+            <div><span style="color:var(--txt2)">পেমেন্ট পদ্ধতি:</span> <strong style="text-transform:uppercase;color:var(--blue2)">${o.payment?.method||'N/A'}</strong></div>
+            <div><span style="color:var(--txt2)">অগ্রিম পরিশোধ:</span> <strong style="color:var(--green2)">৳${(o.payment?.advanceAmount||0).toLocaleString('en')}</strong></div>
+            <div><span style="color:var(--txt2)">ট্রানজেকশন ID:</span> <strong style="font-family:'JetBrains Mono',monospace;color:var(--orange2)">${o.payment?.trxId||'—'}</strong></div>
+            <div><span style="color:var(--txt2)">পেমেন্ট ফোন:</span> <strong>${o.payment?.phone||'—'}</strong></div>
+            <div><span style="color:var(--txt2)">বকেয়া:</span> <strong style="color:var(--red2)">৳${((o.total||0)-(o.payment?.advanceAmount||0)).toLocaleString('en')}</strong></div>
+            ${o.payment?.verifiedAt?`<div><span style="color:var(--txt2)">যাচাইয়ের সময়:</span> <strong style="color:var(--green2)">${new Date(o.payment.verifiedAt).toLocaleString('en-GB')}</strong></div>`:''}
+          </div>
+          ${o.payment?.note?`<div style="background:var(--bg3);border-radius:7px;padding:10px;font-size:.82rem;color:var(--txt2);margin-bottom:10px"><i class="fa-solid fa-note-sticky" style="color:var(--yellow2)"></i> ${o.payment.note}</div>`:''}
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-primary btn-sm" onclick="verifyPayment('${o._id}','paid')" style="background:var(--green)"><i class="fa-solid fa-circle-check"></i> পেমেন্ট নিশ্চিত করুন</button>
+            <button class="btn-secondary btn-sm" onclick="verifyPayment('${o._id}','partial')"><i class="fa-solid fa-circle-half-stroke"></i> আংশিক পেমেন্ট</button>
+            <button class="btn-danger btn-sm" onclick="verifyPayment('${o._id}','unpaid')"><i class="fa-solid fa-circle-xmark"></i> অপরিশোধিত</button>
+          </div>
+        </div></div>
       <div class="card" style="border-radius:8px"><div class="card-header"><h3><i class="fa-solid fa-timeline" style="color:var(--yellow)"></i> স্ট্যাটাস ইতিহাস</h3><div style="margin-left:auto">${statusBadge(o.status)}</div></div>
         <div class="card-body" style="padding:12px"><div class="order-timeline">
           ${(o.statusHistory||[]).reverse().map(h=>`<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-info"><div class="timeline-status">${h.status}</div>${h.note?`<div class="timeline-note">${h.note}</div>`:''}<div class="timeline-time">${new Date(h.time).toLocaleString('en-GB')}</div></div></div>`).join('')}
@@ -2764,6 +2866,134 @@ function toast(msg,type='info') {
   setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300);},3500);
 }
 
+
+let payPage = 1;
+
+function payStatusBadge(status) {
+  const map = { unpaid: 'red', partial: 'yellow', paid: 'green' };
+  const lbl = { unpaid: '⚠️ অপরিশোধিত', partial: '🔄 আংশিক', paid: '✅ পরিশোধিত' };
+  return `<span class="badge ${map[status]||'gray'}">${lbl[status]||status}</span>`;
+}
+
+async function loadPayments() {
+  const search = document.getElementById('paySearch').value.trim();
+  const method = document.getElementById('payMethodFilter').value;
+  const payStatus = document.getElementById('payStatusFilter').value;
+  const tbody = document.getElementById('payTableBody');
+  tbody.innerHTML = '<tr><td colspan="11"><div class="loader"><i class="fa-solid fa-spinner"></i></div></td></tr>';
+
+  try {
+    let url = `/api/orders?page=${payPage}&limit=20&status=all`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    const res = await api('GET', url);
+
+    let orders = res.orders || [];
+    if (method !== 'all') orders = orders.filter(o => (o.payment?.method||'cod') === method);
+    if (payStatus !== 'all') orders = orders.filter(o => (o.payment?.status||'unpaid') === payStatus);
+
+    document.getElementById('payCount').textContent = `${orders.length} রেকর্ড`;
+
+    const totalAdvance = orders.reduce((s, o) => s + (o.payment?.advanceAmount || 0), 0);
+    const paidCount = orders.filter(o => o.payment?.status === 'paid').length;
+    const partialCount = orders.filter(o => o.payment?.status === 'partial').length;
+    const unpaidCount = orders.filter(o => !o.payment?.status || o.payment?.status === 'unpaid').length;
+
+    document.getElementById('payStatCards').innerHTML = `
+      <div class="stat-card green">
+        <div class="stat-top">
+          <div><div class="stat-val">৳${totalAdvance.toLocaleString('en')}</div><div class="stat-lbl">মোট অগ্রিম সংগ্রহ</div></div>
+          <div class="stat-icon green"><i class="fa-solid fa-bangladeshi-taka-sign"></i></div>
+        </div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-top">
+          <div><div class="stat-val">${paidCount}</div><div class="stat-lbl">সম্পূর্ণ পরিশোধিত</div></div>
+          <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        </div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-top">
+          <div><div class="stat-val">${partialCount}</div><div class="stat-lbl">আংশিক পেমেন্ট</div></div>
+          <div class="stat-icon orange"><i class="fa-solid fa-circle-half-stroke"></i></div>
+        </div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-top">
+          <div><div class="stat-val">${unpaidCount}</div><div class="stat-lbl">অপরিশোধিত</div></div>
+          <div class="stat-icon blue"><i class="fa-solid fa-clock"></i></div>
+        </div>
+      </div>`;
+
+    const unverified = orders.filter(o => o.payment?.trxId && o.payment?.status !== 'paid').length;
+    const badge = document.getElementById('unverifiedBadge');
+    if (badge) {
+      badge.textContent = unverified;
+      badge.style.display = unverified > 0 ? 'inline-flex' : 'none';
+    }
+
+    if (!orders.length) {
+      tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><i class="fa-solid fa-money-bill-slash"></i><h3>কোনো পেমেন্ট রেকর্ড নেই</h3></div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = orders.map(o => {
+      const advance = o.payment?.advanceAmount || 0;
+      const due = (o.total || 0) - advance;
+      const methodColors = { bkash: '#e2136e', nagad: '#f55f0f', rocket: '#8b17e8', upay: '#00a859', cod: '' };
+      const methodColor = methodColors[o.payment?.method] || 'var(--txt2)';
+      return `<tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--green2)">${o.orderNum}</span></td>
+        <td><div class="td-name">${o.customer?.name}</div><div class="td-sub">${o.customer?.phone}</div></td>
+        <td><span class="badge ${o.payment?.method==='cod'?'gray':'blue'}" style="${o.payment?.method&&o.payment.method!=='cod'?'background:'+methodColors[o.payment.method]+'22;border-color:'+methodColors[o.payment.method]+'55;color:'+methodColor:''}">${(o.payment?.method||'cod').toUpperCase()}</span></td>
+        <td>
+          ${o.payment?.trxId
+            ? `<span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--orange2);background:rgba(232,102,10,.1);padding:3px 8px;border-radius:5px">${o.payment.trxId}</span>`
+            : `<span style="color:var(--txt3);font-size:.78rem">—</span>`}
+        </td>
+        <td style="font-size:.82rem">${o.payment?.phone||'—'}</td>
+        <td><strong style="color:var(--green2)">৳${advance.toLocaleString('en')}</strong></td>
+        <td><strong>৳${(o.total||0).toLocaleString('en')}</strong></td>
+        <td><strong style="color:${due>0?'var(--red2)':'var(--green2)'}">৳${due.toLocaleString('en')}</strong></td>
+        <td>${payStatusBadge(o.payment?.status||'unpaid')}</td>
+        <td style="font-size:.74rem;color:var(--txt2)">${timeAgo(o.createdAt)}</td>
+        <td>
+          <div class="td-actions">
+            <button class="icon-btn edit" onclick="viewOrder('${o._id}')" title="অর্ডার বিস্তারিত"><i class="fa-solid fa-eye"></i></button>
+            ${o.payment?.status !== 'paid'
+              ? `<button class="icon-btn toggle active-icon" onclick="quickVerifyPayment('${o._id}','paid',this)" title="পেমেন্ট নিশ্চিত করুন"><i class="fa-solid fa-circle-check"></i></button>`
+              : `<button class="icon-btn star-active" style="cursor:default" title="যাচাই হয়েছে"><i class="fa-solid fa-circle-check"></i></button>`}
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+    renderPagination('payPagination', res.total, 20, payPage, (pg) => { payPage = pg; loadPayments(); });
+  } catch (err) {
+    toast('পেমেন্ট লোড ব্যর্থ: ' + err.message, 'error');
+  }
+}
+
+async function verifyPayment(orderId, status) {
+  try {
+    await api('PATCH', `/api/orders/${orderId}/payment`, { status });
+    toast(`পেমেন্ট "${status === 'paid' ? 'নিশ্চিত' : status === 'partial' ? 'আংশিক' : 'অপরিশোধিত'}" হিসেবে আপডেট করা হয়েছে`, 'success');
+    closeModal('orderModal');
+    if (currentPage === 'payments') loadPayments();
+    if (currentPage === 'orders') loadOrders();
+  } catch (err) {
+    toast('আপডেট ব্যর্থ: ' + err.message, 'error');
+  }
+}
+
+async function quickVerifyPayment(orderId, status, btn) {
+  try {
+    await api('PATCH', `/api/orders/${orderId}/payment`, { status });
+    toast('পেমেন্ট নিশ্চিত হয়েছে ✅', 'success');
+    loadPayments();
+  } catch (err) {
+    toast('আপডেট ব্যর্থ', 'error');
+  }
+}
 function debounce(fn,delay) { let timer; return (...args)=>{clearTimeout(timer);timer=setTimeout(()=>fn(...args),delay);}; }
 
 document.addEventListener('DOMContentLoaded',()=>{
