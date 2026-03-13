@@ -191,7 +191,7 @@ const settingsSchema = new mongoose.Schema({
 });
 const Settings = mongoose.model('Settings', settingsSchema);
 
-// ═══ MULTER (memory storage — upload to Cloudinary manually to avoid double-upload bug) ═══
+// ═══ MULTER (memory storage — upload to Cloudinary manually) ═══
 const memStorage = multer.memoryStorage();
 const upload = multer({ storage: memStorage, limits: { fileSize: 5 * 1024 * 1024 } });
 const uploadThumb = multer({ storage: memStorage, limits: { fileSize: 5 * 1024 * 1024 } });
@@ -302,14 +302,24 @@ app.put('/api/auth/password', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── PRODUCTS ───
+// ─── PRODUCTS (সার্চ ফিল্ড সহ আপডেট) ───
 app.get('/api/products', async (req, res) => {
   try {
-    const { cat, best, active = 'true', limit, page = 1 } = req.query;
+    const { cat, best, active = 'true', limit, page = 1, search } = req.query;
     const filter = {};
     if (active !== 'all') filter.active = active === 'true';
     if (cat && cat !== 'all') filter.cat = cat;
     if (best === 'true') filter.best = true;
+
+    // সার্চ টার্ম থাকলে নাম, সাবটাইটেল বা বর্ণনায় খুঁজবে
+    if (search && search.trim()) {
+      const searchRegex = new RegExp(search.trim(), 'i');
+      filter.$or = [
+        { nm: searchRegex },
+        { sub: searchRegex },
+        { desc: searchRegex }
+      ];
+    }
 
     const total = await Product.countDocuments(filter);
     let query = Product.find(filter).sort({ order: 1, createdAt: -1 });
@@ -521,7 +531,6 @@ app.patch('/api/categories/:id/toggle', authMiddleware, async (req, res) => {
 });
 
 // ─── ORDERS ───
-// Updated POST /api/orders to accept advanceDelivery
 app.post('/api/orders', async (req, res) => {
   try {
     const { items, customer, delivery, subtotal, total, advanceDelivery } = req.body;
@@ -677,7 +686,7 @@ app.get('/api/settings', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ নতুন: বাল্ক আপডেট (এডমিন প্যানেল থেকে aboutPage, contactPage, ইত্যাদি সেভ করার জন্য)
+// বাল্ক আপডেট (এডমিন প্যানেল থেকে aboutPage, contactPage, ইত্যাদি সেভ করার জন্য)
 app.put('/api/settings', authMiddleware, async (req, res) => {
   try {
     const updates = req.body;
@@ -718,7 +727,7 @@ app.get('/api/public/settings', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ✅ পাবলিক এন্ডপয়েন্ট — "আমাদের সম্পর্কে" পেজ
+// পাবলিক এন্ডপয়েন্ট — "আমাদের সম্পর্কে" পেজ
 app.get('/api/pages/about', async (req, res) => {
   try {
     const setting = await Settings.findOne({ key: 'aboutPage' });
@@ -728,7 +737,7 @@ app.get('/api/pages/about', async (req, res) => {
   }
 });
 
-// ✅ পাবলিক এন্ডপয়েন্ট — "যোগাযোগ" পেজ
+// পাবলিক এন্ডপয়েন্ট — "যোগাযোগ" পেজ
 app.get('/api/pages/contact', async (req, res) => {
   try {
     const setting = await Settings.findOne({ key: 'contactPage' });
