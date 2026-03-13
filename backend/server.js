@@ -677,6 +677,24 @@ app.get('/api/settings', authMiddleware, async (req, res) => {
   }
 });
 
+// ✅ নতুন: বাল্ক আপডেট (এডমিন প্যানেল থেকে aboutPage, contactPage, ইত্যাদি সেভ করার জন্য)
+app.put('/api/settings', authMiddleware, async (req, res) => {
+  try {
+    const updates = req.body;
+    const operations = Object.entries(updates).map(([key, value]) => ({
+      updateOne: {
+        filter: { key },
+        update: { key, value, updatedAt: new Date() },
+        upsert: true
+      }
+    }));
+    await Settings.bulkWrite(operations);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.put('/api/settings/:key', authMiddleware, async (req, res) => {
   try {
     const { value } = req.body;
@@ -698,6 +716,26 @@ app.get('/api/public/settings', async (req, res) => {
     settings.forEach(s => { if (!["aboutPage","contactPage"].includes(s.key)) obj[s.key] = s.value; });
     res.json(obj);
   } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ✅ পাবলিক এন্ডপয়েন্ট — "আমাদের সম্পর্কে" পেজ
+app.get('/api/pages/about', async (req, res) => {
+  try {
+    const setting = await Settings.findOne({ key: 'aboutPage' });
+    res.json(setting ? setting.value : {});
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ✅ পাবলিক এন্ডপয়েন্ট — "যোগাযোগ" পেজ
+app.get('/api/pages/contact', async (req, res) => {
+  try {
+    const setting = await Settings.findOne({ key: 'contactPage' });
+    res.json(setting ? setting.value : {});
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ─── DASHBOARD STATS ───
