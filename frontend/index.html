@@ -156,8 +156,8 @@ body{
   position:fixed;
   inset:0;
   z-index:2500;
-  background:rgba(0,0,0,.5);
-  backdrop-filter:blur(4px);
+  background:transparent;           /* ← ব্যাকগ্রাউন্ড সরানো */
+  backdrop-filter:none;              /* ← ব্লার ইফেক্ট সরানো */
   opacity:0;
   pointer-events:none;
   transition:opacity .25s;
@@ -167,7 +167,7 @@ body{
 }
 .mob-search-overlay.open{opacity:1;pointer-events:all;}
 .mob-search-box{
-  background:var(--gd);
+  background:transparent;            /* ← সবুজ ব্যাকগ্রাউন্ড সরানো */
   padding:14px 14px 10px;
   display:flex;
   align-items:center;
