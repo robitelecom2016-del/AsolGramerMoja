@@ -12,7 +12,6 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-F5MDVLE0LH');
 </script>
 <style>
@@ -713,11 +712,9 @@ footer p{font-size:.79rem;line-height:1.7;}
 .retry-btn{margin-top:12px;background:var(--gd);color:#fff;border:none;padding:9px 20px;border-radius:6px;font-family:inherit;font-size:.84rem;cursor:pointer;}
 
 /* ══ TOAST — ডান থেকে স্লাইড ইন, স্কয়ার কার্ড ══ */
-/* ══ TOAST — ডানদিক থেকে স্কোয়ার কার্ড স্লাইড ইন ══ */
 .toast{
   position:fixed;
   bottom:20px;
-  /* ডানদিক থেকে সম্পূর্ণ বাইরে — translateX দিয়ে */
   right:16px;
   left:auto;
   width:290px;
@@ -727,7 +724,6 @@ footer p{font-size:.79rem;line-height:1.7;}
   box-shadow:0 8px 32px rgba(0,0,0,.18);
   border-left:5px solid var(--gd);
   overflow:hidden;
-  /* hidden state: ডানে সরানো + invisible */
   transform:translateX(calc(100% + 32px));
   opacity:0;
   transition:transform .38s cubic-bezier(.34,1.28,.64,1), opacity .25s ease;
@@ -753,7 +749,6 @@ footer p{font-size:.79rem;line-height:1.7;}
   flex:1;font-size:.83rem;font-weight:500;
   color:#222;line-height:1.45;
 }
-/* নিচে progress bar */
 .toast-bar{
   height:3px;background:var(--gd);
   transform-origin:left;
@@ -766,7 +761,6 @@ footer p{font-size:.79rem;line-height:1.7;}
 .toast.err-toast{border-left-color:#e53935;}
 .toast.err-toast .toast-icon{background:#e53935;}
 .toast.err-toast .toast-bar{background:#e53935;}
-/* মোবাইলে bottom nav-এর উপরে */
 @media(max-width:900px){
   .toast{bottom:20px;width:calc(100vw - 32px);max-width:290px;}
 }
@@ -861,12 +855,8 @@ footer p{font-size:.79rem;line-height:1.7;}
    RESPONSIVE — TABLET (≤900px)
 ══════════════════════════════════════ */
 @media(max-width:900px){
-  /* Desktop navbar লুকানো */
   .navbar{ display:none; }
-  /* Mobile header দেখানো */
   .mob-header{ display:block; }
-  /* Bottom nav দেখানো */
-
   .hero{aspect-ratio:unset;height:220px;min-height:220px;}
   .hero-ci{padding:0 18px;}
   .hero-ci h1{font-size:1.5rem;max-width:100%;}
@@ -917,16 +907,13 @@ footer p{font-size:.79rem;line-height:1.7;}
   .pcard{flex:0 0 calc(50% - 5px);width:calc(50% - 5px);margin-right:10px;}
   .products-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
   .prod-card .c-img{height:calc(50vw - 26px);}
-  /* ক্যাট ট্যাব সেকশন বড় হেডার */
   #catTabs button{font-size:.76rem;padding:5px 11px;}
 }
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════
-   DESKTOP NAVBAR (≥900px এ দেখাবে)
-══════════════════════════════════════ -->
+<!-- DESKTOP NAVBAR -->
 <nav class="navbar">
   <div class="nb">
     <div class="logo" onclick="goHome()">
@@ -955,12 +942,9 @@ footer p{font-size:.79rem;line-height:1.7;}
   </div>
 </nav>
 
-<!-- ══════════════════════════════════════
-   MOBILE HEADER (≤900px এ দেখাবে)
-══════════════════════════════════════ -->
+<!-- MOBILE HEADER -->
 <header class="mob-header">
   <div class="mob-header-inner">
-    <!-- লোগো + নাম -->
     <div class="mob-logo-block" onclick="goHome()">
       <div class="mob-logo-icon">
         <img src="images/logo-g.png" alt="Logo" />
@@ -970,7 +954,6 @@ footer p{font-size:.79rem;line-height:1.7;}
         <span class="mob-logo-sub">বিশুদ্ধ পণ্য · সরাসরি কৃষক থেকে</span>
       </div>
     </div>
-    <!-- রাইট বাটন -->
     <div class="mob-header-actions">
       <button class="mob-search-pill" onclick="openMobSearch()" aria-label="খুঁজুন">
         <i class="fa-solid fa-magnifying-glass"></i>
@@ -984,7 +967,7 @@ footer p{font-size:.79rem;line-height:1.7;}
   </div>
 </header>
 
-<!-- ══ মোবাইল সার্চ ওভারলে ══ -->
+<!-- মোবাইল সার্চ ওভারলে -->
 <div class="mob-search-overlay" id="mobSearchOverlay" onclick="closeMobSearchOutside(event)">
   <div class="mob-search-box">
     <input class="mob-s-input" id="mobSearchInput" type="text" placeholder="পণ্য খুঁজুন..." autocomplete="off" oninput="doSearch(this.value,'mobSearchResults')">
@@ -993,7 +976,7 @@ footer p{font-size:.79rem;line-height:1.7;}
   <div class="mob-search-results" id="mobSearchResults"></div>
 </div>
 
-<!-- ══ PAGE CONTAINER ══ -->
+<!-- PAGE CONTAINER -->
 <div class="page active" id="page-home">
   <!-- HERO -->
   <div class="hero" id="heroSection">
@@ -1107,7 +1090,7 @@ footer p{font-size:.79rem;line-height:1.7;}
   </section>
 </div>
 
-<!-- ═══ PAGE: PRODUCTS LISTING ═══ -->
+<!-- PAGE: PRODUCTS LISTING -->
 <div class="page" id="page-products">
   <div class="products-page">
     <div class="products-header">
@@ -1116,7 +1099,6 @@ footer p{font-size:.79rem;line-height:1.7;}
         <select class="filter-select" id="prodCatFilter" onchange="loadProductsPage(1)">
           <option value="">সব ক্যাটাগরি</option>
         </select>
-        
       </div>
     </div>
     <div id="productsGrid" class="products-grid"></div>
@@ -1124,17 +1106,17 @@ footer p{font-size:.79rem;line-height:1.7;}
   </div>
 </div>
 
-<!-- ═══ PAGE: ABOUT ═══ -->
+<!-- PAGE: ABOUT -->
 <div class="page" id="page-about">
   <div class="about-page" id="aboutContent"></div>
 </div>
 
-<!-- ═══ PAGE: CONTACT ═══ -->
+<!-- PAGE: CONTACT -->
 <div class="page" id="page-contact">
   <div class="contact-page" id="contactContent"></div>
 </div>
 
-<!-- ═══ PAGE: PRODUCT DETAIL ═══ -->
+<!-- PAGE: PRODUCT DETAIL -->
 <div class="page" id="page-product">
   <div id="pdpContent"></div>
 </div>
@@ -1173,9 +1155,7 @@ footer p{font-size:.79rem;line-height:1.7;}
   </div>
 </footer>
 
-
-
-<!-- BOTTOM NAV — hidden visually, JS functional -->
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav" id="bottomNav" style="display:none !important;">
   <div class="bottom-nav-inner">
     <button class="bnav-item active" id="bnavHome" onclick="goHome()">
@@ -1220,7 +1200,7 @@ footer p{font-size:.79rem;line-height:1.7;}
   </div>
 </div>
 
-<!-- ═══ ORDER MODAL ═══ -->
+<!-- ORDER MODAL -->
 <div class="order-ov" id="orderOv">
   <div class="order-modal" id="orderModal">
     <div class="om-hd">
@@ -1257,7 +1237,7 @@ footer p{font-size:.79rem;line-height:1.7;}
           </div>
         </div>
 
-        <!-- অগ্রিম ডেলিভারি চার্জ বক্স — শুধু নির্দিষ্ট ক্যাটাগরির পণ্যে দেখাবে -->
+        <!-- অগ্রিম ডেলিভারি চার্জ বক্স -->
         <div class="om-advance-box" id="omAdvanceBox" style="display:none;margin-top:14px;">
           <div class="om-advance-title">
             <i class="fa-solid fa-money-bill-wave"></i>
@@ -1342,10 +1322,7 @@ let settings = {};
 let deliveryCharges = { inside: 80, outside: 130 };
 let storePhone = '01712345678';
 
-/* ════ অগ্রিম ডেলিভারি চার্জ প্রযোজ্য ক্যাটাগরি ════
-   এই ক্যাটাগরির পণ্য অর্ডারে ডেলিভারি চার্জ অগ্রিম দিতে হবে
-   (বিকাশ/নগদে পাঠিয়ে ট্রানজেকশন ID দিতে হবে)
-*/
+/* ════ অগ্রিম ডেলিভারি চার্জ প্রযোজ্য ক্যাটাগরি ════ */
 const ADVANCE_DELIVERY_CATS = ['মিষ্টি', 'দই', 'গ্রীষ্মকালীন পানীয়', 'রশমালাই'];
 const ADVANCE_PAYMENT_INFO = {
   bkash: '01XXXXXXXXX',   // ← আপনার বিকাশ নম্বর দিন
@@ -1485,9 +1462,7 @@ function closeMobSearchOutside(e) {
 
 /* ════ ROUTING AND ACTIVE NAV ════ */
 function setActiveNav(page) {
-  // Desktop
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-  // Bottom nav
   document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
 
   const map = { home: ['navHome','bnavHome'], products: ['navProducts','bnavProducts'], about: ['navAbout','bnavAbout'], contact: ['navContact','bnavContact'] };
@@ -1602,11 +1577,7 @@ function slideRow(id, dir) {
   }
 }
 
-/* ══ বেস্ট সেলার — সিমলেস ইনফিনিট লুপ ══
-   কৌশল: মূল কার্ডগুলো clone করে শেষে জুড়ে দেওয়া হয়।
-   শেষ clone-এ পৌঁছালে transition=none দিয়ে মূল শুরুতে
-   চলে যাওয়া হয় — চোখে ধরা পড়ে না।
-*/
+/* ══ বেস্ট সেলার — সিমলেস ইনফিনিট লুপ ══ */
 let bestAutoTimer = null;
 let bestCloned = false;
 
@@ -1622,14 +1593,13 @@ function startBestAutoSlide() {
   if (bestAutoTimer) clearInterval(bestAutoTimer);
   cloneBestCards();
   const s = sState['best']; if (!s) return;
-  const origTotal = s.total; // মূল কার্ড সংখ্যা
+  const origTotal = s.total;
   bestAutoTimer = setInterval(() => {
     const el = document.getElementById('slider-best'); if (!el) return;
     const pct = window.innerWidth <= 900 ? 50 : 25;
     s.idx += 1;
     el.style.transition = 'transform .5s ease';
     el.style.transform = `translateX(-${s.idx * pct}%)`;
-    // clone শেষে পৌঁছালে — transition শেষ হলে silently reset
     if (s.idx >= origTotal) {
       setTimeout(() => {
         el.style.transition = 'none';
@@ -1715,7 +1685,7 @@ function renderBest() {
   const best = prods.filter(p => p.best && p.active !== false);
   if (!best.length) { document.getElementById('slider-best').innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;width:100%">কোনো বেস্ট সেলার পণ্য নেই</div>'; return; }
   document.getElementById('slider-best').innerHTML = best.map(bestCard).join('');
-  bestCloned = false; // reset so clone happens fresh
+  bestCloned = false;
   regSlider('best', best.length, window.innerWidth <= 900 ? 2 : 4);
   startBestAutoSlide();
 }
@@ -1976,12 +1946,9 @@ function deleteFromCart(cartKey) { delete cart[cartKey]; updateCart(); }
 function updateCart() {
   const items = Object.values(cart);
   const tot = items.reduce((s, i) => s + i.qty, 0);
-  // Update all cart counts
   document.getElementById('cartCountDesk').textContent = tot;
   document.getElementById('cartCountMob').textContent = tot;
   document.getElementById('cartCountBnav').textContent = tot;
-  document.getElementById('cartCountBnav').textContent = tot;
-  // Hide mob badge if 0
   const mobBadge = document.getElementById('cartCountMob');
   mobBadge.style.display = tot > 0 ? 'flex' : 'none';
   
@@ -2025,8 +1992,8 @@ function updateCart() {
   fel.style.display = 'block';
 }
 
-let relScrollX = 0, relScrollTimer = null, relScrollRAF = null;
-const REL_CARD_W = 80 + 9; // card + gap
+let relScrollX = 0, relScrollRAF = null;
+const REL_CARD_W = 80 + 9;
 
 function crelCardHTML(rp) {
   return `<div class="crel-card" onclick="goProduct('${rp._id||rp.id}');toggleCart()">
@@ -2041,9 +2008,8 @@ function crelCardHTML(rp) {
 
 function renderRelRow() {
   const row = document.getElementById('cartRelRow'); if (!row || !relItems.length) return;
-  // মূল কার্ড + ক্লোন = seamless loop
   const html = relItems.map(crelCardHTML).join('');
-  row.innerHTML = html + html; // double for infinite loop
+  row.innerHTML = html + html;
   relScrollX = 0;
   row.style.transform = 'translateX(0)';
 }
@@ -2052,22 +2018,20 @@ function startRelScroll() {
   stopRelScroll();
   renderRelRow();
   const row = document.getElementById('cartRelRow'); if (!row || !relItems.length) return;
-  const halfWidth = relItems.length * REL_CARD_W; // মূল অর্ধেকের width
+  const halfWidth = relItems.length * REL_CARD_W;
   let lastTime = null;
-  const SPEED = 38; // px/sec
+  const SPEED = 38;
   function step(ts) {
     if (!lastTime) lastTime = ts;
     const dt = (ts - lastTime) / 1000;
     lastTime = ts;
     relScrollX += SPEED * dt;
-    // half-point এ silently reset
     if (relScrollX >= halfWidth) relScrollX -= halfWidth;
     row.style.transform = `translateX(-${relScrollX}px)`;
     relScrollRAF = requestAnimationFrame(step);
   }
   relScrollRAF = requestAnimationFrame(step);
 
-  // hover pause
   const track = document.querySelector('.cart-rel-track');
   if (track) {
     track.onmouseenter = () => { if (relScrollRAF) { cancelAnimationFrame(relScrollRAF); relScrollRAF = null; } };
@@ -2103,7 +2067,6 @@ let selectedDelivery = null;
 let selectedDeliveryType = '';
 let requiresAdvanceDelivery = false;
 
-/* কার্টে অগ্রিম-প্রযোজ্য পণ্য আছে কিনা চেক */
 function checkAdvanceDelivery(items) {
   const found = items.filter(i => {
     const cat = (i.cat || '').trim();
@@ -2145,8 +2108,10 @@ function openOrderModal() {
   document.getElementById('delCharge1').textContent = '৳' + deliveryCharges.inside;
   document.getElementById('delCharge2').textContent = '৳' + deliveryCharges.outside;
 
-  /* অগ্রিম ডেলিভারি চার্জ চেক */
-  const advItems = checkAdvanceDelivery(items);
+  const advItems = items.filter(i => {
+    const cat = (i.cat || '').trim();
+    return ADVANCE_DELIVERY_CATS.some(ac => cat.includes(ac) || ac.includes(cat));
+  });
   requiresAdvanceDelivery = advItems.length > 0;
   const advBox = document.getElementById('omAdvanceBox');
   const legalEl = document.getElementById('omLegalText');
@@ -2186,7 +2151,6 @@ function selectDelivery(charge, optId, type) {
   document.getElementById('omGrand2').textContent = '৳' + grand.toLocaleString('en');
   document.getElementById('omSubmitTotal').textContent = '৳' + grand.toLocaleString('en');
 
-  /* অগ্রিম পরিমাণ আপডেট */
   const advAmt = document.getElementById('omAdvanceAmtText');
   if (advAmt && requiresAdvanceDelivery) {
     advAmt.innerHTML = `📌 অগ্রিম পাঠাতে হবে: <strong>৳${charge.toLocaleString('en')}</strong> (ডেলিভারি চার্জ মাত্র)`;
@@ -2204,7 +2168,6 @@ async function submitOrder() {
   if (!address) { showToast('❌ ঠিকানা লিখুন'); document.getElementById('omAddress').focus(); return; }
   if (selectedDelivery === null) { showToast('❌ ডেলিভারি পদ্ধতি নির্বাচন করুন'); return; }
 
-  /* অগ্রিম পেমেন্ট ট্রানজেকশন ID চেক */
   let trxId = '';
   if (requiresAdvanceDelivery) {
     trxId = (document.getElementById('omTrxId')?.value || '').trim();
@@ -2263,13 +2226,11 @@ async function submitOrder() {
 async function loadProductsPage(page) {
   prodPage = page;
   prodCatFilter = document.getElementById('prodCatFilter').value;
-  prodSearchFilter = document.getElementById('prodSearchInput').value.trim();
   const grid = document.getElementById('productsGrid');
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.8rem;color:var(--gd)"></i></div>';
   try {
     let url = `/api/products?page=${prodPage}&limit=${prodLimit}&active=true`;
     if (prodCatFilter) url += `&cat=${encodeURIComponent(prodCatFilter)}`;
-    if (prodSearchFilter) url += `&search=${encodeURIComponent(prodSearchFilter)}`;
     const res = await api(url);
     const prodsPage = res.products || [];
     prodTotal = res.total || 0;
@@ -2408,7 +2369,6 @@ function copyPayNum(method, btn) {
     btn.classList.add('copied');
     setTimeout(() => { btn.textContent = 'কপি'; btn.classList.remove('copied'); }, 2000);
   }).catch(() => {
-    /* fallback for older browsers */
     const el = document.createElement('textarea');
     el.value = num; document.body.appendChild(el);
     el.select(); document.execCommand('copy');
@@ -2425,7 +2385,6 @@ function showToast(msg) {
   const icon = document.getElementById('toastIcon');
   const msgEl = document.getElementById('toastMsg');
   const isErr = msg.startsWith('❌');
-  // ইমোজি বাদ দিয়ে clean message
   const cleanMsg = msg.replace(/^[✅❌⚠️]\s*/, '');
   msgEl.textContent = cleanMsg;
   if (isErr) {
@@ -2437,9 +2396,8 @@ function showToast(msg) {
     icon.innerHTML = '<i class="fa-solid fa-check"></i>';
     icon.className = 'toast-icon';
   }
-  // reset animation
   t.classList.remove('show');
-  void t.offsetWidth; // reflow
+  void t.offsetWidth;
   t.classList.add('show');
   if (toastTimer) clearTimeout(toastTimer);
   toastTimer = setTimeout(() => {
