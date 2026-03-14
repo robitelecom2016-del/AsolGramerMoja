@@ -1,3 +1,4 @@
+// server.js (updated with SEO fields and sitemap)
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -10,14 +11,12 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ═══ CLOUDINARY CONFIG ═══
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// ═══ CORS CONFIG ═══
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5500',
@@ -31,7 +30,7 @@ app.use(cors({
     if (!origin || allowedOrigins.some(o => origin.startsWith(o))) {
       callback(null, true);
     } else {
-      callback(null, true); // Allow all for now
+      callback(null, true);
     }
   },
   credentials: true,
@@ -40,7 +39,6 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// ═══ MONGODB CONNECTION ═══
 let isConnected = false;
 
 const connectDB = async () => {
@@ -76,9 +74,13 @@ mongoose.connection.on('error', (err) => {
 
 connectDB();
 
-// ═══ SCHEMAS ═══
+function generateSlug(name) {
+  return name
+    .toLowerCase()
+    .replace(/[^\u0980-\u09FFa-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
 
-// Admin Schema
 const adminSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
@@ -87,7 +89,6 @@ const adminSchema = new mongoose.Schema({
 });
 const Admin = mongoose.model('Admin', adminSchema);
 
-// Category Schema
 const categorySchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   lbl: { type: String, required: true },
@@ -98,7 +99,6 @@ const categorySchema = new mongoose.Schema({
 });
 const Category = mongoose.model('Category', categorySchema);
 
-// Product Schema
 const productSchema = new mongoose.Schema({
   cat: { type: String, required: true },
   nm: { type: String, required: true },
@@ -120,13 +120,15 @@ const productSchema = new mongoose.Schema({
     op: Number,
     disc: String,
   }],
+  metaTitle: { type: String, default: '' },
+  metaDescription: { type: String, default: '' },
+  slug: { type: String, unique: true, sparse: true },
   order: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 const Product = mongoose.model('Product', productSchema);
 
-// Order Schema (updated with advanceDelivery)
 const orderSchema = new mongoose.Schema({
   orderNum: { type: String, required: true, unique: true },
   items: [{
@@ -170,7 +172,6 @@ const orderSchema = new mongoose.Schema({
 });
 const Order = mongoose.model('Order', orderSchema);
 
-// Hero Slide Schema
 const heroSchema = new mongoose.Schema({
   title: String,
   subtitle: String,
@@ -183,7 +184,6 @@ const heroSchema = new mongoose.Schema({
 });
 const Hero = mongoose.model('Hero', heroSchema);
 
-// Settings Schema
 const settingsSchema = new mongoose.Schema({
   key: { type: String, unique: true },
   value: mongoose.Schema.Types.Mixed,
@@ -191,12 +191,10 @@ const settingsSchema = new mongoose.Schema({
 });
 const Settings = mongoose.model('Settings', settingsSchema);
 
-// ═══ MULTER (memory storage — upload to Cloudinary manually to avoid double-upload bug) ═══
 const memStorage = multer.memoryStorage();
 const upload = multer({ storage: memStorage, limits: { fileSize: 5 * 1024 * 1024 } });
 const uploadThumb = multer({ storage: memStorage, limits: { fileSize: 5 * 1024 * 1024 } });
 
-// Helper: upload a buffer to Cloudinary (returns { url, publicId })
 async function uploadToCloudinary(buffer, folder, transformation) {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -210,7 +208,6 @@ async function uploadToCloudinary(buffer, folder, transformation) {
   });
 }
 
-// ═══ AUTH MIDDLEWARE ═══
 const authMiddleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -223,14 +220,12 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-// ═══ DB MIDDLEWARE ═══
 const dbMiddleware = async (req, res, next) => {
   if (!isConnected) await connectDB();
   next();
 };
 app.use(dbMiddleware);
 
-// ═══ KEEP ALIVE (Render free plan) ═══
 const SELF_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
 setInterval(async () => {
   try {
@@ -245,9 +240,6 @@ setInterval(async () => {
   } catch {}
 }, 14 * 60 * 1000);
 
-// ═══ ROUTES ═══
-
-// Health check
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -257,31 +249,23 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ─── AUTH ───
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
-
     let admin = await Admin.findOne({ username });
-
-    // Auto-create default admin on first run
     if (!admin && username === 'admin') {
       const hashed = await bcrypt.hash('admin123', 10);
       admin = await Admin.create({ username: 'admin', password: hashed, name: 'Super Admin' });
     }
-
     if (!admin) return res.status(401).json({ error: 'Invalid credentials' });
-
     const valid = await bcrypt.compare(password, admin.password);
     if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
-
     const token = jwt.sign(
       { id: admin._id, username: admin.username, name: admin.name },
       process.env.JWT_SECRET || 'asolgramer_secret_2024',
       { expiresIn: '7d' }
     );
-
     res.json({ token, admin: { username: admin.username, name: admin.name } });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -302,7 +286,6 @@ app.put('/api/auth/password', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── PRODUCTS ───
 app.get('/api/products', async (req, res) => {
   try {
     const { cat, best, active = 'true', limit, page = 1 } = req.query;
@@ -310,7 +293,6 @@ app.get('/api/products', async (req, res) => {
     if (active !== 'all') filter.active = active === 'true';
     if (cat && cat !== 'all') filter.cat = cat;
     if (best === 'true') filter.best = true;
-
     const total = await Product.countDocuments(filter);
     let query = Product.find(filter).sort({ order: 1, createdAt: -1 });
     if (limit) {
@@ -337,6 +319,9 @@ app.get('/api/products/:id', async (req, res) => {
 
 app.post('/api/products', authMiddleware, async (req, res) => {
   try {
+    if (!req.body.slug && req.body.nm) {
+      req.body.slug = generateSlug(req.body.nm);
+    }
     const product = await Product.create({ ...req.body, updatedAt: new Date() });
     res.status(201).json(product);
   } catch (err) {
@@ -346,6 +331,9 @@ app.post('/api/products', authMiddleware, async (req, res) => {
 
 app.put('/api/products/:id', authMiddleware, async (req, res) => {
   try {
+    if (!req.body.slug && req.body.nm) {
+      req.body.slug = generateSlug(req.body.nm);
+    }
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       { ...req.body, updatedAt: new Date() },
@@ -362,8 +350,6 @@ app.delete('/api/products/:id', authMiddleware, async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
-
-    // Delete images from Cloudinary
     const imageIds = [product.imgPublicId, ...product.imgsPublicIds].filter(Boolean);
     for (const id of imageIds) {
       try {
@@ -372,7 +358,6 @@ app.delete('/api/products/:id', authMiddleware, async (req, res) => {
         console.error(`Failed to delete image ${id}:`, err.message);
       }
     }
-
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -403,7 +388,6 @@ app.patch('/api/products/:id/best', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── UPLOAD ───
 app.post('/api/upload/product-image', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
@@ -418,7 +402,6 @@ app.post('/api/upload/product-image', authMiddleware, upload.single('image'), as
   }
 });
 
-// Hero slider image upload
 app.post('/api/upload/hero-image', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
@@ -461,7 +444,6 @@ app.delete('/api/upload/:publicId', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── CATEGORIES ───
 app.get('/api/categories', async (req, res) => {
   try {
     const cats = await Category.find({ active: true }).sort({ order: 1 });
@@ -507,7 +489,6 @@ app.delete('/api/categories/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// Toggle category active/inactive
 app.patch('/api/categories/:id/toggle', authMiddleware, async (req, res) => {
   try {
     const cat = await Category.findById(req.params.id);
@@ -520,8 +501,6 @@ app.patch('/api/categories/:id/toggle', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── ORDERS ───
-// Updated POST /api/orders to accept advanceDelivery
 app.post('/api/orders', async (req, res) => {
   try {
     const { items, customer, delivery, subtotal, total, advanceDelivery } = req.body;
@@ -549,7 +528,6 @@ app.get('/api/orders', authMiddleware, async (req, res) => {
   try {
     const { status, search, page = 1, limit = 10 } = req.query;
     let filter = status && status !== 'all' ? { status } : {};
-    
     if (search && search.trim()) {
       const searchRegex = new RegExp(search.trim(), 'i');
       filter = {
@@ -561,7 +539,6 @@ app.get('/api/orders', authMiddleware, async (req, res) => {
         ]
       };
     }
-    
     const total = await Order.countDocuments(filter);
     const orders = await Order.find(filter)
       .sort({ createdAt: -1 })
@@ -598,7 +575,6 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── HERO SLIDES ───
 app.get('/api/hero', async (req, res) => {
   try {
     const slides = await Hero.find({ active: true }).sort({ order: 1 });
@@ -665,7 +641,6 @@ app.patch('/api/hero/:id/toggle', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── SETTINGS ───
 app.get('/api/settings', authMiddleware, async (req, res) => {
   try {
     const settings = await Settings.find();
@@ -677,7 +652,6 @@ app.get('/api/settings', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ নতুন: বাল্ক আপডেট (এডমিন প্যানেল থেকে aboutPage, contactPage, ইত্যাদি সেভ করার জন্য)
 app.put('/api/settings', authMiddleware, async (req, res) => {
   try {
     const updates = req.body;
@@ -718,7 +692,6 @@ app.get('/api/public/settings', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ✅ পাবলিক এন্ডপয়েন্ট — "আমাদের সম্পর্কে" পেজ
 app.get('/api/pages/about', async (req, res) => {
   try {
     const setting = await Settings.findOne({ key: 'aboutPage' });
@@ -728,7 +701,6 @@ app.get('/api/pages/about', async (req, res) => {
   }
 });
 
-// ✅ পাবলিক এন্ডপয়েন্ট — "যোগাযোগ" পেজ
 app.get('/api/pages/contact', async (req, res) => {
   try {
     const setting = await Settings.findOne({ key: 'contactPage' });
@@ -738,7 +710,6 @@ app.get('/api/pages/contact', async (req, res) => {
   }
 });
 
-// ─── DASHBOARD STATS ───
 app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
   try {
     const [totalProducts, totalOrders, pendingOrders, deliveredOrders] = await Promise.all([
@@ -747,17 +718,13 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
       Order.countDocuments({ status: 'pending' }),
       Order.countDocuments({ status: 'delivered' }),
     ]);
-
     const revenue = await Order.aggregate([
       { $match: { status: { $in: ['delivered', 'shipped'] } } },
       { $group: { _id: null, total: { $sum: '$total' } } },
     ]);
-
     const recentOrders = await Order.find().sort({ createdAt: -1 }).limit(5);
-
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-
     const monthlyData = await Order.aggregate([
       { $match: { createdAt: { $gte: sixMonthsAgo }, status: { $ne: 'cancelled' } } },
       { $group: {
@@ -767,12 +734,10 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
       }},
       { $sort: { '_id.year': 1, '_id.month': 1 } },
     ]);
-
     const catDist = await Product.aggregate([
       { $group: { _id: '$cat', count: { $sum: 1 } } },
       { $sort: { count: -1 } },
     ]);
-
     res.json({
       totalProducts,
       totalOrders,
@@ -788,12 +753,9 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── SEED INITIAL DATA ───
 app.post('/api/seed', authMiddleware, async (req, res) => {
   try {
     const { force } = req.body;
-    
-    // Seed categories
     const catCount = await Category.countDocuments();
     if (catCount === 0 || force) {
       if (force) await Category.deleteMany({});
@@ -806,48 +768,35 @@ app.post('/api/seed', authMiddleware, async (req, res) => {
         { id: 'rosmalai', lbl: 'রশমালাই', em: '🍚', order: 6, active: true },
       ]);
     }
-
-    // Seed products
     const prodCount = await Product.countDocuments();
     if (prodCount === 0 || force) {
       if (force) await Product.deleteMany({});
       await Product.insertMany([
-        // MISTY (মিষ্টি) - 5
         { cat: 'misty', nm: 'সরিষার ফুলের মধু', sub: '१००% খাঁটি এবং আসল মধু', em: '🍯', bg: '#c8a55a', best: true, active: true, phone: '01712345678', desc: 'সরিষার ফুল থেকে সংগৃহীত খাঁটি মধু।', variants: [{ lbl: '०००gm', p: 280, op: 350, disc: '२०%' }, { lbl: '१kg', p: 520, op: 680, disc: '२४%' }], order: 1 },
         { cat: 'misty', nm: 'খেজুরের মধু', sub: 'মিশ্র ফুলের সংমিশ্রণ', em: '🍯', bg: '#8b6914', best: false, active: true, phone: '01712345678', desc: 'খেজুর গাছের ফুল থেকে সংগৃহীত।', variants: [{ lbl: '००००gm', p: 320, op: 400, disc: '२०%' }], order: 2 },
         { cat: 'misty', nm: 'ফুলের মধু মিশ্রণ', sub: 'বহু ফুলের নির্যাস', em: '🌸', bg: '#d4a574', best: false, active: true, phone: '01712345678', variants: [{ lbl: '३००gm', p: 180, op: 250, disc: '२८%' }], order: 3 },
         { cat: 'misty', nm: 'আম্বাজি মধু', sub: 'স্বর্গীয় स्वाद का मधु', em: '🥭', bg: '#e8b84e', best: false, active: true, phone: '01712345678', variants: [{ lbl: '०२५०gm', p: 200, op: 280, disc: '२८%' }], order: 4 },
         { cat: 'misty', nm: 'স্থানীয় বন মধু', sub: 'প্রাকৃতিক অরণ্য from', em: '🌲', bg: '#997744', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 350, op: 500, disc: '३०%' }], order: 5 },
-
-        // DOI (দই) - 5
         { cat: 'doi', nm: 'গ্রামীণ গরুর দই', sub: 'ঘরে তৈরি খাঁটি দই', em: '🥛', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '१ keji', p: 120, op: 150, disc: '२०%' }], order: 1 },
         { cat: 'doi', nm: 'মিষ্টি মেহেরী দই', sub: 'প্রিমিয়াম মানের দই', em: '🍶', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 70, op: 90, disc: '२२%' }], order: 2 },
         { cat: 'doi', nm: 'ছাগলের দই', sub: 'স্বাস্থ্যকর বিকল্প', em: '🐐', bg: '#e6d5c8', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 100, op: 140, disc: '२९%' }], order: 3 },
         { cat: 'doi', nm: 'কুমড়ার দই', sub: 'বিশেষ স্বাদের দই', em: '🎃', bg: '#ffa500', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 90, op: 120, disc: '२५%' }], order: 4 },
         { cat: 'doi', nm: 'স্ট্রবেরি দই', sub: 'ফলের সুস্বাদু দই', em: '🍓', bg: '#ffb6c1', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 95, op: 130, disc: '२७%' }], order: 5 },
-
-        // MITHAI (মিঠাই) - 5
         { cat: 'mithai', nm: 'সন্দেশ', sub: 'ঐতিহ্য মিঠাই', em: '🍪', bg: '#d4a574', best: true, active: true, phone: '01712345678', variants: [{ lbl: '५टि पिस', p: 150, op: 200, disc: '२५%' }], order: 1 },
         { cat: 'mithai', nm: 'রসগোল্লা', sub: 'সুস্বাদু সাদা মিঠাই', em: '⚪', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '०५टि पिस', p: 120, op: 160, disc: '२५%' }], order: 2 },
         { cat: 'mithai', nm: 'পায়েস', sub: 'ঐতিহ্যবাহী খীরের পায়েস', em: '🥣', bg: '#ffd700', best: false, active: true, phone: '01712345678', variants: [{ lbl: '२००gm', p: 100, op: 140, disc: '२९%' }], order: 3 },
         { cat: 'mithai', nm: 'গুলাব জামুন', sub: 'মিঠাই ভাজার মিঠাই', em: '🔴', bg: '#8b4513', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 130, op: 180, disc: '२८%' }], order: 4 },
         { cat: 'mithai', nm: 'খীর কামান', sub: 'বিশেষ খীরের মিঠাই', em: '🎀', bg: '#daa520', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००gm', p: 90, op: 130, disc: '३१%' }], order: 5 },
-
-        // TAIL (তৈল) - 5
         { cat: 'tail', nm: 'নারকেল তেল', sub: 'পূর্ণ খাঁটি তেল', em: '🥥', bg: '#8b6914', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 250, op: 350, disc: '२९%' }], order: 1 },
         { cat: 'tail', nm: 'তিসি তেল', sub: 'স্বাস্থ্য তেল', em: '🌿', bg: '#6b4423', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 180, op: 260, disc: '३१%' }], order: 2 },
         { cat: 'tail', nm: 'সরিষার তেল', sub: 'রসোই তেল', em: '🌾', bg: '#997744', best: false, active: true, phone: '01712345678', variants: [{ lbl: '१ लiter', p: 320, op: 480, disc: '३३%' }], order: 3 },
         { cat: 'tail', nm: 'জলপাই তেল', sub: 'স্বাস্থ্য বিকল্প', em: '🫒', bg: '#556b2f', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 320, op: 480, disc: '३३%' }], order: 4 },
         { cat: 'tail', nm: 'সুগন্ধি তেল', sub: 'আয়ুর্বেদিক মিশ্রণ', em: '🌸', bg: '#d4a574', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 120, op: 180, disc: '३३%' }], order: 5 },
-
-        // BORHANI (বোরহানী) - 5
         { cat: 'borhani', nm: 'ঘিয়ে বোরহানী', sub: 'ঐতিহ্যবাহী পানীয়', em: '🥤', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 80, op: 120, disc: '३३%' }], order: 1 },
         { cat: 'borhani', nm: 'পুদিনা বোরহানী', sub: 'তাজা পুদিনা', em: '🌿', bg: '#e6f5e6', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 60, op: 100, disc: '४०%' }], order: 2 },
         { cat: 'borhani', nm: 'জিরা বোরহানী', sub: 'পাচন শক্তি', em: '🌾', bg: '#f5deb3', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 70, op: 110, disc: '३६%' }], order: 3 },
         { cat: 'borhani', nm: 'আম্রপালী বোরহানী', sub: 'ফলের স্বাদ', em: '🥭', bg: '#ffd700', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 90, op: 130, disc: '३१%' }], order: 4 },
         { cat: 'borhani', nm: 'মাল্টি মশলা বোরহানী', sub: 'মশলার মিশ্রণ', em: '🌶️', bg: '#ff6347', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००००ml', p: 75, op: 120, disc: '३८%' }], order: 5 },
-
-        // ROSMALAI (রশমালাই) - 5
         { cat: 'rosmalai', nm: 'খাঁটি রশমালাই', sub: 'ছানার মিঠাই', em: '🍚', bg: '#f5f5dc', best: true, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 200, op: 280, disc: '२९%' }], order: 1 },
         { cat: 'rosmalai', nm: 'পিস্তা রশমালাই', sub: 'শুকনো ফল', em: '🌰', bg: '#f5deb3', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 280, op: 400, disc: '३०%' }], order: 2 },
         { cat: 'rosmalai', nm: 'গোলাপি রশমালাই', sub: 'গোলাপ জল', em: '🌹', bg: '#ffb6c1', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 220, op: 320, disc: '३१%' }], order: 3 },
@@ -855,8 +804,6 @@ app.post('/api/seed', authMiddleware, async (req, res) => {
         { cat: 'rosmalai', nm: 'সাদা রশমালাই', sub: 'ঐতিহ্য মিঠাই', em: '⚪', bg: '#fffacd', best: false, active: true, phone: '01712345678', variants: [{ lbl: '००५टि पिस', p: 180, op: 250, disc: '२८%' }], order: 5 }
       ]);
     }
-
-    // Seed hero
     const heroCount = await Hero.countDocuments();
     if (heroCount === 0 || force) {
       if (force) await Hero.deleteMany({});
@@ -866,25 +813,65 @@ app.post('/api/seed', authMiddleware, async (req, res) => {
         { title: 'তাজা দুধ তৈরী দই', subtitle: 'খাঁটি গ্রামীণ স্বাদ', gradient: 's3', order: 3 },
       ]);
     }
-
     res.json({ success: true, message: 'Seed completed - 6 categories with 30 products' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ─── 404 ───
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const products = await Product.find({ active: true }).select('slug updatedAt');
+    const baseUrl = process.env.FRONTEND_URL || 'https://asolgramermoja.netlify.app';
+    let urls = '';
+    products.forEach(p => {
+      if (p.slug) {
+        urls += `
+  <url>
+    <loc>${baseUrl}/#/product/${p.slug}</loc>
+    <lastmod>${p.updatedAt.toISOString().split('T')[0]}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+      }
+    });
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${baseUrl}/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/#/products</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>${urls}
+</urlset>`;
+    res.header('Content-Type', 'application/xml');
+    res.send(sitemap);
+  } catch (err) {
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send(`User-agent: *
+Allow: /
+Sitemap: ${process.env.FRONTEND_URL || 'https://asolgramermoja.netlify.app'}/sitemap.xml
+`);
+});
+
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// ─── ERROR HANDLER ───
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// ─── START ───
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);

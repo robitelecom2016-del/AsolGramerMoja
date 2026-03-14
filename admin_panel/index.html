@@ -1,3 +1,4 @@
+<!-- admin index.html (updated with SEO fields) -->
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -45,7 +46,6 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--txt3); }
 
-/* LOGIN */
 #loginPage {
   min-height: 100vh;
   display: flex;
@@ -72,9 +72,6 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
 .login-err { background:rgba(218,54,51,.12); border:1px solid var(--red); border-radius:7px; padding:10px 14px; font-size:.82rem; color:var(--red2); margin-top:14px; display:none; text-align:center; }
 .login-err.show { display:block; }
 
-/* ═══════════════════════════════
-   LAYOUT — FULL WIDTH FIX
-═══════════════════════════════ */
 #appLayout {
   display: none;
   width: 100%;
@@ -82,7 +79,6 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
   position: relative;
 }
 
-/* SIDEBAR — fixed, always on left */
 .sidebar {
   position: fixed;
   left: 0;
@@ -126,7 +122,6 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
 .btn-logout { margin-left:auto; background:none; border:none; color:var(--txt3); cursor:pointer; font-size:.88rem; padding:6px; border-radius:6px; transition:all .15s; }
 .btn-logout:hover { background:rgba(218,54,51,.15); color:var(--red2); }
 
-/* TOPBAR — spans full width minus sidebar */
 .topbar {
   position: fixed;
   left: var(--sidebar-w);
@@ -159,7 +154,6 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
 .btn-warning { background:rgba(210,153,34,.12); color:var(--yellow2); border:1px solid rgba(210,153,34,.3); padding:6px 12px; border-radius:6px; cursor:pointer; font-family:inherit; font-size:.78rem; display:flex; align-items:center; gap:5px; transition:all .15s; }
 .btn-sm { padding:5px 10px; font-size:.74rem; }
 
-/* MAIN CONTENT — takes all remaining space */
 .main-content {
   position: absolute;
   top: var(--header-h);
@@ -172,12 +166,10 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
   overflow-x: hidden;
 }
 
-/* PAGES */
 .page-view { display:none; animation:fadeIn .2s ease; width: 100%; }
 .page-view.active { display:block; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
 
-/* DASHBOARD */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -204,7 +196,6 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
 .stat-change.up { color:var(--green2); }
 .stat-change.neutral { color:var(--txt2); }
 
-/* Chart grid — revenue chart wider */
 .chart-grid {
   display: grid;
   grid-template-columns: 1fr 300px;
@@ -223,7 +214,6 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
 .chart-bar-inner { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--green),var(--green3)); transition:width 1s ease; }
 .chart-bar-val { font-size:.7rem; font-weight:700; color:var(--txt); width:65px; flex-shrink:0; font-family:'JetBrains Mono',monospace; }
 
-/* TABLE */
 .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; width:100%; }
 .data-table { width:100%; border-collapse:collapse; min-width:600px; }
 .data-table th { background:var(--bg3); color:var(--txt2); font-size:.73rem; font-weight:700; text-transform:uppercase; letter-spacing:.7px; padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; }
@@ -256,7 +246,6 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
 .icon-btn.warn { color:var(--orange2); border-color:rgba(232,102,10,.3); }
 .icon-btn.warn:hover { border-color:var(--orange); color:#fff; background:var(--orange); }
 
-/* FILTERS */
 .filters-bar { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; width:100%; }
 .search-input { background:var(--bg2); border:1.5px solid var(--border); border-radius:8px; padding:9px 14px 9px 34px; color:var(--txt); font-family:inherit; font-size:.84rem; outline:none; transition:border-color .2s, box-shadow .2s; min-width:200px; }
 .search-input:focus { border-color:var(--green); box-shadow:0 0 0 3px var(--green-glow); }
@@ -269,7 +258,6 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
 .filter-count { font-size:.78rem; color:var(--txt2); background:var(--bg3); border:1px solid var(--border); padding:5px 10px; border-radius:6px; white-space:nowrap; }
 .filters-bar .ml-auto { margin-left:auto; }
 
-/* MODAL */
 .modal-ov { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:500; display:flex; align-items:center; justify-content:center; padding:16px; opacity:0; pointer-events:none; transition:opacity .25s; backdrop-filter:blur(4px); }
 .modal-ov.open { opacity:1; pointer-events:all; }
 .modal { background:var(--bg2); border:1px solid var(--border); border-radius:14px; width:100%; max-width:640px; max-height:92vh; overflow-y:auto; transform:translateY(20px) scale(.97); transition:transform .25s; box-shadow:0 24px 64px rgba(0,0,0,.7); scrollbar-width:thin; scrollbar-color:var(--border2) var(--bg2); }
@@ -282,7 +270,6 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
 .modal-body { padding:20px; }
 .modal-footer { padding:14px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; background:var(--bg2); position:sticky; bottom:0; }
 
-/* FORM */
 .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .form-group2 { margin-bottom:16px; }
 .form-group2 label { display:block; font-size:.78rem; font-weight:700; color:var(--txt2); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
@@ -299,7 +286,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .toggle-thumb { position:absolute; left:2px; top:2px; width:14px; height:14px; border-radius:50%; background:#fff; transition:left .2s; }
 .toggle-track.on .toggle-thumb { left:20px; }
 
-/* IMAGE UPLOAD */
 .img-upload-area { border:2px dashed var(--border); border-radius:10px; padding:20px; text-align:center; cursor:pointer; transition:all .2s; position:relative; }
 .img-upload-area:hover, .img-upload-area.drag { border-color:var(--green); background:var(--green-glow); }
 .img-upload-area i { font-size:1.8rem; color:var(--txt3); margin-bottom:8px; display:block; }
@@ -311,7 +297,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .img-prev-rm { position:absolute; top:2px; right:2px; width:18px; height:18px; background:var(--red); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.55rem; cursor:pointer; opacity:0; transition:opacity .15s; }
 .img-prev-item:hover .img-prev-rm { opacity:1; }
 
-/* VARIANTS */
 .variants-list { display:flex; flex-direction:column; gap:8px; }
 .variant-item { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:10px 12px; display:grid; grid-template-columns:2fr 1fr 1fr 1fr auto; gap:8px; align-items:center; }
 .variant-item input { background:var(--bg4); border:1px solid var(--border); border-radius:6px; padding:7px 9px; color:var(--txt); font-family:inherit; font-size:.82rem; outline:none; width:100%; transition:border-color .2s; }
@@ -320,23 +305,19 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .add-variant-btn { display:flex; align-items:center; gap:6px; color:var(--green2); background:none; border:1px dashed rgba(46,160,67,.4); border-radius:7px; padding:8px 14px; cursor:pointer; font-family:inherit; font-size:.82rem; font-weight:600; transition:all .2s; width:100%; justify-content:center; margin-top:6px; }
 .add-variant-btn:hover { background:var(--green-glow); border-color:var(--green); }
 
-/* HIGHLIGHTS */
 .highlights-list { display:flex; flex-direction:column; gap:6px; }
 .highlight-item { display:flex; gap:8px; align-items:center; }
 .highlight-item input { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:8px 11px; color:var(--txt); font-family:inherit; font-size:.84rem; outline:none; transition:border-color .2s; }
 .highlight-item input:focus { border-color:var(--green); }
 
-/* STATUS */
 .status-select { background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:5px 8px; color:var(--txt); font-family:inherit; font-size:.78rem; cursor:pointer; outline:none; }
 
-/* PAGINATION */
 .pagination { display:flex; align-items:center; gap:5px; margin-top:16px; justify-content:center; flex-wrap:wrap; }
 .pg-btn { width:34px; height:34px; border-radius:7px; border:1px solid var(--border); background:var(--bg2); color:var(--txt2); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:.82rem; transition:all .15s; }
 .pg-btn:hover { border-color:var(--green); color:var(--green2); }
 .pg-btn.active { background:var(--green); border-color:var(--green); color:#fff; font-weight:700; }
 .pg-btn:disabled { opacity:.4; cursor:not-allowed; }
 
-/* TOAST */
 .toast-container { position:fixed; bottom:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
 .toast-item { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:10px; min-width:260px; max-width:360px; box-shadow:0 8px 24px rgba(0,0,0,.5); transform:translateX(120%); transition:transform .3s ease; font-size:.84rem; color:var(--txt); }
 .toast-item.show { transform:none; }
@@ -348,7 +329,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .toast-item.error i { color:var(--red2); }
 .toast-item.info i { color:var(--blue2); }
 
-/* LOADING & EMPTY */
 .loader { text-align:center; padding:40px; color:var(--txt2); }
 .loader i { font-size:1.8rem; color:var(--green); animation:spin 1s linear infinite; margin-bottom:10px; display:block; }
 @keyframes spin { to{transform:rotate(360deg)} }
@@ -357,7 +337,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .empty-state h3 { font-size:.96rem; color:var(--txt); margin-bottom:6px; }
 .empty-state p { font-size:.82rem; }
 
-/* ORDER DETAIL */
 .order-items-list { display:flex; flex-direction:column; gap:8px; }
 .order-item-row { display:flex; align-items:center; gap:10px; padding:10px; background:var(--bg3); border-radius:8px; }
 .order-item-img { width:38px; height:38px; border-radius:6px; object-fit:cover; flex-shrink:0; }
@@ -373,13 +352,11 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .timeline-note { font-size:.74rem; color:var(--txt2); margin-top:2px; }
 .timeline-time { font-size:.68rem; color:var(--txt3); margin-top:2px; font-family:'JetBrains Mono',monospace; }
 
-/* CONFIRM */
 .confirm-modal { max-width:400px; }
 .confirm-icon { text-align:center; padding:20px 0 10px; font-size:2.5rem; }
 .confirm-msg { text-align:center; font-size:.9rem; color:var(--txt2); margin-bottom:6px; }
 .confirm-name { text-align:center; font-weight:700; color:var(--txt); font-size:.9rem; }
 
-/* SETTINGS */
 .settings-section { background:var(--bg2); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:18px; }
 .settings-section-hd { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
 .settings-section-hd h3 { font-size:.9rem; font-weight:700; color:var(--txt); }
@@ -389,7 +366,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .settings-info label { font-size:.86rem; font-weight:600; color:var(--txt); }
 .settings-info p { font-size:.74rem; color:var(--txt2); margin-top:2px; }
 
-/* CATEGORIES */
 .cat-cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:12px; }
 .cat-card { background:var(--bg2); border:1.5px solid var(--border); border-radius:12px; padding:18px 16px 14px; transition:all .2s; display:flex; flex-direction:column; gap:8px; position:relative; overflow:hidden; }
 .cat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:12px 12px 0 0; background:var(--green); opacity:0; transition:opacity .2s; }
@@ -403,16 +379,13 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .cat-cnt { font-size:.72rem; color:var(--txt2); }
 .cat-actions { display:flex; gap:5px; margin-top:4px; padding-top:8px; border-top:1px solid var(--border); }
 
-/* HERO IMAGE UPLOAD */
 .hero-img-preview { margin-top:10px; border-radius:8px; overflow:hidden; border:1px solid var(--border); position:relative; max-height:180px; }
 .hero-img-preview img { width:100%; max-height:180px; object-fit:cover; display:block; }
 .hero-img-preview .remove-hero-img { position:absolute; top:8px; right:8px; width:28px; height:28px; background:var(--red); color:#fff; border:none; border-radius:50%; cursor:pointer; font-size:.75rem; display:flex; align-items:center; justify-content:center; }
 
-/* PROGRESS BAR */
 .progress-bar { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; margin-top:5px; }
 .progress-fill { height:100%; background:linear-gradient(90deg,var(--green),var(--green3)); border-radius:2px; transition:width .6s ease; }
 
-/* EMOJI SUGGESTIONS */
 .emoji-suggest-wrap { margin-top:8px; }
 .emoji-suggest-label { font-size:.68rem; color:var(--txt3); margin-bottom:5px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
 .emoji-suggest-row { display:flex; flex-wrap:wrap; gap:5px; }
@@ -421,18 +394,14 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .emoji-chip.selected { border-color:var(--green); background:var(--green-glow); box-shadow:0 0 0 2px var(--green-glow); }
 .emoji-chip .chip-lbl { font-size:.62rem; color:var(--txt2); }
 
-/* PAGE CONTENT SECTIONS */
 .content-editor { background:var(--bg3); border:1.5px solid var(--border); border-radius:8px; padding:14px; min-height:120px; color:var(--txt); font-family:inherit; font-size:.87rem; outline:none; resize:vertical; width:100%; transition:border-color .2s; }
 .content-editor:focus { border-color:var(--green); }
 
-/* MOBILE MENU */
 .mobile-menu-btn { display:none; background:none; border:none; color:var(--txt2); font-size:1.1rem; cursor:pointer; padding:7px; border-radius:6px; transition:all .15s; }
 .mobile-menu-btn:hover { background:var(--bg3); color:var(--txt); }
 
-/* CLOCK */
 #clockDisp { font-family:'JetBrains Mono', monospace; }
 
-/* ══ RESPONSIVE ══ */
 @media (max-width: 1400px) {
   .stats-grid { grid-template-columns: repeat(4, 1fr); }
 }
@@ -474,11 +443,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
   .filters-bar .ml-auto { margin-left:0; }
   .variant-item { grid-template-columns:1fr; }
 }
-/* ═══════════════════════════════
-   LOGO STYLING — PERFECT SHAPE & SIZE
-═══════════════════════════════ */
-
-/* লোগিন পেজ লোগো */
 .login-logo .logo-icon {
     width: 80px;
     height: 80px;
@@ -495,7 +459,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
     overflow: hidden;
 }
 
-/* লোগিন পেজ লোগো ইমেজ */
 .login-logo .logo-icon img {
     width: 90%;
     height: 90%;
@@ -504,7 +467,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
     display: block;
 }
 
-/* লোগিন পেজ লোগো ফলব্যাক (emoji) */
 .login-logo .logo-icon > div {
     display: flex !important;
     align-items: center;
@@ -514,9 +476,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
     font-size: 45px;
 }
 
-/* ─────────────────────────────── */
-
-/* সাইডবার লোগো */
 .sidebar-logo .logo-icon {
     width: 42px;
     height: 42px;
@@ -532,7 +491,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* সাইডবার লোগো ইমেজ */
 .sidebar-logo .logo-icon img {
     width: 90%;
     height: 90%;
@@ -541,7 +499,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
     display: block;
 }
 
-/* সাইডবার লোগো ফলব্যাক (emoji) */
 .sidebar-logo .logo-icon > div {
     display: flex !important;
     align-items: center;
@@ -551,9 +508,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
     font-size: 24px;
 }
 
-/* ─────────────────────────────── */
-
-/* সম্পূর্ণ লোগো কন্টেইনার */
 .logo {
     display: flex;
     align-items: center;
@@ -570,7 +524,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
 </head>
 <body>
 
-<!-- LOGIN PAGE -->
 <div id="loginPage">
   <div class="login-box">
     <div class="login-logo">
@@ -595,11 +548,9 @@ textarea.form-control { resize:vertical; min-height:80px; }
   </div>
 </div>
 
-<!-- APP LAYOUT -->
 <div id="appLayout">
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <div class="logo" onclick="goHome()" style="flex-shrink: 0;">
@@ -659,7 +610,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
     </div>
   </aside>
 
-  <!-- TOPBAR -->
   <header class="topbar">
     <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
     <div>
@@ -678,10 +628,8 @@ textarea.form-control { resize:vertical; min-height:80px; }
     </div>
   </header>
 
-  <!-- MAIN CONTENT -->
   <main class="main-content">
 
-    <!-- DASHBOARD -->
     <div class="page-view active" id="page-dashboard">
       <div class="stats-grid" id="statsGrid">
         <div class="loader"><i class="fa-solid fa-spinner"></i></div>
@@ -722,7 +670,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <!-- PRODUCTS -->
     <div class="page-view" id="page-products">
       <div class="filters-bar">
         <div class="search-wrap">
@@ -757,7 +704,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="pagination" id="prodPagination"></div>
     </div>
 
-    <!-- ORDERS -->
     <div class="page-view" id="page-orders">
       <div class="filters-bar">
         <div class="search-wrap">
@@ -786,7 +732,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="pagination" id="orderPagination"></div>
     </div>
 
-    <!-- CATEGORIES -->
     <div class="page-view" id="page-categories">
       <div class="filters-bar">
         <span class="filter-count" id="catCount">0 ক্যাটাগরি</span>
@@ -797,7 +742,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="cat-cards" id="catCards"></div>
     </div>
 
-    <!-- HERO SLIDES -->
     <div class="page-view" id="page-hero">
       <div class="filters-bar">
         <p style="font-size:.82rem;color:var(--txt2)">স্লাইডারে ছবি যোগ করুন। ছবি না দিলে গ্র্যাডিয়েন্ট ব্যাকগ্রাউন্ড ব্যবহার হবে।</p>
@@ -815,7 +759,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <!-- ABOUT PAGE -->
     <div class="page-view" id="page-about">
       <div class="card" style="margin-bottom:16px">
         <div class="card-header">
@@ -880,7 +823,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <!-- CONTACT PAGE -->
     <div class="page-view" id="page-contact">
       <div class="card" style="margin-bottom:16px">
         <div class="card-header">
@@ -963,7 +905,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <!-- SETTINGS -->
     <div class="page-view" id="page-settings">
       <div class="settings-section">
         <div class="settings-section-hd"><i class="fa-solid fa-store" style="color:var(--green)"></i><h3>স্টোর তথ্য</h3></div>
@@ -1028,7 +969,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
   </main>
 </div>
 
-<!-- PRODUCT MODAL -->
 <div class="modal-ov" id="prodModal">
   <div class="modal wide">
     <div class="modal-hd">
@@ -1114,6 +1054,20 @@ textarea.form-control { resize:vertical; min-height:80px; }
           <i class="fa-solid fa-plus"></i> ভেরিয়েন্ট যোগ করুন
         </button>
       </div>
+      <div class="form-group2">
+        <label>SEO টাইটেল (মেটা টাইটেল)</label>
+        <input type="text" class="form-control" id="pMetaTitle" placeholder="পণ্যের টাইটেল (SEO)">
+        <div class="form-hint">ফাঁকা রাখলে পণ্যের নাম ব্যবহার হবে।</div>
+      </div>
+      <div class="form-group2">
+        <label>SEO ডেসক্রিপশন (মেটা ডেসক্রিপশন)</label>
+        <textarea class="form-control" id="pMetaDesc" rows="2" placeholder="সার্চ ইঞ্জিনে দেখাবে এমন একটি বর্ণনা (১৫৫-১৬০ অক্ষর)"></textarea>
+      </div>
+      <div class="form-group2">
+        <label>Slug (URL-এর অংশ)</label>
+        <input type="text" class="form-control" id="pSlug" placeholder="যেমন: sorisha-fuler-modhu">
+        <div class="form-hint">ফাঁকা রাখলে নাম থেকে অটো জেনারেট হবে।</div>
+      </div>
       <div class="form-row" style="margin-top:6px">
         <div class="form-group2">
           <label>বেস্ট সেলার</label>
@@ -1142,7 +1096,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
   </div>
 </div>
 
-<!-- CATEGORY MODAL -->
 <div class="modal-ov" id="catModal">
   <div class="modal">
     <div class="modal-hd">
@@ -1185,7 +1138,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
   </div>
 </div>
 
-<!-- HERO MODAL -->
 <div class="modal-ov" id="heroModal">
   <div class="modal">
     <div class="modal-hd">
@@ -1238,7 +1190,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
   </div>
 </div>
 
-<!-- ORDER DETAIL MODAL -->
 <div class="modal-ov" id="orderModal">
   <div class="modal wide">
     <div class="modal-hd">
@@ -1249,7 +1200,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
   </div>
 </div>
 
-<!-- CONFIRM MODAL -->
 <div class="modal-ov" id="confirmModal">
   <div class="modal confirm-modal">
     <div class="modal-body">
@@ -1283,6 +1233,10 @@ const api = async (method, path, body, isFormData = false) => {
   if (!res.ok) throw new Error(data.error || 'API Error');
   return data;
 };
+
+function generateSlug(str) {
+  return str.toLowerCase().replace(/[^\u0980-\u09FFa-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
 
 let currentPage = 'dashboard';
 let prodPage = 1, orderPage = 1;
@@ -1557,6 +1511,9 @@ function openProdModal(prod=null) {
   document.getElementById('pBestLbl').textContent='না'; document.getElementById('pActiveLbl').textContent='হ্যাঁ';
   document.getElementById('mainImgPreview').innerHTML=''; document.getElementById('thumbImgPreview').innerHTML='';
   document.getElementById('prodModalTitle').innerHTML='<i class="fa-solid fa-plus" style="color:var(--green)"></i> নতুন পণ্য যোগ করুন';
+  document.getElementById('pMetaTitle').value = prod?.metaTitle || '';
+  document.getElementById('pMetaDesc').value = prod?.metaDescription || '';
+  document.getElementById('pSlug').value = prod?.slug || '';
   addProductEmojiPicker();
   if (prod) {
     document.getElementById('prodModalTitle').innerHTML='<i class="fa-solid fa-pen-to-square" style="color:var(--blue)"></i> পণ্য সম্পাদনা করুন';
@@ -1705,7 +1662,23 @@ async function saveProd() {
   if (!cat) { toast('ক্যাটাগরি নির্বাচন করুন','error'); return; }
   const variants=getVariants();
   if (!variants.length) { toast('কমপক্ষে একটি ভেরিয়েন্ট যোগ করুন','error'); return; }
-  const data = { nm, cat, sub:document.getElementById('pSub').value.trim(), em:document.getElementById('pEm').value.trim()||'🛒', bg:document.getElementById('pBg').value.trim(), phone:document.getElementById('pPhone').value.trim(), desc:document.getElementById('pDesc').value.trim(), img:document.getElementById('pImg').value, imgPublicId:document.getElementById('pImgPid').value, imgs:JSON.parse(document.getElementById('pImgs').value||'[]'), imgsPublicIds:JSON.parse(document.getElementById('pImgsPids').value||'[]'), best:document.getElementById('pBest').value==='true', active:document.getElementById('pActive').value==='true', variants, highlights:getHighlights() };
+  let slug = document.getElementById('pSlug').value.trim();
+  if (!slug && nm) slug = generateSlug(nm);
+  const data = { 
+    nm, cat, sub:document.getElementById('pSub').value.trim(), em:document.getElementById('pEm').value.trim()||'🛒', 
+    bg:document.getElementById('pBg').value.trim(), phone:document.getElementById('pPhone').value.trim(), 
+    desc:document.getElementById('pDesc').value.trim(), img:document.getElementById('pImg').value, 
+    imgPublicId:document.getElementById('pImgPid').value, 
+    imgs:JSON.parse(document.getElementById('pImgs').value||'[]'), 
+    imgsPublicIds:JSON.parse(document.getElementById('pImgsPids').value||'[]'), 
+    best:document.getElementById('pBest').value==='true', 
+    active:document.getElementById('pActive').value==='true', 
+    variants, 
+    highlights:getHighlights(),
+    metaTitle: document.getElementById('pMetaTitle').value.trim(),
+    metaDescription: document.getElementById('pMetaDesc').value.trim(),
+    slug
+  };
   const id=document.getElementById('prodId').value;
   const btn=document.getElementById('saveProdBtn');
   
@@ -1772,7 +1745,6 @@ async function updateOrderStatus(id,status) {
   catch { toast('আপডেট ব্যর্থ','error'); }
 }
 
-// ═══ UPDATED viewOrder FUNCTION ═══
 async function viewOrder(id) {
   try {
     const o = await api('GET', `/api/orders/${id}`);
