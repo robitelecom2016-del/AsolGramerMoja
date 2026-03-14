@@ -1,4 +1,3 @@
-<!-- frontend index.html (updated with SEO meta tags and structured data) -->
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -14,7 +13,6 @@
 <link rel="canonical" href="https://asolgramermoja.netlify.app">
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-F5MDVLE0LH"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -40,11 +38,9 @@ body{
   flex-direction:column;
   min-height:100vh;
 }
-
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:#f0ede6;}
 ::-webkit-scrollbar-thumb{background:#c8c0b0;border-radius:3px;}
-
 .navbar{background:var(--gd);position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,.3);}
 .nb{max-width:var(--mw);margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:14px;height:62px;}
 .nb-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
@@ -95,7 +91,6 @@ body{
 .cart-btn{background:var(--or);color:#fff;border:none;padding:8px 15px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:.87rem;display:flex;align-items:center;gap:6px;transition:background .2s;flex-shrink:0;white-space:nowrap;}
 .cart-btn:hover{background:var(--orl);}
 .cart-count{background:#fff;color:var(--or);border-radius:50%;width:17px;height:17px;font-size:.65rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
-
 .mob-header{
   display:none;
   position:sticky;top:0;z-index:1000;
@@ -157,7 +152,6 @@ body{
   font-size:.6rem;font-weight:700;
   display:flex;align-items:center;justify-content:center;
 }
-
 .mob-search-overlay{
   position:fixed;
   inset:0;
@@ -222,7 +216,6 @@ body{
   transition:all .28s ease .1s;
 }
 .mob-search-overlay.open .mob-search-results{transform:translateY(0);opacity:1;}
-
 .bottom-nav{
   display:none;
   position:fixed;bottom:0;left:0;right:0;
@@ -310,7 +303,6 @@ body{
   font-size:.62rem;font-weight:600;color:#999;
   line-height:1;margin-top:4px;
 }
-
 .mob-nav-drawer{display:none;position:fixed;inset:0;z-index:1500;}
 .mob-nav-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);}
 .mob-nav-panel{position:absolute;left:0;top:0;width:280px;height:100%;background:var(--gd);display:flex;flex-direction:column;box-shadow:4px 0 20px rgba(0,0,0,.3);transform:translateX(-100%);transition:transform .3s ease;}
@@ -330,7 +322,6 @@ body{
 .mob-nav-links li a:hover,.mob-nav-links li a.active{background:rgba(255,255,255,.1);color:#fff;}
 .mob-nav-links li a i{width:22px;text-align:center;font-size:.9rem;color:#b8e67a;}
 .mob-nav-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,.1);font-size:.75rem;color:rgba(255,255,255,.45);text-align:center;}
-
 .search-dropdown{position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:500;display:none;max-height:300px;overflow-y:auto;}
 .search-dropdown.open{display:block;}
 .srch-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #f0ede6;transition:background .15s;}
@@ -343,7 +334,6 @@ body{
 .srch-cat{font-size:.7rem;color:var(--txt2);}
 .srch-price{font-size:.84rem;font-weight:700;color:var(--gd);}
 .srch-empty{padding:18px;text-align:center;color:#aaa;font-size:.84rem;}
-
 @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
 .skeleton{background:linear-gradient(90deg,#e8e4dc 25%,#f0ece4 50%,#e8e4dc 75%);background-size:800px 100%;animation:shimmer 1.4s infinite linear;border-radius:6px;}
 .skeleton-card{background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
@@ -351,7 +341,6 @@ body{
 .sk-line{height:12px;margin:10px;border-radius:4px;}
 .sk-line.short{width:60%;}
 .sk-line.shorter{width:40%;}
-
 .cat-bar-outer{background:#e3f0dc;border-bottom:2px solid #bcd8b4;}
 .cat-bar-inner{max-width:var(--mw);margin:0 auto;overflow:hidden;}
 .cat-track{display:flex;width:max-content;animation:catScroll 28s linear infinite;}
@@ -362,10 +351,8 @@ body{
 .cat-item.active .cat-lbl{color:var(--gd);font-weight:700;}
 .cat-emoji{font-size:1.4rem;line-height:1;}
 .cat-lbl{font-size:.72rem;font-weight:500;color:#3a5a34;margin-top:3px;white-space:nowrap;}
-
 .page{display:none; flex:1; }
 .page.active{display:block;}
-
 .main{max-width:var(--mw);margin:0 auto;padding:24px 16px 40px;}
 .sec-block{margin-bottom:44px;}
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--border);}
@@ -373,7 +360,6 @@ body{
 .sec-arrows{display:flex;gap:6px;}
 .arr-btn{width:30px;height:30px;border-radius:4px;border:1px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.78rem;color:#555;transition:all .15s;}
 .arr-btn:hover{background:var(--gd);color:#fff;border-color:var(--gd);}
-
 .hero{
   position:relative;
   width:100%;
@@ -405,7 +391,6 @@ body{
 .hero-arrow:hover{background:rgba(255,255,255,.3);transform:translateY(-50%) scale(1.1);}
 .hero-arrow.prev{left:16px;}
 .hero-arrow.next{right:16px;}
-
 .c-img{display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
 .c-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease;}
 .c-acts{display:flex;align-items:stretch;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
@@ -420,7 +405,6 @@ body{
 .c-prices{display:flex;align-items:baseline;gap:6px;}
 .c-price{font-size:.9rem;font-weight:700;color:var(--txt);}
 .c-old{font-size:.7rem;color:#ccc;text-decoration:line-through;}
-
 .best-wrap{overflow:hidden;}
 .best-slider{display:flex;gap:0;transition:transform .4s ease;}
 .bcard{flex:0 0 25%;width:25%;padding:0 8px;cursor:pointer;position:relative;}
@@ -437,7 +421,6 @@ body{
 .bcard:hover .c-price{color:var(--gd);transition:color .25s;}
 .b-badge{position:absolute;top:0;left:0;z-index:5;background:var(--or);color:#fff;font-size:.58rem;font-weight:700;padding:3px 8px;border-radius:0 0 5px 0;transition:background .2s;}
 .bcard:hover .b-badge{background:#c44d00;}
-
 .cat-row-wrap{overflow:hidden;}
 .cat-row{display:flex;gap:0;transition:transform .4s ease;}
 .pcard{flex:0 0 calc(20% - 11.2px);width:calc(20% - 11.2px);margin-right:14px;background:#fff;border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:box-shadow .2s,transform .2s;cursor:pointer;position:relative;}
@@ -445,19 +428,16 @@ body{
 .pcard:hover{box-shadow:0 4px 18px rgba(0,0,0,.12);transform:translateY(-2px);}
 .pcard .c-img{height:200px;}
 .pcard:hover .c-img img{transform:scale(1.07);}
-
 .all-cat-tabs{display:flex;flex-wrap:wrap;gap:0;margin-bottom:14px;border:1px solid var(--border);border-radius:0;overflow:hidden;width:fit-content;}
 .all-cat-tabs button{padding:7px 16px;border:none;border-right:1px solid var(--border);cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;border-radius:0 !important;background:#fff;color:#555;transition:background .18s,color .18s;white-space:nowrap;}
 .all-cat-tabs button:last-child{border-right:none;}
 .all-cat-tabs button.active-cat{background:var(--gd);color:#fff;}
 .all-cat-tabs button:hover:not(.active-cat){background:#f0f9eb;color:var(--gd);}
-
 .all-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
 .agcard{background:#fff;border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:box-shadow .2s,transform .2s;cursor:pointer;position:relative;}
 .agcard:hover{box-shadow:0 4px 18px rgba(0,0,0,.12);transform:translateY(-2px);}
 .agcard .c-img{height:200px;}
 .agcard:hover .c-img img{transform:scale(1.07);}
-
 .products-page{max-width:var(--mw);margin:0 auto;padding:20px 16px 40px;}
 .products-header{margin-bottom:24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;}
 .products-title{font-size:1.4rem;font-weight:700;color:var(--gd);display:flex;align-items:center;gap:8px;}
@@ -480,7 +460,6 @@ body{
 .pg-btn:hover{background:var(--gd);color:#fff;border-color:var(--gd);}
 .pg-btn.active{background:var(--gd);color:#fff;border-color:var(--gd);}
 .pg-btn:disabled{opacity:.4;cursor:not-allowed;}
-
 .about-page{max-width:var(--mw);margin:0 auto;padding:0 0 60px;}
 .about-banner{width:100%;height:300px;overflow:hidden;position:relative;margin-bottom:0;}
 .about-banner img{width:100%;height:100%;object-fit:cover;}
@@ -502,7 +481,6 @@ body{
 .about-content{background:#fff;border:1px solid var(--border);border-radius:12px;padding:32px;margin:0 0 32px;line-height:2;font-size:.94rem;color:#444;box-shadow:0 2px 10px rgba(0,0,0,.04);}
 .about-content p{margin-bottom:12px;}
 .about-content p:last-child{margin-bottom:0;}
-
 .contact-page{max-width:var(--mw);margin:0 auto;padding:0 0 60px;}
 .contact-hero{background:linear-gradient(135deg,var(--gd),var(--gm));padding:48px 16px 40px;text-align:center;position:relative;overflow:hidden;}
 .contact-hero::before{content:'📞';font-size:8rem;position:absolute;right:-10px;top:-10px;opacity:.08;line-height:1;}
@@ -531,7 +509,6 @@ body{
 .contact-social-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;flex-shrink:0;}
 .contact-social-ico.fb{background:#1877f2;}
 .contact-social-ico.ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);}
-
 .why-sec{background:#e3f0dc;border-top:2px solid #bcd8b4;border-bottom:2px solid #bcd8b4;padding:36px 16px;}
 .why-in{max-width:var(--mw);margin:0 auto;}
 .why-ttl{text-align:center;font-size:1.3rem;font-weight:700;color:var(--gd);margin-bottom:20px;}
@@ -541,7 +518,6 @@ body{
 .why-ic{font-size:2rem;margin-bottom:7px;display:block;}
 .why-card h3{font-size:.92rem;font-weight:700;color:var(--gd);margin-bottom:5px;}
 .why-card p{font-size:.78rem;color:var(--txt2);line-height:1.6;}
-
 footer{background:var(--gd);color:#c8e6b0;padding:32px 16px 16px; flex-shrink:0; }
 .fin{max-width:var(--mw);margin:0 auto;}
 .fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:24px;margin-bottom:20px;}
@@ -555,7 +531,6 @@ footer p{font-size:.79rem;line-height:1.7;}
 .sb{background:rgba(255,255,255,.1);color:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:.88rem;display:flex;align-items:center;justify-content:center;transition:background .2s;text-decoration:none;}
 .sb:hover{background:var(--or);}
 .fbot{border-top:1px solid rgba(255,255,255,.12);padding-top:12px;text-align:center;font-size:.74rem;color:rgba(255,255,255,.4);}
-
 .cart-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;opacity:0;pointer-events:none;transition:opacity .3s;}
 .cart-ov.open{opacity:1;pointer-events:all;}
 .cart-sb{position:fixed;right:-420px;top:0;width:400px;height:100%;background:#fff;z-index:2001;transition:right .3s ease;display:flex;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,.18);}
@@ -604,7 +579,6 @@ footer p{font-size:.79rem;line-height:1.7;}
 .btn-co:hover{background:var(--orl);}
 .empty-c{text-align:center;padding:36px 20px;color:#bbb;}
 .empty-c span{font-size:2.5rem;display:block;margin-bottom:8px;}
-
 #page-product{background:#f0ede6;min-height:60vh;}
 .pdp-wrap{max-width:var(--mw);margin:0 auto;padding:20px 16px 40px;}
 .pdp-breadcrumb{font-size:.8rem;color:#aaa;display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:20px;padding:12px 0 12px;border-bottom:1px solid var(--border);}
@@ -672,12 +646,10 @@ footer p{font-size:.79rem;line-height:1.7;}
 .rel-pcard .rc-act:hover{background:#f5f1eb;color:var(--gd);}
 .rel-pcard .rc-act.add:hover{color:var(--or);background:#fff5ef;}
 .rel-pcard .rc-div{width:1px;background:var(--border);margin:5px 0;}
-
 .error-state{text-align:center;padding:40px 20px;color:#aaa;}
 .error-state i{font-size:2rem;display:block;margin-bottom:10px;color:#ccc;}
 .error-state p{font-size:.84rem;}
 .retry-btn{margin-top:12px;background:var(--gd);color:#fff;border:none;padding:9px 20px;border-radius:6px;font-family:inherit;font-size:.84rem;cursor:pointer;}
-
 .toast{
   position:fixed;
   bottom:20px;
@@ -730,7 +702,6 @@ footer p{font-size:.79rem;line-height:1.7;}
 @media(max-width:900px){
   .toast{bottom:20px;width:calc(100vw - 32px);max-width:290px;}
 }
-
 .om-advance-box{background:#fff8e6;border:1.5px solid #f0a500;border-radius:10px;padding:14px 16px;margin:0 0 4px;}
 .om-advance-title{font-size:.85rem;font-weight:700;color:#b45000;display:flex;align-items:center;gap:7px;margin-bottom:10px;}
 .om-advance-title i{color:#e67e00;}
@@ -751,7 +722,6 @@ footer p{font-size:.79rem;line-height:1.7;}
 .om-trx-input:focus{border-color:#e8a000;box-shadow:0 0 0 3px rgba(240,160,0,.12);}
 .om-trx-input::placeholder{color:#bbb;font-weight:400;}
 .om-advance-amt{font-size:.8rem;color:#7a4500;background:#fff0cc;padding:7px 12px;border-radius:6px;margin-top:6px;text-align:center;font-weight:600;}
-
 .order-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;align-items:center;justify-content:center;padding:16px;}
 .order-ov.open{opacity:1;pointer-events:all;}
 .order-modal{background:#fff;border-radius:0;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;transform:translateY(30px) scale(.97);transition:transform .3s ease;box-shadow:0 20px 60px rgba(0,0,0,.3);scrollbar-width:thin;scrollbar-color:#b0c8aa #f0ede6;}
@@ -813,9 +783,7 @@ footer p{font-size:.79rem;line-height:1.7;}
 .om-success h3{font-size:1.2rem;font-weight:700;color:var(--gd);margin-bottom:8px;}
 .om-success p{font-size:.85rem;color:#666;line-height:1.7;}
 .om-success .order-num{background:#e8f5e0;color:var(--gd);font-weight:700;padding:8px 20px;border-radius:20px;display:inline-block;margin:12px 0;font-size:.9rem;}
-
 .logo-icon img{width:50px;height:auto;}
-
 @media(max-width:900px){
   .navbar{ display:none; }
   .mob-header{ display:block; }
@@ -843,7 +811,6 @@ footer p{font-size:.79rem;line-height:1.7;}
   .pdp-related-grid{grid-template-columns:repeat(2,1fr);}
   .order-modal{max-height:95vh;}
 }
-
 @media(max-width:600px){
   .hero{aspect-ratio:unset;height:200px;min-height:200px;}
   .hero-ci{padding:0 14px;}
@@ -860,7 +827,6 @@ footer p{font-size:.79rem;line-height:1.7;}
   .main{padding:16px 12px 32px;}
   .sec-head h2{font-size:1rem;}
 }
-
 @media(max-width:480px){
   .cart-sb{width:100%;right:-100%;}
   .pcard{flex:0 0 calc(50% - 5px);width:calc(50% - 5px);margin-right:10px;}
@@ -871,12 +837,11 @@ footer p{font-size:.79rem;line-height:1.7;}
 </style>
 </head>
 <body>
-
 <nav class="navbar">
   <div class="nb">
     <div class="logo" onclick="goHome()">
       <div class="logo-icon">
-        <img src="images/logo-g.png" alt="Logo" />
+        <img src="images/logo-g.png" alt="Logo">
       </div>
       <div class="logo-txt"><span class="lt-main">আসল গ্রামের মজা</span><span class="lt-sub">বিশুদ্ধ পণ্য · সরাসরি কৃষক থেকে</span></div>
     </div>
@@ -899,12 +864,11 @@ footer p{font-size:.79rem;line-height:1.7;}
     </div>
   </div>
 </nav>
-
 <header class="mob-header">
   <div class="mob-header-inner">
     <div class="mob-logo-block" onclick="goHome()">
       <div class="mob-logo-icon">
-        <img src="images/logo-g.png" alt="Logo" />
+        <img src="images/logo-g.png" alt="Logo">
       </div>
       <div class="mob-logo-text">
         <span class="mob-logo-name">আসল গ্রামের মজা</span>
@@ -923,7 +887,6 @@ footer p{font-size:.79rem;line-height:1.7;}
     </div>
   </div>
 </header>
-
 <div class="mob-search-overlay" id="mobSearchOverlay" onclick="closeMobSearchOutside(event)">
   <div class="mob-search-box">
     <input class="mob-s-input" id="mobSearchInput" type="text" placeholder="পণ্য খুঁজুন..." autocomplete="off" oninput="doSearch(this.value,'mobSearchResults')">
@@ -931,7 +894,6 @@ footer p{font-size:.79rem;line-height:1.7;}
   </div>
   <div class="mob-search-results" id="mobSearchResults"></div>
 </div>
-
 <div class="page active" id="page-home">
   <div class="hero" id="heroSection">
     <div class="slide active s1">
@@ -973,13 +935,11 @@ footer p{font-size:.79rem;line-height:1.7;}
       <div class="dot" onclick="goSlide(2)"></div>
     </div>
   </div>
-
   <div class="cat-bar-outer">
     <div class="cat-bar-inner">
       <div class="cat-track" id="catTrack"></div>
     </div>
   </div>
-
   <div class="main" id="sec-products">
     <div class="sec-block">
       <div class="sec-head">
@@ -996,7 +956,6 @@ footer p{font-size:.79rem;line-height:1.7;}
         <div class="bcard"><div class="skeleton-card"><div class="sk-img skeleton"></div><div class="sk-line skeleton"></div><div class="sk-line short skeleton"></div><div class="sk-line shorter skeleton" style="margin-bottom:14px"></div></div></div>
       </div></div>
     </div>
-
     <div class="sec-block" id="sec-catrow">
       <div class="sec-head">
         <div style="display:flex;align-items:center;overflow-x:auto;scrollbar-width:none;">
@@ -1013,7 +972,6 @@ footer p{font-size:.79rem;line-height:1.7;}
         <div class="pcard"><div class="skeleton-card"><div class="c-img skeleton" style="height:200px"></div><div class="sk-line skeleton" style="margin:8px"></div><div class="sk-line short skeleton" style="margin:8px"></div></div></div>
       </div></div>
     </div>
-
     <div class="sec-block">
       <div class="sec-head">
         <h2>📦 সকল পণ্য</h2>
@@ -1028,7 +986,6 @@ footer p{font-size:.79rem;line-height:1.7;}
       </div>
     </div>
   </div>
-
   <section class="why-sec" id="sec-about">
     <div class="why-in">
       <div class="why-ttl">কেন আমাদের পণ্য কিনবেন?</div>
@@ -1040,13 +997,12 @@ footer p{font-size:.79rem;line-height:1.7;}
     </div>
   </section>
 </div>
-
 <div class="page" id="page-products">
   <div class="products-page">
     <div class="products-header">
       <div class="products-title"><i class="fa-solid fa-box-open" style="color:var(--gd)"></i> সকল পণ্য</div>
       <div class="products-filters">
-        <select class="filter-select" id="prodCatFilter" onchange="loadProductsPage(1)">
+        <select class="filter-select" id="prodCatFilter" onchange="goProductsPage(this.value)">
           <option value="">সব ক্যাটাগরি</option>
         </select>
       </div>
@@ -1055,26 +1011,22 @@ footer p{font-size:.79rem;line-height:1.7;}
     <div id="productsPagination" class="prod-pagination"></div>
   </div>
 </div>
-
 <div class="page" id="page-about">
   <div class="about-page" id="aboutContent"></div>
 </div>
-
 <div class="page" id="page-contact">
   <div class="contact-page" id="contactContent"></div>
 </div>
-
 <div class="page" id="page-product">
   <div id="pdpContent"></div>
 </div>
-
 <footer>
   <div class="fin">
     <div class="fgrid">
       <div>
         <div class="logo" onclick="goHome()" style="margin-bottom:12px;display:flex;">
           <div class="logo-icon">
-            <img src="images/logo-g.png" alt="Logo" />
+            <img src="images/logo-g.png" alt="Logo">
           </div>
           <div class="logo-txt"><span class="lt-main">আসল গ্রামের মজা</span><span class="lt-sub">বিশুদ্ধ পণ্য · সরাসরি কৃষক থেকে</span></div>
         </div>
@@ -1100,7 +1052,6 @@ footer p{font-size:.79rem;line-height:1.7;}
     <div class="fbot" id="footerCopyright">&copy; 2024 আসল গ্রামের মজা | সর্বস্বত্ব সংরক্ষিত</div>
   </div>
 </footer>
-
 <nav class="bottom-nav" id="bottomNav" style="display:none !important;">
   <div class="bottom-nav-inner">
     <button class="bnav-item active" id="bnavHome" onclick="goHome()">
@@ -1123,7 +1074,6 @@ footer p{font-size:.79rem;line-height:1.7;}
     </button>
   </div>
 </nav>
-
 <div class="cart-ov" id="cartOv" onclick="toggleCart()"></div>
 <div class="cart-sb" id="cartSb">
   <div class="cart-hd"><h2>🛒 আপনার কার্ট</h2><button class="cls-cart" onclick="toggleCart()">✕</button></div>
@@ -1143,7 +1093,6 @@ footer p{font-size:.79rem;line-height:1.7;}
     <button class="btn-co" onclick="openOrderModal()">অর্ডার করুন</button>
   </div>
 </div>
-
 <div class="order-ov" id="orderOv">
   <div class="order-modal" id="orderModal">
     <div class="om-hd">
@@ -1239,45 +1188,36 @@ footer p{font-size:.79rem;line-height:1.7;}
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast"><div class="toast-inner"><div class="toast-icon" id="toastIcon"><i class="fa-solid fa-check"></i></div><span class="toast-msg" id="toastMsg"></span></div><div class="toast-bar" id="toastBar"></div></div>
-
 <script>
 const API_BASE = 'https://asolgramermoja-jysj.onrender.com';
-
 const api = async (path, opts = {}) => {
   const res = await fetch(API_BASE + path, { ...opts, headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) } });
   if (!res.ok) throw new Error('API error: ' + res.status);
   return res.json();
 };
-
 let prods = [];
 let cats = [];
 let heroSlides = [];
 let settings = {};
 let deliveryCharges = { inside: 80, outside: 130 };
 let storePhone = '01712345678';
-
 const ADVANCE_DELIVERY_CATS = ['মিষ্টি', 'দই', 'গ্রীষ্মকালীন পানীয়', 'রশমালাই'];
 const ADVANCE_PAYMENT_INFO = {
   bkash: '01XXXXXXXXX',
   nagad: '01XXXXXXXXX',
 };
-
 let dataLoaded = false;
-
 let prodPage = 1;
 let prodTotal = 0;
 let prodLimit = 200;
 let prodCatFilter = '';
 let prodSearchFilter = '';
-
 function updateMetaTags(product) {
   const title = product.metaTitle || product.nm;
   const description = product.metaDescription || product.sub || (product.desc ? product.desc.substring(0, 160) : '');
   const image = product.img || 'https://asolgramermoja.netlify.app/images/logo-g.png';
   const url = window.location.href;
-
   document.title = title + ' – আসল গ্রামের মজা';
   document.querySelector('meta[name="description"]').setAttribute('content', description);
   document.querySelector('meta[property="og:title"]').setAttribute('content', title);
@@ -1291,11 +1231,9 @@ function updateMetaTags(product) {
   const twImg = document.querySelector('meta[name="twitter:image"]');
   if (twImg) twImg.setAttribute('content', image);
 }
-
 function addProductStructuredData(product) {
   const price = product.variants?.[0]?.p || 0;
   const availability = product.active ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
-
   const script = document.createElement('script');
   script.type = 'application/ld+json';
   script.text = JSON.stringify({
@@ -1321,7 +1259,6 @@ function addProductStructuredData(product) {
   if (oldScript) oldScript.remove();
   document.head.appendChild(script);
 }
-
 async function loadAllData() {
   try {
     const [prodsRes, catsRes, heroRes] = await Promise.all([
@@ -1338,11 +1275,10 @@ async function loadAllData() {
     loadContactPageContent().catch(()=>{});
   } catch (err) {
     console.error('Data load failed:', err);
-    document.getElementById('slider-best').innerHTML = `<div style="padding:30px;text-align:center;color:#aaa;width:100%"><i class="fa-solid fa-wifi" style="font-size:1.5rem;display:block;margin-bottom:8px"></i>পণ্য লোড হয়নি। পেজ রিলোড করুন।<br><button class="retry-btn" onclick="location.reload()">পুনরায় লোড করুন</button></div>`;
+    document.getElementById('slider-best').innerHTML = `<div style="padding:30px;text-align:center;color:#aaa;width:100%"><i class="fa-solid fa-wifi" style="font-size:1.5rem;display:block;margin-bottom:8px"></i>পণ্য লোড হয়নি। পেজ রিলোড করুন。<br><button class="retry-btn" onclick="location.reload()">পুনরায় লোড করুন</button></div>`;
     document.getElementById('allGrid').innerHTML = '';
   }
 }
-
 function buildUI() {
   buildCatBar();
   buildAllCatTabs();
@@ -1361,10 +1297,8 @@ function buildUI() {
     catSel.innerHTML = '<option value="">সব ক্যাটাগরি</option>' + cats.map(c => `<option value="${c.id}">${c.em} ${c.lbl}</option>`).join('');
   }
 }
-
 let cur = 0;
 let heroTimer = null;
-
 function buildHero() {
   if (!heroSlides.length) return;
   const section = document.getElementById('heroSection');
@@ -1393,7 +1327,6 @@ function buildHero() {
   if (heroTimer) clearInterval(heroTimer);
   heroTimer = setInterval(() => goSlide((cur+1) % heroSlides.length), 4500);
 }
-
 function goSlide(n) {
   if (!heroSlides.length) return;
   n = ((n % heroSlides.length) + heroSlides.length) % heroSlides.length;
@@ -1411,18 +1344,15 @@ function goSlide(n) {
   cur = n;
   if (heroTimer) { clearInterval(heroTimer); heroTimer = setInterval(() => goSlide(cur+1), 4500); }
 }
-
 function buildFooter() {
   const catLinks = document.getElementById('footerCatLinks');
   const linksHtml = cats.map(c => `<li><a onclick="goProductsPage('${c.id}')">${c.em} ${c.lbl}</a></li>`).join('');
   if (catLinks) catLinks.innerHTML = linksHtml;
 }
-
 function imgTag(src, alt) {
   if (!src) return '';
   return `<img src="${src}" alt="${alt}" loading="lazy" onerror="this.style.display='none'">`;
 }
-
 function openMobSearch() {
   const ov = document.getElementById('mobSearchOverlay');
   ov.classList.add('open');
@@ -1439,17 +1369,14 @@ function closeMobSearch() {
 function closeMobSearchOutside(e) {
   if (e.target === document.getElementById('mobSearchOverlay')) closeMobSearch();
 }
-
 function setActiveNav(page) {
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
   document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
-
   const map = { home: ['navHome','bnavHome'], products: ['navProducts','bnavProducts'], about: ['navAbout','bnavAbout'], contact: ['navContact','bnavContact'] };
   if (map[page]) {
     map[page].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('active'); });
   }
 }
-
 function goHome() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-home').classList.add('active');
@@ -1457,20 +1384,21 @@ function goHome() {
   window.history.pushState({}, '', '#/');
   window.scrollTo(0, 0);
 }
-
 function goProductsPage(cat = '') {
-  if (cat) {
-    prodCatFilter = cat;
-    document.getElementById('prodCatFilter').value = cat;
-  }
+  prodCatFilter = cat;
+  const filterEl = document.getElementById('prodCatFilter');
+  if (filterEl) filterEl.value = cat;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-products').classList.add('active');
   setActiveNav('products');
-  window.history.pushState({}, '', '#/products');
+  if (cat) {
+    window.history.pushState({}, '', `#/products/${encodeURIComponent(cat)}`);
+  } else {
+    window.history.pushState({}, '', '#/products');
+  }
   window.scrollTo(0, 0);
   loadProductsPage(1);
 }
-
 function goAboutPage() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-about').classList.add('active');
@@ -1479,7 +1407,6 @@ function goAboutPage() {
   window.scrollTo(0, 0);
   loadAboutPageContent();
 }
-
 function goContactPage() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-contact').classList.add('active');
@@ -1488,7 +1415,6 @@ function goContactPage() {
   window.scrollTo(0, 0);
   loadContactPageContent();
 }
-
 function goProduct(idOrSlug) {
   const p = prods.find(x => x._id === idOrSlug || x.slug === idOrSlug);
   if (!p) { loadProductById(idOrSlug); return; }
@@ -1502,7 +1428,6 @@ function goProduct(idOrSlug) {
   updateMetaTags(p);
   addProductStructuredData(p);
 }
-
 async function loadProductById(id) {
   document.getElementById('pdpContent').innerHTML = '<div style="padding:60px;text-align:center;"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--gd)"></i></div>';
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1520,32 +1445,42 @@ async function loadProductById(id) {
     document.getElementById('pdpContent').innerHTML = '<div class="error-state" style="padding:80px"><i class="fa-solid fa-box-open"></i><p>পণ্যটি পাওয়া যায়নি</p><button class="retry-btn" onclick="goHome()">হোমে ফিরে যান</button></div>';
   }
 }
-
 window.addEventListener('popstate', e => {
   const h = location.hash;
   if (h.startsWith('#/product/')) {
-    const parts = h.split('/');
-    const slug = parts[parts.length - 1];
+    const slug = h.split('/').pop();
     goProduct(slug);
-  } else if (h === '#/products') { goProductsPage(); }
-  else if (h === '#/about') { goAboutPage(); }
-  else if (h === '#/contact') { goContactPage(); }
-  else { goHome(); }
+  } else if (h.startsWith('#/products/')) {
+    const cat = decodeURIComponent(h.replace('#/products/', ''));
+    goProductsPage(cat);
+  } else if (h === '#/products') {
+    goProductsPage('');
+  } else if (h === '#/about') {
+    goAboutPage();
+  } else if (h === '#/contact') {
+    goContactPage();
+  } else {
+    goHome();
+  }
 });
-
 window.addEventListener('DOMContentLoaded', () => {
   const h = location.hash;
   if (h.startsWith('#/product/')) {
-    const parts = h.split('/');
-    const slug = parts[parts.length - 1];
+    const slug = h.split('/').pop();
     loadAllData().then(() => goProduct(slug));
-    return;
-  } else if (h === '#/products') { loadAllData().then(() => goProductsPage()); return; }
-  else if (h === '#/about') { loadAllData().then(() => goAboutPage()); return; }
-  else if (h === '#/contact') { loadAllData().then(() => goContactPage()); return; }
-  loadAllData();
+  } else if (h.startsWith('#/products/')) {
+    const cat = decodeURIComponent(h.replace('#/products/', ''));
+    loadAllData().then(() => goProductsPage(cat));
+  } else if (h === '#/products') {
+    loadAllData().then(() => goProductsPage(''));
+  } else if (h === '#/about') {
+    loadAllData().then(() => goAboutPage());
+  } else if (h === '#/contact') {
+    loadAllData().then(() => goContactPage());
+  } else {
+    loadAllData();
+  }
 });
-
 const sState = {};
 function regSlider(id, total, vis) { sState[id] = { idx: 0, total, vis }; }
 function slideRow(id, dir) {
@@ -1561,10 +1496,8 @@ function slideRow(id, dir) {
     el.style.transform = `translateX(-${s.idx * (cardEl.offsetWidth + 14)}px)`;
   }
 }
-
 let bestAutoTimer = null;
 let bestCloned = false;
-
 function cloneBestCards() {
   const el = document.getElementById('slider-best');
   if (!el || bestCloned) return;
@@ -1572,7 +1505,6 @@ function cloneBestCards() {
   origCards.forEach(c => { el.appendChild(c.cloneNode(true)); });
   bestCloned = true;
 }
-
 function startBestAutoSlide() {
   if (bestAutoTimer) clearInterval(bestAutoTimer);
   cloneBestCards();
@@ -1595,7 +1527,6 @@ function startBestAutoSlide() {
     }
   }, 3000);
 }
-
 document.addEventListener('DOMContentLoaded', () => {
   const wrap = document.querySelector('.best-wrap');
   if (wrap) {
@@ -1605,10 +1536,8 @@ document.addEventListener('DOMContentLoaded', () => {
     wrap.addEventListener('touchend', () => { setTimeout(startBestAutoSlide, 2000); });
   }
 });
-
 function getBasePrice(p) { return p.variants?.[0]?.p || 0; }
 function getBaseOld(p) { return p.variants?.[0]?.op || null; }
-
 function acts(id) {
   return `<div class="c-acts">
     <button class="c-act" onclick="goProduct('${id}');event.stopPropagation()" title="বিস্তারিত"><i class="fa-regular fa-eye"></i></button>
@@ -1616,7 +1545,6 @@ function acts(id) {
     <button class="c-act ca" onclick="addToCartBase('${id}');event.stopPropagation()" title="কার্টে যোগ"><i class="fa-solid fa-cart-shopping"></i></button>
   </div>`;
 }
-
 function cardBody(p) {
   const bp = getBasePrice(p), bo = getBaseOld(p);
   const old = bo ? `<span class="c-old">৳${bo.toLocaleString('en')}</span>` : '';
@@ -1626,7 +1554,6 @@ function cardBody(p) {
     <div class="c-prices"><span class="c-price">৳${bp.toLocaleString('en')}</span>${old}</div>
   </div>`;
 }
-
 function bestCard(p) {
   return `<div class="bcard">
     <div class="bcard-inner">
@@ -1642,7 +1569,6 @@ function bestCard(p) {
     </div>
   </div>`;
 }
-
 function regCard(p) {
   return `<div class="pcard" onclick="goProduct('${p._id}')">
     <div class="c-img" style="background:${p.bg||'#c8a55a'}22;">
@@ -1652,7 +1578,6 @@ function regCard(p) {
     ${acts(p._id)}${cardBody(p)}
   </div>`;
 }
-
 function allCard(p) {
   return `<div class="agcard" onclick="goProduct('${p._id}')">
     <div class="c-img" style="background:${p.bg||'#c8a55a'}22;">
@@ -1662,7 +1587,6 @@ function allCard(p) {
     ${acts(p._id)}${cardBody(p)}
   </div>`;
 }
-
 function renderBest() {
   const best = prods.filter(p => p.best && p.active !== false);
   if (!best.length) { document.getElementById('slider-best').innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;width:100%">কোনো বেস্ট সেলার পণ্য নেই</div>'; return; }
@@ -1671,7 +1595,6 @@ function renderBest() {
   regSlider('best', best.length, window.innerWidth <= 900 ? 2 : 4);
   startBestAutoSlide();
 }
-
 let activeCatRow = '';
 function renderCatTabs() {
   document.getElementById('catTabs').innerHTML = cats.map(c => `
@@ -1682,7 +1605,6 @@ function renderCatTabs() {
       border-right:1px solid var(--border);transition:all .2s;white-space:nowrap;
     ">${c.em} ${c.lbl}</button>`).join('');
 }
-
 function switchCat(catId) {
   activeCatRow = catId;
   renderCatTabs();
@@ -1696,7 +1618,6 @@ function switchCat(catId) {
   rowEl.innerHTML = items.map(regCard).join('');
   regSlider('catrow', items.length, window.innerWidth <= 900 ? 2 : 5);
 }
-
 let allCatFilter = '';
 function buildAllCatTabs() {
   const tabsEl = document.getElementById('allCatTabs'); if (!tabsEl) return;
@@ -1704,34 +1625,29 @@ function buildAllCatTabs() {
   tabsEl.innerHTML = allCats.map(c => `
     <button onclick="switchAllCat('${c.id}')" class="${c.id===allCatFilter?'active-cat':''}">${c.em} ${c.lbl}</button>`).join('');
 }
-
 function switchAllCat(catId) {
   allCatFilter = catId;
   buildAllCatTabs();
   renderAll();
 }
-
 function renderAll() {
   const active = prods.filter(p => p.active !== false && (allCatFilter === '' || p.cat === allCatFilter));
   if (!active.length) { document.getElementById('allGrid').innerHTML = '<div style="grid-column:1/-1;padding:30px;text-align:center;color:#aaa">কোনো পণ্য পাওয়া যায়নি</div>'; return; }
   document.getElementById('allGrid').innerHTML = active.map(allCard).join('');
 }
-
 function buildCatBar() {
   const scrollCats = [{ id: 'all', lbl: 'সব পণ্য', em: '🛒' }, ...cats];
   const one = scrollCats.map(c => `
-    <a class="cat-item" data-cat="${c.id}" onclick="filterScrollCat('${c.id}');return false;">
+    <a class="cat-item" data-cat="${c.id}" onclick="goProductsPage('${c.id}');return false;">
       <span class="cat-emoji">${c.em}</span><span class="cat-lbl">${c.lbl}</span>
     </a>`).join('');
   document.getElementById('catTrack').innerHTML = one + one + one + one;
 }
-
 function filterScrollCat(catId) {
   document.querySelectorAll('.cat-item').forEach(c => c.classList.toggle('active', c.getAttribute('data-cat') === catId));
   if (catId === 'all') { if (cats.length) switchCat(activeCatRow || cats[0]?.id); }
   else { switchCat(catId); setTimeout(() => document.getElementById('sec-catrow').scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }
 }
-
 function doSearch(q, dropId) {
   const drop = document.getElementById(dropId);
   q = q.trim();
@@ -1746,25 +1662,20 @@ function doSearch(q, dropId) {
     </div>`).join('');
   drop.classList.add('open');
 }
-
 function searchGo(id) {
   document.getElementById('deskSearch').value = '';
   document.getElementById('deskDrop').classList.remove('open');
   closeMobSearch();
   goProduct(id);
 }
-
 document.addEventListener('click', e => {
   if (!e.target.closest('.search-wrap')) document.getElementById('deskDrop').classList.remove('open');
 });
-
 let pdpState = { pid: null, varIdx: 0, qty: 1 };
-
 function buildPdp(p) {
   pdpState = { pid: p._id || p.id, varIdx: 0, qty: 1 };
   renderPdp(p);
 }
-
 function renderPdp(p) {
   const v = p.variants?.[pdpState.varIdx] || { p: 0 };
   const price = v.p * pdpState.qty;
@@ -1805,7 +1716,6 @@ function renderPdp(p) {
         </div>`;
       }).join('')}
     </div>` : '';
-
   document.getElementById('pdpContent').innerHTML = `
   <div class="pdp-wrap">
     <div class="pdp-breadcrumb">
@@ -1857,7 +1767,6 @@ function renderPdp(p) {
     ${relHtml}
   </div>`;
 }
-
 function setPdpVar(pid, idx) {
   const p = prods.find(x => (x._id || x.id) === pid); if (!p) return;
   pdpState.varIdx = idx; pdpState.qty = 1;
@@ -1865,27 +1774,23 @@ function setPdpVar(pid, idx) {
   updatePdpPrice(p);
   const qv = document.getElementById('pdpQtyVal'); if (qv) qv.value = 1;
 }
-
 function pdpQtyChange(d) {
   pdpState.qty = Math.max(1, pdpState.qty + d);
   const el = document.getElementById('pdpQtyVal'); if (el) el.value = pdpState.qty;
   const p = prods.find(x => (x._id || x.id) === pdpState.pid);
   if (p) updatePdpPrice(p);
 }
-
 function updatePdpPrice(p) {
   const v = p.variants?.[pdpState.varIdx] || { p: 0 };
   const el = document.getElementById('pdpPrice');
   if (el) el.textContent = `৳${(v.p * pdpState.qty).toLocaleString('en')}`;
 }
-
 function pdpSetThumb(el, imgUrl) {
   document.querySelectorAll('.pdp-thumb').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   const me = document.getElementById('pdpMainImgEl');
   if (me) { me.src = imgUrl; me.style.display = ''; }
 }
-
 function pdpAddCart(id) {
   const p = prods.find(x => (x._id || x.id) === id); if (!p) return;
   const v = p.variants?.[pdpState.varIdx] || { p: getBasePrice(p), lbl: 'Default' };
@@ -1897,10 +1802,8 @@ function pdpAddCart(id) {
   const btn = document.getElementById('pdpCartBtn');
   if (btn) { btn.classList.add('added'); btn.innerHTML = '<i class="fa-solid fa-check"></i> যোগ হয়েছে'; setTimeout(() => { btn.classList.remove('added'); btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> কার্টে যোগ করুন'; }, 1800); }
 }
-
 let cart = {};
 let relIdx = 0, relItems = [], relTimer = null;
-
 function addToCartBase(id) {
   const p = prods.find(x => (x._id || x.id) === id); if (!p) return;
   const v = p.variants?.[0] || { p: getBasePrice(p), lbl: '' };
@@ -1910,7 +1813,6 @@ function addToCartBase(id) {
   updateCart();
   showToast(`✅ ${p.nm} কার্টে যোগ হয়েছে`);
 }
-
 function changeQty(cartKey, d) {
   if (!cart[cartKey]) return;
   const nq = cart[cartKey].qty + d;
@@ -1918,9 +1820,7 @@ function changeQty(cartKey, d) {
   cart[cartKey].qty = nq;
   updateCart();
 }
-
 function deleteFromCart(cartKey) { delete cart[cartKey]; updateCart(); }
-
 function updateCart() {
   const items = Object.values(cart);
   const tot = items.reduce((s, i) => s + i.qty, 0);
@@ -1929,16 +1829,13 @@ function updateCart() {
   document.getElementById('cartCountBnav').textContent = tot;
   const mobBadge = document.getElementById('cartCountMob');
   mobBadge.style.display = tot > 0 ? 'flex' : 'none';
-  
   const iel = document.getElementById('cartIts'), fel = document.getElementById('cartFt'), relSec = document.getElementById('cartRelSection');
-  
   if (!items.length) {
     iel.innerHTML = '<div class="empty-c"><span>🛒</span>আপনার কার্ট খালি</div>';
     fel.style.display = 'none'; relSec.style.display = 'none';
     stopRelScroll();
     return;
   }
-  
   iel.innerHTML = `<div class="cart-items-list">` + items.map(i => `
     <div class="cart-it">
       <div class="ci-ic">${i.img ? `<img src="${i.img}" alt="${i.nm}" onerror="this.style.display='none';this.parentElement.textContent='${i.em||'📦'}'">` : (i.em || '📦')}</div>
@@ -1954,7 +1851,6 @@ function updateCart() {
       </div>
       <div class="ci-price">৳${(i.cartPrice * i.qty).toLocaleString('en')}</div>
     </div>`).join('') + `</div>`;
-
   const cartPids = new Set(items.map(i => i._id || i.id));
   const cartCats = [...new Set(items.map(i => i.cat))];
   relItems = prods.filter(p => cartCats.includes(p.cat) && !cartPids.has(p._id || p.id) && p.active !== false);
@@ -1965,14 +1861,11 @@ function updateCart() {
     relSec.style.display = 'none';
     stopRelScroll();
   }
-  
   document.getElementById('cartTotal').textContent = '৳' + items.reduce((s, i) => s + i.cartPrice * i.qty, 0).toLocaleString('en');
   fel.style.display = 'block';
 }
-
 let relScrollX = 0, relScrollRAF = null;
 const REL_CARD_W = 80 + 9;
-
 function crelCardHTML(rp) {
   return `<div class="crel-card" onclick="goProduct('${rp._id||rp.id}');toggleCart()">
     <div class="crel-img" style="background:${rp.bg||'#c8a55a'}22;">
@@ -1983,7 +1876,6 @@ function crelCardHTML(rp) {
     <button class="crel-add" onclick="addToCartBase('${rp._id||rp.id}');event.stopPropagation()">+ যোগ</button>
   </div>`;
 }
-
 function renderRelRow() {
   const row = document.getElementById('cartRelRow'); if (!row || !relItems.length) return;
   const html = relItems.map(crelCardHTML).join('');
@@ -1991,7 +1883,6 @@ function renderRelRow() {
   relScrollX = 0;
   row.style.transform = 'translateX(0)';
 }
-
 function startRelScroll() {
   stopRelScroll();
   renderRelRow();
@@ -2009,7 +1900,6 @@ function startRelScroll() {
     relScrollRAF = requestAnimationFrame(step);
   }
   relScrollRAF = requestAnimationFrame(step);
-
   const track = document.querySelector('.cart-rel-track');
   if (track) {
     track.onmouseenter = () => { if (relScrollRAF) { cancelAnimationFrame(relScrollRAF); relScrollRAF = null; } };
@@ -2018,13 +1908,11 @@ function startRelScroll() {
     };
   }
 }
-
 function stopRelScroll() {
   if (relScrollRAF) { cancelAnimationFrame(relScrollRAF); relScrollRAF = null; }
   if (relTimer) { clearInterval(relTimer); relTimer = null; }
   relScrollX = 0;
 }
-
 function slideRelated(dir) {
   if (!relItems.length) return;
   relIdx = Math.max(0, Math.min(relIdx + dir, relItems.length - 1));
@@ -2032,18 +1920,15 @@ function slideRelated(dir) {
   if (relTimer) { clearInterval(relTimer); relTimer = null; }
   relTimer = setInterval(() => { relIdx = (relIdx + 1) % relItems.length; renderRelRow(); }, 2500);
 }
-
 function toggleCart() {
   document.getElementById('cartSb').classList.toggle('open');
   document.getElementById('cartOv').classList.toggle('open');
   const isOpen = document.getElementById('cartSb').classList.contains('open');
   document.body.style.overflow = isOpen ? 'hidden' : '';
 }
-
 let selectedDelivery = null;
 let selectedDeliveryType = '';
 let requiresAdvanceDelivery = false;
-
 function checkAdvanceDelivery(items) {
   const found = items.filter(i => {
     const cat = (i.cat || '').trim();
@@ -2051,7 +1936,6 @@ function checkAdvanceDelivery(items) {
   });
   return found;
 }
-
 function openOrderModal() {
   const items = Object.values(cart);
   if (!items.length) { showToast('❌ কার্টে কোনো পণ্য নেই'); return; }
@@ -2066,7 +1950,6 @@ function openOrderModal() {
   document.querySelectorAll('.om-del-opt').forEach(o => o.classList.remove('selected'));
   document.getElementById('omMainContent').style.display = 'block';
   document.getElementById('omSuccess').classList.remove('show');
-  
   const subtotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
   document.getElementById('omItems').innerHTML = items.map(i => `
     <div class="om-item">
@@ -2074,7 +1957,6 @@ function openOrderModal() {
       <div class="om-item-info"><div class="om-item-nm">${i.nm}</div><div class="om-item-var">${i.varLabel} × ${i.qty}</div></div>
       <div class="om-item-price">৳${(i.cartPrice * i.qty).toLocaleString('en')}</div>
     </div>`).join('');
-  
   document.getElementById('omSubtotal').textContent = '৳' + subtotal.toLocaleString('en');
   document.getElementById('omSubtotal2').textContent = '৳' + subtotal.toLocaleString('en');
   document.getElementById('omDeliveryDisplay').textContent = '— নির্বাচন করুন';
@@ -2084,7 +1966,6 @@ function openOrderModal() {
   document.getElementById('omSubmitTotal').textContent = '৳' + subtotal.toLocaleString('en');
   document.getElementById('delCharge1').textContent = '৳' + deliveryCharges.inside;
   document.getElementById('delCharge2').textContent = '৳' + deliveryCharges.outside;
-
   const advItems = items.filter(i => {
     const cat = (i.cat || '').trim();
     return ADVANCE_DELIVERY_CATS.some(ac => cat.includes(ac) || ac.includes(cat));
@@ -2103,18 +1984,15 @@ function openOrderModal() {
     advBox.style.display = 'none';
     if (legalEl) legalEl.textContent = 'ক্যাশ অন ডেলিভারি — পণ্য পেলে টাকা দিন। কোনো অগ্রিম পেমেন্ট নেই।';
   }
-
   document.getElementById('cartSb').classList.remove('open');
   document.getElementById('cartOv').classList.remove('open');
   document.getElementById('orderOv').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
 function closeOrderModal() {
   document.getElementById('orderOv').classList.remove('open');
   document.body.style.overflow = '';
 }
-
 function selectDelivery(charge, optId, type) {
   selectedDelivery = charge;
   selectedDeliveryType = type;
@@ -2127,24 +2005,20 @@ function selectDelivery(charge, optId, type) {
   document.getElementById('omGrandTotal').textContent = '৳' + grand.toLocaleString('en');
   document.getElementById('omGrand2').textContent = '৳' + grand.toLocaleString('en');
   document.getElementById('omSubmitTotal').textContent = '৳' + grand.toLocaleString('en');
-
   const advAmt = document.getElementById('omAdvanceAmtText');
   if (advAmt && requiresAdvanceDelivery) {
     advAmt.innerHTML = `📌 অগ্রিম পাঠাতে হবে: <strong>৳${charge.toLocaleString('en')}</strong> (ডেলিভারি চার্জ মাত্র)`;
   }
 }
-
 async function submitOrder() {
   const name = document.getElementById('omName').value.trim();
   const phone = document.getElementById('omPhone').value.trim();
   const address = document.getElementById('omAddress').value.trim();
   const note = document.getElementById('omNote').value.trim();
-  
   if (!name) { showToast('❌ নাম লিখুন'); document.getElementById('omName').focus(); return; }
   if (!phone || phone.length < 11) { showToast('❌ সঠিক মোবাইল নম্বর দিন'); document.getElementById('omPhone').focus(); return; }
   if (!address) { showToast('❌ ঠিকানা লিখুন'); document.getElementById('omAddress').focus(); return; }
   if (selectedDelivery === null) { showToast('❌ ডেলিভারি পদ্ধতি নির্বাচন করুন'); return; }
-
   let trxId = '';
   if (requiresAdvanceDelivery) {
     trxId = (document.getElementById('omTrxId')?.value || '').trim();
@@ -2160,15 +2034,12 @@ async function submitOrder() {
       return;
     }
   }
-
   const items = Object.values(cart);
   const subtotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
   const total = subtotal + selectedDelivery;
-
   const btn = document.getElementById('omSubmitBtn');
   btn.disabled = true;
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> অর্ডার হচ্ছে...';
-
   const orderData = {
     items: items.map(i => ({ productId: i._id || i.id, nm: i.nm, varLabel: i.varLabel, qty: i.qty, cartPrice: i.cartPrice, em: i.em, img: i.img || '' })),
     customer: { name, phone, address, note },
@@ -2176,7 +2047,6 @@ async function submitOrder() {
     subtotal, total,
     advanceDelivery: requiresAdvanceDelivery ? { paid: true, trxId, amount: selectedDelivery } : null,
   };
-
   try {
     const res = await fetch(API_BASE + '/api/orders', {
       method: 'POST',
@@ -2198,7 +2068,6 @@ async function submitOrder() {
     btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> অর্ডার কনফার্ম করুন';
   }
 }
-
 async function loadProductsPage(page) {
   prodPage = page;
   prodCatFilter = document.getElementById('prodCatFilter').value;
@@ -2238,7 +2107,6 @@ async function loadProductsPage(page) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa"><i class="fa-solid fa-exclamation-triangle"></i> লোড ব্যর্থ হয়েছে</div>';
   }
 }
-
 function renderProdPagination() {
   const pages = Math.ceil(prodTotal / prodLimit);
   const container = document.getElementById('productsPagination');
@@ -2254,7 +2122,6 @@ function renderProdPagination() {
   html += `<button class="pg-btn" onclick="loadProductsPage(${prodPage+1})" ${prodPage===pages?'disabled':''}><i class="fa-solid fa-chevron-right"></i></button>`;
   container.innerHTML = html;
 }
-
 async function loadAboutPageContent() {
   const container = document.getElementById('aboutContent');
   container.innerHTML = '<div style="text-align:center;padding:40px"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--gd)"></i></div>';
@@ -2285,7 +2152,6 @@ async function loadAboutPageContent() {
     container.innerHTML = '<div class="error-state"><i class="fa-solid fa-circle-exclamation"></i><p>পৃষ্ঠা লোড হয়নি</p></div>';
   }
 }
-
 async function loadContactPageContent() {
   const container = document.getElementById('contactContent');
   container.innerHTML = '<div style="text-align:center;padding:40px"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--gd)"></i></div>';
@@ -2333,7 +2199,6 @@ async function loadContactPageContent() {
     container.innerHTML = '<div class="error-state"><i class="fa-solid fa-circle-exclamation"></i><p>পৃষ্ঠা লোড হয়নি</p></div>';
   }
 }
-
 function copyPayNum(method, btn) {
   const num = ADVANCE_PAYMENT_INFO[method];
   if (!num) return;
@@ -2350,7 +2215,6 @@ function copyPayNum(method, btn) {
     setTimeout(() => { btn.textContent = 'কপি'; btn.classList.remove('copied'); }, 2000);
   });
 }
-
 let toastTimer = null;
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -2377,7 +2241,6 @@ function showToast(msg) {
     toastTimer = null;
   }, 2600);
 }
-
 updateCart();
 if (!heroTimer) {
   heroTimer = setInterval(() => {
@@ -2392,4 +2255,4 @@ if (!heroTimer) {
 }
 </script>
 </body>
-</html>
+</html> 
