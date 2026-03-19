@@ -1147,51 +1147,36 @@ footer p{font-size:.79rem;line-height:1.7;}
         </div>
         <div class="om-advance-box" id="omAdvanceBox" style="display:none;margin-top:14px;">
           <div class="om-advance-title">
-            <i class="fa-solid fa-truck-fast"></i>
-            ডেলিভারি চার্জ মোটে যোগ করুন?
+            <i class="fa-solid fa-money-bill-wave"></i>
+            অগ্রিম ডেলিভারি চার্জ প্রযোজ্য
           </div>
-          <div class="om-advance-alert" style="margin-bottom:12px;">
-            ℹ️ আপনার অর্ডারে <strong id="omAdvanceCatList"></strong> পণ্য রয়েছে।
-            ডেলিভারি চার্জ মোট পরিমাণে যোগ করতে চাইলে নিচের অপশনটি নির্বাচন করুন।
+          <div class="om-advance-alert">
+            ⚠️ আপনার অর্ডারে <strong id="omAdvanceCatList"></strong> পণ্য রয়েছে।
+            এই পণ্যগুলোর জন্য <strong>ডেলিভারি চার্জ অগ্রিম পাঠাতে হবে</strong>।
+            নিচের যেকোনো একটি মাধ্যমে ডেলিভারি চার্জ সেন্ড করুন, তারপর ট্রানজেকশন ID দিন।
           </div>
-          <div style="display:flex;align-items:flex-start;gap:10px;background:#f0f9f0;border:1.5px solid #4a7c3f;border-radius:9px;padding:12px 14px;cursor:pointer;" onclick="toggleAddDeliveryToTotal()" id="omAddToTotalRow">
-            <div style="flex-shrink:0;margin-top:2px;">
-              <div id="omAddToTotalCheck" style="width:20px;height:20px;border-radius:5px;border:2px solid #4a7c3f;background:#fff;display:flex;align-items:center;justify-content:center;transition:all .2s;">
-                <i class="fa-solid fa-check" style="color:#fff;font-size:.7rem;display:none;" id="omAddToTotalCheckIcon"></i>
+          <div class="om-pay-methods">
+            <div class="om-pay-method">
+              <div class="om-pay-logo bk">বি</div>
+              <div class="om-pay-details">
+                <div class="om-pay-type">বিকাশ — Send Money</div>
+                <div class="om-pay-num" id="omBkashNum"></div>
               </div>
+              <button class="om-pay-copy" onclick="copyPayNum('bkash',this)">কপি</button>
             </div>
-            <div style="flex:1;">
-              <div style="font-weight:600;font-size:.9rem;color:#2d5a27;">হ্যাঁ, ডেলিভারি চার্জ মোটে যোগ করুন</div>
-              <div style="font-size:.78rem;color:#5a7a55;margin-top:2px;">ডেলিভারি চার্জ সর্বমোটের সাথে যোগ হবে এবং ডেলিভারিতে একসাথে পরিশোধ করবেন।</div>
+            <div class="om-pay-method">
+              <div class="om-pay-logo ng">ন</div>
+              <div class="om-pay-details">
+                <div class="om-pay-type">নগদ — Send Money</div>
+                <div class="om-pay-num" id="omNagadNum"></div>
+              </div>
+              <button class="om-pay-copy" onclick="copyPayNum('nagad',this)">কপি</button>
             </div>
           </div>
-          <div id="omAdvancePaySection" style="display:none;margin-top:12px;">
-            <div class="om-advance-alert" style="margin-bottom:10px;">
-              ✅ ডেলিভারি চার্জ মোটে যোগ হয়েছে। নিচের যেকোনো মাধ্যমে পাঠাতে পারবেন, তারপর ট্রানজেকশন ID দিন।
-            </div>
-            <div class="om-pay-methods">
-              <div class="om-pay-method">
-                <div class="om-pay-logo bk">বি</div>
-                <div class="om-pay-details">
-                  <div class="om-pay-type">বিকাশ — Send Money</div>
-                  <div class="om-pay-num" id="omBkashNum"></div>
-                </div>
-                <button class="om-pay-copy" onclick="copyPayNum('bkash',this)">কপি</button>
-              </div>
-              <div class="om-pay-method">
-                <div class="om-pay-logo ng">ন</div>
-                <div class="om-pay-details">
-                  <div class="om-pay-type">নগদ — Send Money</div>
-                  <div class="om-pay-num" id="omNagadNum"></div>
-                </div>
-                <button class="om-pay-copy" onclick="copyPayNum('nagad',this)">কপি</button>
-              </div>
-            </div>
-            <div class="om-advance-amt" id="omAdvanceAmtText"></div>
-            <div style="margin-top:12px;">
-              <div class="om-trx-label"><i class="fa-solid fa-receipt" style="color:#e67e00"></i> ট্রানজেকশন ID <span style="color:#e00;margin-left:2px;">*</span></div>
-              <input type="text" class="om-trx-input" id="omTrxId" placeholder="বিকাশ/নগদ ট্রানজেকশন ID লিখুন (যেমন: 8F3K9X2P)">
-            </div>
+          <div class="om-advance-amt" id="omAdvanceAmtText"></div>
+          <div style="margin-top:12px;">
+            <div class="om-trx-label"><i class="fa-solid fa-receipt" style="color:#e67e00"></i> ট্রানজেকশন ID <span style="color:#e00;margin-left:2px;">*</span></div>
+            <input type="text" class="om-trx-input" id="omTrxId" placeholder="বিকাশ/নগদ ট্রানজেকশন ID লিখুন (যেমন: 8F3K9X2P)">
           </div>
         </div>
       </div>
@@ -1212,8 +1197,8 @@ footer p{font-size:.79rem;line-height:1.7;}
       <h3>অর্ডার সম্পন্ন হয়েছে!</h3>
       <p>আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে।<br>শীঘ্রই আমাদের টিম আপনার সাথে যোগাযোগ করবে।</p>
       <div class="order-num" id="omOrderNum"></div>
-      <div id="omSuccessAdvanceNote" style="display:none;background:#f0f9f0;border:1px solid #4a7c3f;border-radius:8px;padding:10px 14px;font-size:.8rem;color:#2d5a27;margin:10px 0;line-height:1.7;">
-        ✅ ডেলিভারি চার্জ মোটে যোগ করা হয়েছে। আপনার পেমেন্ট যাচাই করা হবে এবং কনফার্মেশন SMS পাবেন।
+      <div id="omSuccessAdvanceNote" style="display:none;background:#fff8e6;border:1px solid #f0a500;border-radius:8px;padding:10px 14px;font-size:.8rem;color:#7a4500;margin:10px 0;line-height:1.7;">
+        💳 আপনার অগ্রিম ডেলিভারি চার্জ পেমেন্ট যাচাই করা হবে এবং কনফার্মেশন SMS পাবেন।
       </div>
       <p style="font-size:.8rem;color:#aaa;margin-top:8px;">ধন্যবাদ আমাদের সাথে কেনাকাটা করার জন্য 🙏</p>
       <button onclick="closeOrderModal()" style="margin-top:20px;background:var(--gd);color:#fff;border:none;padding:11px 30px;border-radius:7px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;">বাড়িতে ফিরে যান</button>
@@ -1961,39 +1946,6 @@ function toggleCart() {
 let selectedDelivery = null;
 let selectedDeliveryType = '';
 let requiresAdvanceDelivery = false;
-let addDeliveryToTotal = false;
-
-function toggleAddDeliveryToTotal() {
-  addDeliveryToTotal = !addDeliveryToTotal;
-  const checkBox = document.getElementById('omAddToTotalCheck');
-  const checkIcon = document.getElementById('omAddToTotalCheckIcon');
-  const paySection = document.getElementById('omAdvancePaySection');
-  const legalEl = document.getElementById('omLegalText');
-  if (addDeliveryToTotal) {
-    checkBox.style.background = '#4a7c3f';
-    checkBox.style.borderColor = '#4a7c3f';
-    checkIcon.style.display = 'block';
-    paySection.style.display = 'block';
-    if (selectedDelivery !== null) {
-      const subtotal = Object.values(cart).reduce((s, i) => s + i.cartPrice * i.qty, 0);
-      const grand = subtotal + selectedDelivery;
-      document.getElementById('omGrandTotal').textContent = '৳' + grand.toLocaleString('en');
-      document.getElementById('omGrand2').textContent = '৳' + grand.toLocaleString('en');
-      document.getElementById('omSubmitTotal').textContent = '৳' + grand.toLocaleString('en');
-      const advAmt = document.getElementById('omAdvanceAmtText');
-      if (advAmt) advAmt.innerHTML = `📌 ডেলিভারি চার্জ মোটে যোগ হয়েছে: <strong>৳${selectedDelivery.toLocaleString('en')}</strong>`;
-      document.getElementById('omBkashNum').textContent = ADVANCE_PAYMENT_INFO.bkash;
-      document.getElementById('omNagadNum').textContent = ADVANCE_PAYMENT_INFO.nagad;
-    }
-    if (legalEl) legalEl.innerHTML = '✅ ডেলিভারি চার্জ মোটে যুক্ত হয়েছে। পণ্য পেলে সম্পূর্ণ পরিমাণ দিন।';
-  } else {
-    checkBox.style.background = '#fff';
-    checkBox.style.borderColor = '#4a7c3f';
-    checkIcon.style.display = 'none';
-    paySection.style.display = 'none';
-    if (legalEl) legalEl.textContent = 'ক্যাশ অন ডেলিভারি — পণ্য পেলে টাকা দিন। কোনো অগ্রিম পেমেন্ট নেই।';
-  }
-}
 function checkAdvanceDelivery(items) {
   const found = items.filter(i => {
     const cat = (i.cat || '').trim();
@@ -2041,8 +1993,10 @@ function openOrderModal() {
   if (requiresAdvanceDelivery) {
     const catNames = [...new Set(advItems.map(i => i.cat))].join(', ');
     document.getElementById('omAdvanceCatList').textContent = catNames;
+    document.getElementById('omBkashNum').textContent = ADVANCE_PAYMENT_INFO.bkash;
+    document.getElementById('omNagadNum').textContent = ADVANCE_PAYMENT_INFO.nagad;
     advBox.style.display = 'block';
-    if (legalEl) legalEl.textContent = 'ক্যাশ অন ডেলিভারি — পণ্য পেলে টাকা দিন। কোনো অগ্রিম পেমেন্ট নেই।';
+    if (legalEl) legalEl.innerHTML = '⚠️ এই অর্ডারে <strong>ডেলিভারি চার্জ অগ্রিম</strong> পরিশোধ করতে হবে। বাকি পণ্যমূল্য ডেলিভারিতে দিন।';
   } else {
     advBox.style.display = 'none';
     if (legalEl) legalEl.textContent = 'ক্যাশ অন ডেলিভারি — পণ্য পেলে টাকা দিন। কোনো অগ্রিম পেমেন্ট নেই।';
@@ -2051,14 +2005,6 @@ function openOrderModal() {
   document.getElementById('cartOv').classList.remove('open');
   document.getElementById('orderOv').classList.add('open');
   document.body.style.overflow = 'hidden';
-  // reset checkbox state
-  addDeliveryToTotal = false;
-  const checkBox = document.getElementById('omAddToTotalCheck');
-  const checkIcon = document.getElementById('omAddToTotalCheckIcon');
-  const paySection = document.getElementById('omAdvancePaySection');
-  if (checkBox) { checkBox.style.background = '#fff'; checkBox.style.borderColor = '#4a7c3f'; }
-  if (checkIcon) checkIcon.style.display = 'none';
-  if (paySection) paySection.style.display = 'none';
 }
 function closeOrderModal() {
   document.getElementById('orderOv').classList.remove('open');
@@ -2077,8 +2023,8 @@ function selectDelivery(charge, optId, type) {
   document.getElementById('omGrand2').textContent = '৳' + grand.toLocaleString('en');
   document.getElementById('omSubmitTotal').textContent = '৳' + grand.toLocaleString('en');
   const advAmt = document.getElementById('omAdvanceAmtText');
-  if (advAmt && requiresAdvanceDelivery && addDeliveryToTotal) {
-    advAmt.innerHTML = `📌 ডেলিভারি চার্জ মোটে যোগ হয়েছে: <strong>৳${charge.toLocaleString('en')}</strong>`;
+  if (advAmt && requiresAdvanceDelivery) {
+    advAmt.innerHTML = `📌 অগ্রিম পাঠাতে হবে: <strong>৳${charge.toLocaleString('en')}</strong> (ডেলিভারি চার্জ মাত্র)`;
   }
 }
 async function submitOrder() {
@@ -2091,7 +2037,7 @@ async function submitOrder() {
   if (!address) { showToast('❌ ঠিকানা লিখুন'); document.getElementById('omAddress').focus(); return; }
   if (selectedDelivery === null) { showToast('❌ ডেলিভারি পদ্ধতি নির্বাচন করুন'); return; }
   let trxId = '';
-  if (requiresAdvanceDelivery && addDeliveryToTotal) {
+  if (requiresAdvanceDelivery) {
     trxId = (document.getElementById('omTrxId')?.value || '').trim();
     if (!trxId) {
       showToast('❌ বিকাশ/নগদ ট্রানজেকশন ID দিন');
@@ -2116,7 +2062,7 @@ async function submitOrder() {
     customer: { name, phone, address, note },
     delivery: { type: selectedDeliveryType, charge: selectedDelivery },
     subtotal, total,
-    advanceDelivery: (requiresAdvanceDelivery && addDeliveryToTotal) ? { paid: true, trxId, amount: selectedDelivery } : null,
+    advanceDelivery: requiresAdvanceDelivery ? { paid: true, trxId, amount: selectedDelivery } : null,
   };
   try {
     const res = await fetch(API_BASE + '/api/orders', {
@@ -2128,7 +2074,7 @@ async function submitOrder() {
     if (!res.ok) throw new Error(data.error || 'Order failed');
     document.getElementById('omOrderNum').textContent = 'অর্ডার নম্বর: ' + data.orderNum;
     const advNote = document.getElementById('omSuccessAdvanceNote');
-    if (advNote) advNote.style.display = (requiresAdvanceDelivery && addDeliveryToTotal) ? 'block' : 'none';
+    if (advNote) advNote.style.display = requiresAdvanceDelivery ? 'block' : 'none';
     document.getElementById('omMainContent').style.display = 'none';
     document.getElementById('omSuccess').classList.add('show');
     cart = {};
@@ -2326,4 +2272,4 @@ if (!heroTimer) {
 }
 </script>
 </body>
-</html>
+</html> 
