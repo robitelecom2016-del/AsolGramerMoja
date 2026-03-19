@@ -719,7 +719,7 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
       Order.countDocuments({ status: 'delivered' }),
     ]);
     const revenue = await Order.aggregate([
-      { $match: { status: { $in: ['delivered', 'shipped'] } } },
+      { $match: { status: 'delivered' } },
       { $group: { _id: null, total: { $sum: '$total' } } },
     ]);
     const recentOrders = await Order.find().sort({ createdAt: -1 }).limit(5);
