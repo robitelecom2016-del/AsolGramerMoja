@@ -775,11 +775,11 @@ textarea.form-control { resize:vertical; min-height:80px; }
           <div class="form-row">
             <div class="form-group2">
               <label>ব্যানার ছবি</label>
-              <div class="img-upload-area" onclick="document.getElementById('aboutBannerInput').click()">
+              <label class="img-upload-area" for="aboutBannerInput" style="display:block;cursor:pointer;">
                 <i class="fa-solid fa-cloud-arrow-up"></i>
                 <p>ব্যানার ছবি আপলোড করুন</p>
-                <input type="file" id="aboutBannerInput" accept="image/*" onchange="uploadPageBanner('about',this)">
-              </div>
+                <input type="file" id="aboutBannerInput" accept="image/*" onchange="uploadPageBanner('about',this)" onclick="this.value=''">
+              </label>
               <div id="aboutBannerPreview"></div>
               <input type="hidden" id="aboutBannerUrl">
             </div>
@@ -1009,22 +1009,22 @@ textarea.form-control { resize:vertical; min-height:80px; }
       </div>
       <div class="form-group2">
         <label>মূল ছবি</label>
-        <div class="img-upload-area" id="mainImgArea" onclick="document.getElementById('mainImgInput').click()">
+        <label class="img-upload-area" id="mainImgArea" for="mainImgInput" style="display:block;cursor:pointer;">
           <i class="fa-solid fa-cloud-arrow-up"></i>
           <p>ক্লিক করুন বা ড্র্যাগ করুন (max 5MB)</p>
-          <input type="file" id="mainImgInput" accept="image/*" onchange="uploadMainImg(this)">
-        </div>
+          <input type="file" id="mainImgInput" accept="image/*" onchange="uploadMainImg(this)" onclick="this.value=''">
+        </label>
         <div id="mainImgPreview"></div>
         <input type="hidden" id="pImg">
         <input type="hidden" id="pImgPid">
       </div>
       <div class="form-group2">
         <label>গ্যালারি ছবি (সর্বোচ্চ ৪টি)</label>
-        <div class="img-upload-area" onclick="document.getElementById('thumbImgsInput').click()">
+        <label class="img-upload-area" for="thumbImgsInput" style="display:block;cursor:pointer;">
           <i class="fa-solid fa-images"></i>
           <p>একসাথে ৪টি পর্যন্ত ছবি আপলোড করুন</p>
-          <input type="file" id="thumbImgsInput" accept="image/*" multiple onchange="uploadThumbImgs(this)">
-        </div>
+          <input type="file" id="thumbImgsInput" accept="image/*" multiple onchange="uploadThumbImgs(this)" onclick="this.value=''">
+        </label>
         <div class="img-preview" id="thumbImgPreview"></div>
         <input type="hidden" id="pImgs" value="[]">
         <input type="hidden" id="pImgsPids" value="[]">
@@ -1150,11 +1150,11 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="form-group2"><label>সাবটাইটেল</label><input type="text" class="form-control" id="hSub" placeholder="সাবটাইটেল"></div>
       <div class="form-group2">
         <label>স্লাইড ছবি (ঐচ্ছিক — না দিলে গ্র্যাডিয়েন্ট ব্যবহার হবে)</label>
-        <div class="img-upload-area" onclick="document.getElementById('heroImgInput').click()">
+        <label class="img-upload-area" for="heroImgInput" style="display:block;cursor:pointer;">
           <i class="fa-solid fa-image"></i>
           <p>স্লাইডের জন্য ছবি আপলোড করুন (1200×500 রেকমেন্ডেড)</p>
-          <input type="file" id="heroImgInput" accept="image/*" onchange="uploadHeroImg(this)">
-        </div>
+          <input type="file" id="heroImgInput" accept="image/*" onchange="uploadHeroImg(this)" onclick="this.value=''">
+        </label>
         <div id="heroImgPreview"></div>
         <input type="hidden" id="hImg">
         <input type="hidden" id="hImgPid">
