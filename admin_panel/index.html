@@ -1788,47 +1788,30 @@ async function viewOrder(id) {
             <div style="display:flex;flex-direction:column;gap:7px;font-size:.83rem">
               <div><span style="color:var(--txt2)">অর্ডার নং:</span> <span style="font-family:'JetBrains Mono',monospace;color:var(--green2)">${o.orderNum}</span></div>
               <div><span style="color:var(--txt2)">পণ্য মূল্য:</span> <strong>৳${o.subtotal?.toLocaleString('en')}</strong></div>
-              <div style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--bg3)">
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-                  <div>
-                    <span style="color:var(--txt2)">ডেলিভারি:</span>
-                    <strong id="deliveryChargeDisplay">৳${o.delivery?.charge||0}</strong>
-                    <span style="font-size:.75rem;color:var(--txt3);margin-left:4px">(${o.delivery?.type||'—'})</span>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:4px 9px;">
-                    <span style="font-size:.72rem;color:var(--txt2)">মোটে যোগ করুন?</span>
-                    <div style="display:flex;align-items:center;gap:5px;cursor:pointer;" onclick="toggleDeliveryInTotal(this, ${o.delivery?.charge||0}, ${o.subtotal||0}${o.advanceDelivery?.paid ? ', true, '+o.advanceDelivery.amount : ', false, 0'})">
-                      <div id="deliveryToggleTrack" data-on="1" style="width:34px;height:18px;background:var(--green);border:1.5px solid var(--green);border-radius:9px;position:relative;transition:all .2s;flex-shrink:0;"><div id="deliveryToggleThumb" style="position:absolute;top:2px;left:18px;width:12px;height:12px;border-radius:50%;background:#fff;transition:all .2s;"></div></div>
-                      <span id="deliveryToggleLbl" style="font-size:.73rem;color:var(--green3);font-weight:700;">হ্যাঁ</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <div><span style="color:var(--txt2)">ডেলিভারি:</span> <strong>৳${o.delivery?.charge||0}</strong> (${o.delivery?.type||'—'})</div>
               ${o.advanceDelivery?.paid ? `
-                <div style="border:1px solid rgba(46,160,67,.25);border-radius:8px;padding:8px 10px;background:rgba(46,160,67,.06);margin-top:2px">
-                  <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
+                <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px">
+                  <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">
                     <i class="fa-solid fa-circle-check" style="color:var(--green)"></i>
-                    <span style="color:var(--txt2);font-weight:600;font-size:.83rem">অগ্রিম পেমেন্ট গৃহীত</span>
+                    <span style="color:var(--txt2);font-weight:600">অগ্রিম পেমেন্ট গৃহীত</span>
                   </div>
-                  <div style="font-size:.82rem;margin-bottom:4px"><span style="color:var(--txt2)">ট্রানজেকশন আইডি:</span> <span style="font-family:'JetBrains Mono',monospace;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--yellow2)">${o.advanceDelivery.trxId}</span></div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-                    <div style="font-size:.82rem"><span style="color:var(--txt2)">পরিমাণ:</span> <strong>৳${o.advanceDelivery.amount.toLocaleString('en')}</strong></div>
-                    <div style="display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:4px 9px;">
-                      <span style="font-size:.72rem;color:var(--txt2)">মোটে যোগ করুন?</span>
-                      <div style="display:flex;align-items:center;gap:5px;cursor:pointer;" onclick="toggleAdvanceInTotal(this, ${o.advanceDelivery.amount}, ${o.subtotal||0})">
-                        <div id="advanceToggleTrack" data-on="0" style="width:34px;height:18px;background:var(--bg4);border:1.5px solid var(--border);border-radius:9px;position:relative;transition:all .2s;flex-shrink:0;"><div id="advanceToggleThumb" style="position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--txt3);transition:all .2s;"></div></div>
-                        <span id="advanceToggleLbl" style="font-size:.73rem;color:var(--txt3);font-weight:700;">না</span>
+                  <div><span style="color:var(--txt2)">ট্রানজেকশন আইডি:</span> <span style="font-family:'JetBrains Mono',monospace;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--yellow2)">${o.advanceDelivery.trxId}</span></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:4px">
+                    <div><span style="color:var(--txt2)">পরিমাণ:</span> <strong>৳${o.advanceDelivery.amount.toLocaleString('en')}</strong></div>
+                    <div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:5px 10px;">
+                      <span style="font-size:.74rem;color:var(--txt2)">মোটে যোগ করুন?</span>
+                      <div style="display:flex;align-items:center;gap:6px;cursor:pointer;" onclick="toggleAdvanceInTotal(this, ${o.advanceDelivery.amount}, ${o.total})">
+                        <div id="advanceToggleTrack" style="width:34px;height:18px;background:var(--bg4);border:1.5px solid var(--border);border-radius:9px;position:relative;transition:all .2s;flex-shrink:0;"><div id="advanceToggleThumb" style="position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--txt3);transition:all .2s;"></div></div>
+                        <span id="advanceToggleLbl" style="font-size:.74rem;color:var(--txt3);font-weight:600;">না</span>
                       </div>
                     </div>
                   </div>
                 </div>
               ` : ''}
-              <div style="border-top:1px solid var(--border);padding-top:8px;margin-top:6px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px" id="orderTotalRow">
-                <span style="color:var(--txt2);font-size:.84rem">সর্বমোট:</span>
-                <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap">
-                  <strong style="color:var(--green2);font-size:1.05rem" id="orderTotalDisplay">৳${o.total?.toLocaleString('en')}</strong>
-                  <span id="totalBreakdownNote" style="font-size:.7rem;color:var(--txt3)"></span>
-                </div>
+              <div style="border-top:1px solid var(--border);padding-top:7px;margin-top:4px" id="orderTotalRow">
+                <span style="color:var(--txt2)">সর্বমোট:</span> 
+                <strong style="color:var(--green2);font-size:1rem" id="orderTotalDisplay">৳${o.total?.toLocaleString('en')}</strong>
+                ${o.advanceDelivery?.paid ? `<span id="advanceTotalNote" style="font-size:.72rem;color:var(--txt3);display:none;margin-left:6px">(+ অগ্রিম ৳${o.advanceDelivery.amount.toLocaleString('en')} যোগসহ)</span>` : ''}
               </div>
             </div>
           </div>
@@ -2785,75 +2768,35 @@ async function autoSeedContactPage() {
     }
   );
 }
-// ডেলিভারি চার্জ toggle — সর্বমোটে যোগ/বাদ
-function toggleDeliveryInTotal(el, delivCharge, subtotal, hasAdvance, advanceAmt) {
-  const track = document.getElementById('deliveryToggleTrack');
-  const thumb = document.getElementById('deliveryToggleThumb');
-  const lbl = document.getElementById('deliveryToggleLbl');
-  const totalDisplay = document.getElementById('orderTotalDisplay');
-  const note = document.getElementById('totalBreakdownNote');
-  const advTrack = document.getElementById('advanceToggleTrack');
-  if (!track) return;
-
-  const delivOn = track.dataset.on === '1';
-  const advOn = advTrack ? advTrack.dataset.on === '1' : false;
-
-  if (delivOn) {
-    // বন্ধ করুন — ডেলিভারি বাদ দিন
-    track.dataset.on = '0';
-    track.style.background = 'var(--bg4)';
-    track.style.borderColor = 'var(--border)';
-    thumb.style.left = '2px'; thumb.style.background = 'var(--txt3)';
-    lbl.style.color = 'var(--txt3)'; lbl.textContent = 'না';
-  } else {
-    // চালু করুন — ডেলিভারি যোগ করুন
-    track.dataset.on = '1';
-    track.style.background = 'var(--green)';
-    track.style.borderColor = 'var(--green)';
-    thumb.style.left = '18px'; thumb.style.background = '#fff';
-    lbl.style.color = 'var(--green3)'; lbl.textContent = 'হ্যাঁ';
-  }
-  _recalcTotal(subtotal, delivOn ? 0 : delivCharge, advOn ? (advanceAmt||0) : 0, note);
-}
-
-// অগ্রিম পেমেন্ট toggle — সর্বমোটে যোগ/বাদ
-function toggleAdvanceInTotal(el, advanceAmt, subtotal) {
+function toggleAdvanceInTotal(el, advanceAmt, baseTotal) {
   const track = document.getElementById('advanceToggleTrack');
   const thumb = document.getElementById('advanceToggleThumb');
   const lbl = document.getElementById('advanceToggleLbl');
-  const note = document.getElementById('totalBreakdownNote');
-  const delivTrack = document.getElementById('deliveryToggleTrack');
+  const totalDisplay = document.getElementById('orderTotalDisplay');
+  const note = document.getElementById('advanceTotalNote');
   if (!track) return;
-
-  const advOn = track.dataset.on === '1';
-  const delivOn = delivTrack ? delivTrack.dataset.on === '1' : true;
-  // delivCharge কত? deliveryChargeDisplay থেকে পাই
-  const delivText = document.getElementById('deliveryChargeDisplay')?.textContent || '0';
-  const delivCharge = parseInt(delivText.replace(/[^\d]/g,'')) || 0;
-
-  if (advOn) {
+  const isOn = track.dataset.on === '1';
+  if (isOn) {
+    // Turn OFF — remove advance from total
     track.dataset.on = '0';
-    track.style.background = 'var(--bg4)'; track.style.borderColor = 'var(--border)';
-    thumb.style.left = '2px'; thumb.style.background = 'var(--txt3)';
-    lbl.style.color = 'var(--txt3)'; lbl.textContent = 'না';
+    track.style.background = 'var(--bg4)';
+    track.style.borderColor = 'var(--border)';
+    if(thumb){ thumb.style.left = '2px'; thumb.style.background = 'var(--txt3)'; }
+    lbl.style.color = 'var(--txt3)';
+    lbl.textContent = 'না';
+    totalDisplay.textContent = '৳' + baseTotal.toLocaleString('en');
+    if(note) note.style.display = 'none';
   } else {
+    // Turn ON — add advance to total
     track.dataset.on = '1';
-    track.style.background = 'var(--green)'; track.style.borderColor = 'var(--green)';
-    thumb.style.left = '18px'; thumb.style.background = '#fff';
-    lbl.style.color = 'var(--green3)'; lbl.textContent = 'হ্যাঁ';
-  }
-  _recalcTotal(subtotal, delivOn ? delivCharge : 0, advOn ? 0 : advanceAmt, note);
-}
-
-// সর্বমোট পুনঃগণনা করুন
-function _recalcTotal(subtotal, delivCharge, advanceAmt, noteEl) {
-  const total = subtotal + delivCharge + advanceAmt;
-  document.getElementById('orderTotalDisplay').textContent = '৳' + total.toLocaleString('en');
-  if (noteEl) {
-    const parts = [];
-    if (delivCharge > 0) parts.push(`ডেলিভারি ৳${delivCharge.toLocaleString('en')}`);
-    if (advanceAmt > 0) parts.push(`অগ্রিম ৳${advanceAmt.toLocaleString('en')}`);
-    noteEl.textContent = parts.length ? '(পণ্য + ' + parts.join(' + ') + ')' : '';
+    track.style.background = 'var(--green)';
+    track.style.borderColor = 'var(--green)';
+    if(thumb){ thumb.style.left = '18px'; thumb.style.background = '#fff'; }
+    lbl.style.color = 'var(--green3)';
+    lbl.textContent = 'হ্যাঁ';
+    const newTotal = baseTotal + advanceAmt;
+    totalDisplay.textContent = '৳' + newTotal.toLocaleString('en');
+    if(note) note.style.display = 'inline';
   }
 }
 
