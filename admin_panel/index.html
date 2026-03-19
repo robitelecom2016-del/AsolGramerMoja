@@ -1199,7 +1199,12 @@ textarea.form-control { resize:vertical; min-height:80px; }
     <div class="modal-body" id="orderDetailBody"></div>
     <div class="modal-footer" style="justify-content:space-between">
       <button class="btn-danger" id="orderDeleteBtn" onclick="deleteOrderFromModal()"><i class="fa-solid fa-trash"></i> অর্ডার মুছুন</button>
-      <button class="btn-secondary" onclick="closeModal('orderModal')">বন্ধ করুন</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn-primary" id="orderDeliveredBtn" onclick="markOrderDeliveredFromModal()" style="background:var(--green);display:none">
+          <i class="fa-solid fa-circle-check"></i> ডেলিভারড করুন
+        </button>
+        <button class="btn-secondary" onclick="closeModal('orderModal')">বন্ধ করুন</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1736,7 +1741,7 @@ async function loadOrders() {
         <td><div class="td-sub">${(o.items||[]).length} আইটেম</div></td>
         <td><strong>৳${(o.total||0).toLocaleString('en')}</strong></td>
         <td style="font-size:.78rem;color:var(--txt2)">${o.delivery?.type||'—'}<br>${o.delivery?.charge?`৳${o.delivery.charge}`:''}</td>
-        <td><select class="status-select" onchange="updateOrderStatus('${o._id}',this.value)" style="border-color:${statusColor(o.status)}">${['pending','confirmed','processing','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
+        <td><select class="status-select" onchange="updateOrderStatus('${o._id}',this.value,null)" style="border-color:${statusColor(o.status)}">${['pending','confirmed','processing','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
         <td style="font-size:.74rem;color:var(--txt2)">${timeAgo(o.createdAt)}</td>
         <td><button class="icon-btn edit" onclick="viewOrder('${o._id}')"><i class="fa-solid fa-eye"></i></button></td>
         <td><button class="icon-btn del" onclick="deleteOrder('${o._id}','${o.orderNum}')"><i class="fa-solid fa-trash"></i></button></td>
@@ -1745,9 +1750,21 @@ async function loadOrders() {
   } catch(err) { toast('অর্ডার লোড ব্যর্থ: '+err.message,'error'); }
 }
 
-async function updateOrderStatus(id,status) {
-  try { await api('PATCH',`/api/orders/${id}/status`,{status}); toast(`স্ট্যাটাস "${status}" আপডেট সফল`,'success'); }
-  catch { toast('আপডেট ব্যর্থ','error'); }
+async function updateOrderStatus(id, status, effectiveRevenue) {
+  try {
+    const payload = { status };
+    // যদি delivered এবং effective revenue থাকে, পাঠাও
+    if (status === 'delivered') {
+      const rev = (effectiveRevenue !== null && effectiveRevenue !== undefined)
+        ? effectiveRevenue
+        : (_orderEffectiveRevenue > 0 ? _orderEffectiveRevenue : null);
+      if (rev !== null) payload.revenueAmount = rev;
+    }
+    await api('PATCH', `/api/orders/${id}/status`, payload);
+    toast(`স্ট্যাটাস "${status}" আপডেট সফল`, 'success');
+    if (status === 'delivered') loadDashboard();
+  }
+  catch { toast('আপডেট ব্যর্থ', 'error'); }
 }
 
 function deleteOrder(id, orderNum) {
@@ -1758,6 +1775,18 @@ function deleteOrder(id, orderNum) {
 }
 
 let _currentOrderId = null, _currentOrderNum = '';
+async function markOrderDeliveredFromModal() {
+  if (!_currentOrderId) return;
+  const btn = document.getElementById('orderDeliveredBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> আপডেট হচ্ছে...'; }
+  try {
+    await updateOrderStatus(_currentOrderId, 'delivered', _orderEffectiveRevenue);
+    closeModal('orderModal');
+    loadOrders();
+  } catch {}
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> ডেলিভারড করুন'; }
+}
+
 function deleteOrderFromModal() {
   if (!_currentOrderId) return;
   closeModal('orderModal');
@@ -1787,8 +1816,18 @@ async function viewOrder(id) {
           <div class="card-body" style="padding:14px">
             <div style="display:flex;flex-direction:column;gap:7px;font-size:.83rem">
               <div><span style="color:var(--txt2)">অর্ডার নং:</span> <span style="font-family:'JetBrains Mono',monospace;color:var(--green2)">${o.orderNum}</span></div>
-              <div><span style="color:var(--txt2)">পণ্য মূল্য:</span> <strong>৳${o.subtotal?.toLocaleString('en')}</strong></div>
-              <div><span style="color:var(--txt2)">ডেলিভারি:</span> <strong>৳${o.delivery?.charge||0}</strong> (${o.delivery?.type||'—'})</div>
+              <div><span style="color:var(--txt2)">পণ্য মূল্য:</span> <strong>৳${(o.subtotal||0).toLocaleString('en')}</strong></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                <div><span style="color:var(--txt2)">ডেলিভারি:</span> <strong>৳${o.delivery?.charge||0}</strong> (${o.delivery?.type||'—'})</div>
+                ${(o.delivery?.charge||0) > 0 ? `
+                <div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:5px 10px;">
+                  <span style="font-size:.74rem;color:var(--txt2)">ডেলিভারি মোটে যোগ?</span>
+                  <div style="display:flex;align-items:center;gap:6px;cursor:pointer;" onclick="toggleDeliveryInTotal(this, ${o.delivery.charge}, ${o.subtotal||0}, ${o.advanceDelivery?.paid ? o.advanceDelivery.amount : 0})">
+                    <div id="deliveryToggleTrack" data-on="0" style="width:34px;height:18px;background:var(--bg4);border:1.5px solid var(--border);border-radius:9px;position:relative;transition:all .2s;flex-shrink:0;"><div id="deliveryToggleThumb" style="position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--txt3);transition:all .2s;"></div></div>
+                    <span id="deliveryToggleLbl" style="font-size:.74rem;color:var(--txt3);font-weight:600;">না</span>
+                  </div>
+                </div>` : ''}
+              </div>
               ${o.advanceDelivery?.paid ? `
                 <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px">
                   <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">
@@ -1799,9 +1838,9 @@ async function viewOrder(id) {
                   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:4px">
                     <div><span style="color:var(--txt2)">পরিমাণ:</span> <strong>৳${o.advanceDelivery.amount.toLocaleString('en')}</strong></div>
                     <div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:5px 10px;">
-                      <span style="font-size:.74rem;color:var(--txt2)">মোটে যোগ করুন?</span>
-                      <div style="display:flex;align-items:center;gap:6px;cursor:pointer;" onclick="toggleAdvanceInTotal(this, ${o.advanceDelivery.amount}, ${o.total})">
-                        <div id="advanceToggleTrack" style="width:34px;height:18px;background:var(--bg4);border:1.5px solid var(--border);border-radius:9px;position:relative;transition:all .2s;flex-shrink:0;"><div id="advanceToggleThumb" style="position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--txt3);transition:all .2s;"></div></div>
+                      <span style="font-size:.74rem;color:var(--txt2)">অগ্রিম মোটে যোগ?</span>
+                      <div style="display:flex;align-items:center;gap:6px;cursor:pointer;" onclick="toggleAdvanceInTotal(this, ${o.advanceDelivery.amount}, ${o.subtotal||0}, ${o.delivery?.charge||0})">
+                        <div id="advanceToggleTrack" data-on="0" style="width:34px;height:18px;background:var(--bg4);border:1.5px solid var(--border);border-radius:9px;position:relative;transition:all .2s;flex-shrink:0;"><div id="advanceToggleThumb" style="position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--txt3);transition:all .2s;"></div></div>
                         <span id="advanceToggleLbl" style="font-size:.74rem;color:var(--txt3);font-weight:600;">না</span>
                       </div>
                     </div>
@@ -1809,9 +1848,9 @@ async function viewOrder(id) {
                 </div>
               ` : ''}
               <div style="border-top:1px solid var(--border);padding-top:7px;margin-top:4px" id="orderTotalRow">
-                <span style="color:var(--txt2)">সর্বমোট:</span> 
-                <strong style="color:var(--green2);font-size:1rem" id="orderTotalDisplay">৳${o.total?.toLocaleString('en')}</strong>
-                ${o.advanceDelivery?.paid ? `<span id="advanceTotalNote" style="font-size:.72rem;color:var(--txt3);display:none;margin-left:6px">(+ অগ্রিম ৳${o.advanceDelivery.amount.toLocaleString('en')} যোগসহ)</span>` : ''}
+                <span style="color:var(--txt2)">সর্বমোট (রাজস্বে যাবে):</span> 
+                <strong style="color:var(--green2);font-size:1rem" id="orderTotalDisplay">৳${(o.subtotal||0).toLocaleString('en')}</strong>
+                <div id="orderTotalBreakdown" style="font-size:.72rem;color:var(--txt3);margin-top:3px">পণ্য মূল্য: ৳${(o.subtotal||0).toLocaleString('en')}</div>
               </div>
             </div>
           </div>
@@ -1855,6 +1894,18 @@ async function viewOrder(id) {
       </div>
     `;
     openModal('orderModal');
+    // ডেলিভারড বাটন শুধু না-ডেলিভারড অর্ডারে দেখাবে
+    const delivBtn = document.getElementById('orderDeliveredBtn');
+    if (delivBtn) delivBtn.style.display = (o.status !== 'delivered' && o.status !== 'cancelled') ? 'flex' : 'none';
+    // subtotal দিয়ে effective revenue শুরু করো
+    _orderEffectiveRevenue = o.subtotal || 0;
+    // orderTotalDisplay এ base data সেট করো
+    const dispEl = document.getElementById('orderTotalDisplay');
+    if (dispEl) {
+      dispEl.dataset.subtotal = o.subtotal || 0;
+      dispEl.dataset.delivCharge = o.delivery?.charge || 0;
+      dispEl.dataset.advanceAmt = o.advanceDelivery?.paid ? o.advanceDelivery.amount : 0;
+    }
   } catch {
     toast('অর্ডার লোড ব্যর্থ','error');
   }
@@ -2768,36 +2819,101 @@ async function autoSeedContactPage() {
     }
   );
 }
-function toggleAdvanceInTotal(el, advanceAmt, baseTotal) {
-  const track = document.getElementById('advanceToggleTrack');
-  const thumb = document.getElementById('advanceToggleThumb');
-  const lbl = document.getElementById('advanceToggleLbl');
+// ===== ORDER TOTAL TOGGLE SYSTEM =====
+// Tracks current effective revenue amount for "delivered" status
+let _orderEffectiveRevenue = 0;
+
+function _recalcOrderTotal() {
+  const subtotalEl = document.getElementById('orderTotalDisplay');
+  const breakdownEl = document.getElementById('orderTotalBreakdown');
+  const delivTrack = document.getElementById('deliveryToggleTrack');
+  const advTrack = document.getElementById('advanceToggleTrack');
+
+  // Read base values from data attributes set on the display element
+  const subtotal = parseFloat(subtotalEl?.dataset.subtotal || 0);
+  const delivCharge = parseFloat(subtotalEl?.dataset.delivCharge || 0);
+  const advanceAmt = parseFloat(subtotalEl?.dataset.advanceAmt || 0);
+
+  const includeDelivery = delivTrack?.dataset.on === '1';
+  const includeAdvance = advTrack?.dataset.on === '1';
+
+  let total = subtotal;
+  let parts = [`পণ্য মূল্য: ৳${subtotal.toLocaleString('en')}`];
+
+  if (includeDelivery && delivCharge > 0) {
+    total += delivCharge;
+    parts.push(`ডেলিভারি: +৳${delivCharge.toLocaleString('en')}`);
+  }
+  if (includeAdvance && advanceAmt > 0) {
+    total += advanceAmt;
+    parts.push(`অগ্রিম: +৳${advanceAmt.toLocaleString('en')}`);
+  }
+
+  _orderEffectiveRevenue = total;
+  if (subtotalEl) subtotalEl.textContent = '৳' + total.toLocaleString('en');
+  if (breakdownEl) breakdownEl.textContent = parts.join(' | ');
+}
+
+function toggleDeliveryInTotal(el, delivCharge, subtotal, advanceAmt) {
+  const track = document.getElementById('deliveryToggleTrack');
+  const thumb = document.getElementById('deliveryToggleThumb');
+  const lbl = document.getElementById('deliveryToggleLbl');
   const totalDisplay = document.getElementById('orderTotalDisplay');
-  const note = document.getElementById('advanceTotalNote');
-  if (!track) return;
+  if (!track || !totalDisplay) return;
+
+  // Store base values on the display element for recalc
+  totalDisplay.dataset.subtotal = subtotal;
+  totalDisplay.dataset.delivCharge = delivCharge;
+  totalDisplay.dataset.advanceAmt = advanceAmt;
+
   const isOn = track.dataset.on === '1';
-  if (isOn) {
-    // Turn OFF — remove advance from total
-    track.dataset.on = '0';
+  track.dataset.on = isOn ? '0' : '1';
+
+  if (!isOn) {
+    track.style.background = 'var(--orange)';
+    track.style.borderColor = 'var(--orange)';
+    if(thumb){ thumb.style.left = '18px'; thumb.style.background = '#fff'; }
+    lbl.style.color = 'var(--orange2)';
+    lbl.textContent = 'হ্যাঁ';
+  } else {
     track.style.background = 'var(--bg4)';
     track.style.borderColor = 'var(--border)';
     if(thumb){ thumb.style.left = '2px'; thumb.style.background = 'var(--txt3)'; }
     lbl.style.color = 'var(--txt3)';
     lbl.textContent = 'না';
-    totalDisplay.textContent = '৳' + baseTotal.toLocaleString('en');
-    if(note) note.style.display = 'none';
-  } else {
-    // Turn ON — add advance to total
-    track.dataset.on = '1';
+  }
+  _recalcOrderTotal();
+}
+
+function toggleAdvanceInTotal(el, advanceAmt, subtotal, delivCharge) {
+  const track = document.getElementById('advanceToggleTrack');
+  const thumb = document.getElementById('advanceToggleThumb');
+  const lbl = document.getElementById('advanceToggleLbl');
+  const totalDisplay = document.getElementById('orderTotalDisplay');
+  if (!track || !totalDisplay) return;
+
+  // Store base values on the display element for recalc
+  totalDisplay.dataset.subtotal = subtotal;
+  totalDisplay.dataset.delivCharge = delivCharge;
+  totalDisplay.dataset.advanceAmt = advanceAmt;
+
+  const isOn = track.dataset.on === '1';
+  track.dataset.on = isOn ? '0' : '1';
+
+  if (!isOn) {
     track.style.background = 'var(--green)';
     track.style.borderColor = 'var(--green)';
     if(thumb){ thumb.style.left = '18px'; thumb.style.background = '#fff'; }
     lbl.style.color = 'var(--green3)';
     lbl.textContent = 'হ্যাঁ';
-    const newTotal = baseTotal + advanceAmt;
-    totalDisplay.textContent = '৳' + newTotal.toLocaleString('en');
-    if(note) note.style.display = 'inline';
+  } else {
+    track.style.background = 'var(--bg4)';
+    track.style.borderColor = 'var(--border)';
+    if(thumb){ thumb.style.left = '2px'; thumb.style.background = 'var(--txt3)'; }
+    lbl.style.color = 'var(--txt3)';
+    lbl.textContent = 'না';
   }
+  _recalcOrderTotal();
 }
 
 function statusBadge(status) {

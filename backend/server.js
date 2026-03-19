@@ -157,6 +157,7 @@ const orderSchema = new mongoose.Schema({
   },
   subtotal: Number,
   total: Number,
+  revenueAmount: { type: Number, default: null }, // admin-confirmed effective revenue
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
@@ -572,12 +573,16 @@ app.delete('/api/orders/:id', authMiddleware, async (req, res) => {
 
 app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
   try {
-    const { status, note } = req.body;
+    const { status, note, revenueAmount } = req.body;
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ error: 'Order not found' });
     order.status = status;
     order.statusHistory.push({ status, note, time: new Date() });
     order.updatedAt = new Date();
+    // ডেলিভারড হলে effective revenue সংরক্ষণ করো
+    if (status === 'delivered' && revenueAmount !== undefined && revenueAmount !== null) {
+      order.revenueAmount = Number(revenueAmount);
+    }
     await order.save();
     res.json(order);
   } catch (err) {
@@ -730,7 +735,18 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
     ]);
     const revenue = await Order.aggregate([
       { $match: { status: 'delivered' } },
-      { $group: { _id: null, total: { $sum: '$total' } } },
+      { $group: { 
+        _id: null, 
+        total: { 
+          $sum: { 
+            $cond: [
+              { $and: [{ $ne: ['$revenueAmount', null] }, { $gt: ['$revenueAmount', 0] }] },
+              '$revenueAmount',
+              '$total'
+            ]
+          }
+        } 
+      } },
     ]);
     const recentOrders = await Order.find().sort({ createdAt: -1 }).limit(5);
     const sixMonthsAgo = new Date();
@@ -739,7 +755,15 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
       { $match: { createdAt: { $gte: sixMonthsAgo }, status: { $ne: 'cancelled' } } },
       { $group: {
         _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
-        revenue: { $sum: '$total' },
+        revenue: { 
+          $sum: {
+            $cond: [
+              { $and: [{ $ne: ['$revenueAmount', null] }, { $gt: ['$revenueAmount', 0] }] },
+              '$revenueAmount',
+              '$total'
+            ]
+          }
+        },
         count: { $sum: 1 },
       }},
       { $sort: { '_id.year': 1, '_id.month': 1 } },
