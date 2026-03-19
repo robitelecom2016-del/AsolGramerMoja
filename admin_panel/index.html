@@ -724,7 +724,7 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="card">
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>অর্ডার নং</th><th>গ্রাহক</th><th>পণ্য</th><th>মোট</th><th>ডেলিভারি</th><th>স্ট্যাটাস</th><th>তারিখ</th><th>দেখুন</th></tr></thead>
+            <thead><tr><th>অর্ডার নং</th><th>গ্রাহক</th><th>পণ্য</th><th>মোট</th><th>ডেলিভারি</th><th>স্ট্যাটাস</th><th>তারিখ</th><th>দেখুন</th><th>মুছুন</th></tr></thead>
             <tbody id="orderTableBody"></tbody>
           </table>
         </div>
@@ -1197,6 +1197,10 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <button class="modal-cls" onclick="closeModal('orderModal')"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body" id="orderDetailBody"></div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <button class="btn-danger" id="orderDeleteBtn" onclick="deleteOrderFromModal()"><i class="fa-solid fa-trash"></i> অর্ডার মুছুন</button>
+      <button class="btn-secondary" onclick="closeModal('orderModal')">বন্ধ করুন</button>
+    </div>
   </div>
 </div>
 
@@ -1735,6 +1739,7 @@ async function loadOrders() {
         <td><select class="status-select" onchange="updateOrderStatus('${o._id}',this.value)" style="border-color:${statusColor(o.status)}">${['pending','confirmed','processing','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
         <td style="font-size:.74rem;color:var(--txt2)">${timeAgo(o.createdAt)}</td>
         <td><button class="icon-btn edit" onclick="viewOrder('${o._id}')"><i class="fa-solid fa-eye"></i></button></td>
+        <td><button class="icon-btn del" onclick="deleteOrder('${o._id}','${o.orderNum}')"><i class="fa-solid fa-trash"></i></button></td>
       </tr>`).join('');
     renderPagination('orderPagination',res.total,15,orderPage,(pg)=>{orderPage=pg;loadOrders();});
   } catch(err) { toast('অর্ডার লোড ব্যর্থ: '+err.message,'error'); }
@@ -1745,9 +1750,25 @@ async function updateOrderStatus(id,status) {
   catch { toast('আপডেট ব্যর্থ','error'); }
 }
 
+function deleteOrder(id, orderNum) {
+  showConfirm('🗑️',`অর্ডার "${orderNum}" মুছে ফেলতে চান?`,'এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।', async () => {
+    try { await api('DELETE', `/api/orders/${id}`); toast('অর্ডার মুছে ফেলা হয়েছে', 'success'); loadOrders(); }
+    catch(err) { toast('মুছতে ব্যর্থ: ' + err.message, 'error'); }
+  });
+}
+
+let _currentOrderId = null, _currentOrderNum = '';
+function deleteOrderFromModal() {
+  if (!_currentOrderId) return;
+  closeModal('orderModal');
+  deleteOrder(_currentOrderId, _currentOrderNum);
+}
+
 async function viewOrder(id) {
   try {
     const o = await api('GET', `/api/orders/${id}`);
+    _currentOrderId = o._id;
+    _currentOrderNum = o.orderNum;
     document.getElementById('orderDetailBody').innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
         <div class="card" style="border-radius:8px">
