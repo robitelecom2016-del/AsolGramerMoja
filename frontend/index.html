@@ -457,10 +457,6 @@ body{
 .bcard-inner:hover .c-img::after{opacity:1;}
 .bcard .c-img{aspect-ratio:1/1;height:auto;}
 .bcard:hover .c-img img{transform:scale(1.08);}
-.stockout-badge{position:absolute;top:8px;left:8px;background:rgba(220,53,69,.92);color:#fff;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:20px;z-index:10;letter-spacing:.3px;backdrop-filter:blur(4px);pointer-events:none;}
-.c-act.disabled,.pdp-btn-cart.disabled,.pdp-btn-order.disabled,.bcard-quick-add.disabled,.rc-act.disabled,.crel-add.disabled{opacity:.45;cursor:not-allowed;pointer-events:none;}
-.pdp-stockout-bar{background:#fff3cd;border:1.5px solid #ffc107;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:9px;font-size:.88rem;color:#856404;font-weight:600;margin-bottom:4px;}
-.pdp-stockout-bar i{color:#e67e22;font-size:1rem;}
 .bcard-quick-add{position:absolute;bottom:0;left:0;right:0;background:var(--gd);color:#fff;font-family:inherit;font-size:.78rem;font-weight:700;padding:9px 0;border:none;cursor:pointer;transform:translateY(100%);transition:transform .28s cubic-bezier(.22,.68,0,1.2),background .2s;z-index:6;display:flex;align-items:center;justify-content:center;gap:6px;}
 .bcard-quick-add:hover{background:var(--gm);}
 .bcard:hover .bcard-quick-add{transform:translateY(0);}
@@ -1585,23 +1581,19 @@ document.addEventListener('DOMContentLoaded', () => {
 function getBasePrice(p) { return p.variants?.[0]?.p || 0; }
 function getBaseOld(p) { return p.variants?.[0]?.op || null; }
 function acts(id) {
-  const p = prods.find(x => (x._id || x.id) === id);
-  const so = p && p.stockOut;
   return `<div class="c-acts">
-    <button class="c-act" onclick="goProduct('${id}');event.stopPropagation()" title="à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤"><i class="fa-regular fa-eye"></i></button>
+    <button class="c-act" onclick="goProduct('${id}');event.stopPropagation()" title="বিস্তারিত"><i class="fa-regular fa-eye"></i></button>
     <span class="c-div"></span>
-    <button class="c-act ca${so ? ' disabled' : ''}" onclick="${so ? 'showStockOutMsg()' : `addToCartBase('${id}');event.stopPropagation()`}" title="${so ? 'à¦¸à§à¦à¦ à¦à¦à¦' : 'à¦à¦¾à¦°à§à¦à§ à¦¯à§à¦'}"><i class="fa-solid fa-${so ? 'ban' : 'cart-shopping'}"></i></button>
+    <button class="c-act ca" onclick="addToCartBase('${id}');event.stopPropagation()" title="কার্টে যোগ"><i class="fa-solid fa-cart-shopping"></i></button>
   </div>`;
 }
 function cardBody(p) {
   const bp = getBasePrice(p), bo = getBaseOld(p);
-  const old = bo ? `<span class="c-old">à§³${bo.toLocaleString('en')}</span>` : '';
-  const soTag = p.stockOut ? `<span style="display:inline-block;background:#dc3545;color:#fff;font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:10px;margin-bottom:4px;">â à¦¸à§à¦à¦ à¦à¦à¦</span>` : '';
+  const old = bo ? `<span class="c-old">৳${bo.toLocaleString('en')}</span>` : '';
   return `<div class="c-body">
-    ${soTag}
     <div class="c-name">${p.nm}</div>
     <div class="c-sub">${p.sub || ''}</div>
-    <div class="c-prices"><span class="c-price">à§³${bp.toLocaleString('en')}</span>${old}</div>
+    <div class="c-prices"><span class="c-price">৳${bp.toLocaleString('en')}</span>${old}</div>
   </div>`;
 }
 function bestCard(p) {
@@ -1613,8 +1605,8 @@ function bestCard(p) {
         <span style="position:absolute;bottom:8px;right:10px;font-size:1.4rem;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));pointer-events:none;">${p.em}</span>
       </div>
       ${acts(p._id)}${cardBody(p)}
-      <button class="bcard-quick-add${p.stockOut ? ' disabled' : ''}" onclick="${p.stockOut ? 'showStockOutMsg()' : `addToCartBase('${p._id}');event.stopPropagation()`}">
-        <i class="fa-solid fa-${p.stockOut ? 'ban' : 'cart-plus'}"></i> ${p.stockOut ? 'à¦¸à§à¦à¦ à¦à¦à¦' : 'à¦à¦¾à¦°à§à¦à§ à¦¯à§à¦ à¦à¦°à§à¦¨'}
+      <button class="bcard-quick-add" onclick="addToCartBase('${p._id}');event.stopPropagation()">
+        <i class="fa-solid fa-cart-plus"></i> কার্টে যোগ করুন
       </button>
     </div>
   </div>`;
@@ -1754,7 +1746,7 @@ function renderPdp(p) {
           <div class="rc-acts">
             <button class="rc-act" onclick="goProduct('${rp._id||rp.id}');event.stopPropagation()"><i class="fa-regular fa-eye"></i></button>
             <div class="rc-div"></div>
-            <button class="rc-act add${rp.stockOut ? ' disabled' : ''}" onclick="${rp.stockOut ? 'showStockOutMsg()' : `addToCartBase('${rp._id||rp.id}');event.stopPropagation()`}" title="${rp.stockOut ? 'স্টক আউট' : 'কার্টে যোগ'}"><i class="fa-solid fa-${rp.stockOut ? 'ban' : 'cart-shopping'}"></i></button>
+            <button class="rc-act add" onclick="addToCartBase('${rp._id||rp.id}');event.stopPropagation()"><i class="fa-solid fa-cart-shopping"></i></button>
           </div>
           <div class="rc-body">
             <div class="rc-name">${rp.nm}</div>
@@ -1796,13 +1788,12 @@ function renderPdp(p) {
             <button class="pdp-qbtn" onclick="pdpQtyChange(1)">+</button>
           </div>
         </div>
-        ${p.stockOut ? `<div class="pdp-stockout-bar"><i class="fa-solid fa-circle-exclamation"></i> à¦à¦ à¦ªà¦£à§à¦¯à¦à¦¿ à¦¬à¦°à§à¦¤à¦®à¦¾à¦¨à§ à¦¸à§à¦à¦à§ à¦¨à§à¦à¥¤ à¦¶à§à¦à§à¦°à¦ à¦ªà¦¾à¦à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¬à§à¥¤</div>` : ''}
         <div class="pdp-btns">
-          <button class="pdp-btn-cart${p.stockOut ? ' disabled' : ''}" id="pdpCartBtn" onclick="${p.stockOut ? 'showStockOutMsg()' : `pdpAddCart('${p._id||p.id}')`}">
-            <i class="fa-solid fa-${p.stockOut ? 'ban' : 'cart-plus'}"></i> ${p.stockOut ? 'à¦¸à§à¦à¦ à¦à¦à¦' : 'à¦à¦¾à¦°à§à¦à§ à¦¯à§à¦ à¦à¦°à§à¦¨'}
+          <button class="pdp-btn-cart" id="pdpCartBtn" onclick="pdpAddCart('${p._id||p.id}')">
+            <i class="fa-solid fa-cart-plus"></i> কার্টে যোগ করুন
           </button>
-          <button class="pdp-btn-order${p.stockOut ? ' disabled' : ''}" onclick="${p.stockOut ? 'showStockOutMsg()' : `pdpAddCart('${p._id||p.id}');toggleCart()`}">
-            <i class="fa-solid fa-${p.stockOut ? 'ban' : 'bag-shopping'}"></i> ${p.stockOut ? 'à¦¸à§à¦à¦ à¦à¦à¦' : 'à¦à¦à¦¨à¦ à¦à¦°à§à¦¡à¦¾à¦° à¦à¦°à§à¦¨'}
+          <button class="pdp-btn-order" onclick="pdpAddCart('${p._id||p.id}');toggleCart()">
+            <i class="fa-solid fa-bag-shopping"></i> এখনই অর্ডার করুন
           </button>
           <button class="pdp-btn-phone">
             <i class="fa-solid fa-phone"></i> কল করুন: ${p.phone || storePhone}
@@ -1844,7 +1835,6 @@ function pdpSetThumb(el, imgUrl) {
 }
 function pdpAddCart(id) {
   const p = prods.find(x => (x._id || x.id) === id); if (!p) return;
-  if (p.stockOut) { showStockOutMsg(); return; }
   const v = p.variants?.[pdpState.varIdx] || { p: getBasePrice(p), lbl: 'Default' };
   const cartKey = `${id}_${pdpState.varIdx}`;
   if (!cart[cartKey]) cart[cartKey] = { ...p, qty: 0, cartPrice: v.p, varLabel: v.lbl || '', cartKey };
@@ -1858,7 +1848,6 @@ let cart = {};
 let relIdx = 0, relItems = [], relTimer = null;
 function addToCartBase(id) {
   const p = prods.find(x => (x._id || x.id) === id); if (!p) return;
-  if (p.stockOut) { showStockOutMsg(); return; }
   const v = p.variants?.[0] || { p: getBasePrice(p), lbl: '' };
   const cartKey = `${id}_0`;
   if (!cart[cartKey]) cart[cartKey] = { ...p, qty: 0, cartPrice: v.p, varLabel: v.lbl || '', cartKey };
@@ -1926,7 +1915,7 @@ function crelCardHTML(rp) {
     </div>
     <div class="crel-nm">${rp.nm}</div>
     <div class="crel-pr">৳${getBasePrice(rp).toLocaleString('en')}</div>
-    <button class="crel-add${rp.stockOut ? ' disabled' : ''}" onclick="${rp.stockOut ? 'showStockOutMsg()' : `addToCartBase('${rp._id||rp.id}');event.stopPropagation()`}">${rp.stockOut ? '⛔ আউট' : '+ যোগ'}</button>
+    <button class="crel-add" onclick="addToCartBase('${rp._id||rp.id}');event.stopPropagation()">+ যোগ</button>
   </div>`;
 }
 function renderRelRow() {
@@ -2269,10 +2258,6 @@ function copyPayNum(method, btn) {
   });
 }
 let toastTimer = null;
-function showStockOutMsg() {
-  showToast('â à¦à¦ à¦ªà¦£à§à¦¯à¦à¦¿ à¦¬à¦°à§à¦¤à¦®à¦¾à¦¨à§ à¦¸à§à¦à¦ à¦à¦à¦à¥¤ à¦¶à§à¦à§à¦°à¦ à¦ªà¦¾à¦à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¬à§à¥¤');
-}
-
 function showToast(msg) {
   const t = document.getElementById('toast');
   const icon = document.getElementById('toastIcon');
