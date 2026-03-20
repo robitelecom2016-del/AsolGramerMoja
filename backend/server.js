@@ -123,6 +123,7 @@ const productSchema = new mongoose.Schema({
   metaTitle: { type: String, default: '' },
   metaDescription: { type: String, default: '' },
   slug: { type: String, unique: true, sparse: true },
+  stockOut: { type: Boolean, default: false },
   order: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
@@ -387,6 +388,20 @@ app.patch('/api/products/:id/best', authMiddleware, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+app.patch('/api/products/:id/stockout', authMiddleware, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+    product.stockOut = !product.stockOut;
+    product.updatedAt = new Date();
+    await product.save();
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 app.post('/api/upload/product-image', authMiddleware, upload.single('image'), async (req, res) => {
   try {

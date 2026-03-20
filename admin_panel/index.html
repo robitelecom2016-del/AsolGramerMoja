@@ -696,7 +696,7 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="card">
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>#</th><th>পণ্য</th><th>ক্যাটাগরি</th><th>মূল্য</th><th>⭐</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+            <thead><tr><th>#</th><th>পণ্য</th><th>ক্যাটাগরি</th><th>মূল্য</th><th>⭐</th><th>📦 স্টক</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
             <tbody id="prodTableBody"></tbody>
           </table>
         </div>
@@ -1076,6 +1076,15 @@ textarea.form-control { resize:vertical; min-height:80px; }
             <span id="pBestLbl">না</span>
           </label>
           <input type="hidden" id="pBest" value="false">
+        </div>
+        <div class="form-group2">
+          <label>⚠️ স্টক আউট</label>
+          <label class="toggle-switch" onclick="toggleProdField('pStockOut')">
+            <div class="toggle-track" id="pStockOutTrack"><div class="toggle-thumb"></div></div>
+            <span id="pStockOutLbl">না</span>
+          </label>
+          <input type="hidden" id="pStockOut" value="false">
+          <div class="form-hint" style="color:var(--orange2)">চালু করলে ফ্রন্টেন্ডে \"স্টক আউট\" দেখাবে</div>
         </div>
         <div class="form-group2">
           <label>সক্রিয় / প্রকাশিত</label>
@@ -1466,6 +1475,7 @@ async function loadProducts() {
         <td><span class="badge orange">${p.em} ${p.cat}</span></td>
         <td><strong>৳${bp.toLocaleString('en')}</strong>${bo?`<br><span style="font-size:.7rem;color:var(--txt3);text-decoration:line-through">৳${bo.toLocaleString('en')}</span>`:''}</td>
         <td><button class="icon-btn star ${p.best?'star-active':''}" onclick="toggleBest('${p._id}',this)"><i class="fa-solid fa-star"></i></button></td>
+        <td><button class="icon-btn ${p.stockOut?'warn':''}" title="${p.stockOut?'স্টক আউট — ক্লিক করে ফিরিয়ে আনুন':'স্টকে আছে — ক্লিক করে স্টক আউট করুন'}" onclick="toggleStockOut('${p._id}',this)">${p.stockOut?'<i class=\'fa-solid fa-box-open\' style=\'color:var(--orange)\'></i>':'<i class=\'fa-solid fa-cubes\' style=\'color:var(--green2)\'></i>'}</button></td>
         <td><button class="icon-btn toggle ${p.active?'active-icon':''}" onclick="toggleProd('${p._id}',this)"><i class="fa-solid fa-${p.active?'eye':'eye-slash'}"></i></button></td>
         <td><div class="td-actions">
           <button class="icon-btn edit" onclick="editProd('${p._id}')"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -1513,6 +1523,7 @@ function openProdModal(prod=null) {
   document.getElementById('pDesc').value=''; document.getElementById('pBest').value='false'; document.getElementById('pActive').value='true';
   document.getElementById('pBestTrack').className='toggle-track'; document.getElementById('pActiveTrack').className='toggle-track on';
   document.getElementById('pBestLbl').textContent='না'; document.getElementById('pActiveLbl').textContent='হ্যাঁ';
+  document.getElementById('pStockOut').value='false'; document.getElementById('pStockOutTrack').className='toggle-track'; document.getElementById('pStockOutLbl').textContent='না';
   document.getElementById('mainImgPreview').innerHTML=''; document.getElementById('thumbImgPreview').innerHTML='';
   document.getElementById('prodModalTitle').innerHTML='<i class="fa-solid fa-plus" style="color:var(--green)"></i> নতুন পণ্য যোগ করুন';
   document.getElementById('pMetaTitle').value = prod?.metaTitle || '';
@@ -1537,6 +1548,10 @@ function openProdModal(prod=null) {
     document.getElementById('pActiveTrack').className='toggle-track '+(isActive?'on':'');
     document.getElementById('pBestLbl').textContent=isBest?'হ্যাঁ':'না';
     document.getElementById('pActiveLbl').textContent=isActive?'হ্যাঁ':'না';
+    const isStockOut=prod.stockOut===true;
+    document.getElementById('pStockOut').value=String(isStockOut);
+    document.getElementById('pStockOutTrack').className='toggle-track '+(isStockOut?'on':'');
+    document.getElementById('pStockOutLbl').textContent=isStockOut?'হ্যাঁ':'না';
     renderVariants(prod.variants||[]); renderHighlights(prod.highlights||[]);
   } else { renderVariants([{lbl:'',p:'',op:'',disc:''}]); renderHighlights(['']); }
   openModal('prodModal');
@@ -1677,6 +1692,7 @@ async function saveProd() {
     imgsPublicIds:JSON.parse(document.getElementById('pImgsPids').value||'[]'), 
     best:document.getElementById('pBest').value==='true', 
     active:document.getElementById('pActive').value==='true', 
+    stockOut:document.getElementById('pStockOut').value==='true',
     variants, 
     highlights:getHighlights(),
     metaTitle: document.getElementById('pMetaTitle').value.trim(),
@@ -1717,6 +1733,22 @@ async function toggleProd(id,btn) {
 async function toggleBest(id,btn) {
   try { const prod=await api('PATCH',`/api/products/${id}/best`); btn.className='icon-btn star '+(prod.best?'star-active':''); toast(`বেস্ট সেলার ${prod.best?'যোগ':'বাতিল'} করা হয়েছে`,'success'); }
   catch { toast('আপডেট ব্যর্থ','error'); }
+}
+
+async function toggleStockOut(id, btn) {
+  try {
+    const prod = await api('PATCH', `/api/products/${id}/stockout`);
+    if (prod.stockOut) {
+      btn.className = 'icon-btn warn';
+      btn.title = 'স্টক আউট — ক্লিক করে ফিরিয়ে আনুন';
+      btn.innerHTML = '<i class="fa-solid fa-box-open" style="color:var(--orange)"></i>';
+    } else {
+      btn.className = 'icon-btn';
+      btn.title = 'স্টকে আছে — ক্লিক করে স্টক আউট করুন';
+      btn.innerHTML = '<i class="fa-solid fa-cubes" style="color:var(--green2)"></i>';
+    }
+    toast(`পণ্য ${prod.stockOut ? '⚠️ স্টক আউট' : '✅ স্টকে আছে'} করা হয়েছে`, prod.stockOut ? 'info' : 'success');
+  } catch { toast('আপডেট ব্যর্থ', 'error'); }
 }
 
 async function loadOrders() {
