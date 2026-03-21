@@ -172,7 +172,7 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 20px;
   width: 100%;
@@ -298,7 +298,7 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .img-prev-item:hover .img-prev-rm { opacity:1; }
 
 .variants-list { display:flex; flex-direction:column; gap:8px; }
-.variant-item { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:10px 12px; display:grid; grid-template-columns:2fr 1fr 1fr 1fr auto; gap:8px; align-items:center; }
+.variant-item { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:10px 12px; display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr auto; gap:8px; align-items:center; }
 .variant-item input { background:var(--bg4); border:1px solid var(--border); border-radius:6px; padding:7px 9px; color:var(--txt); font-family:inherit; font-size:.82rem; outline:none; width:100%; transition:border-color .2s; }
 .variant-item input:focus { border-color:var(--green); }
 .variant-item input::placeholder { color:var(--txt3); }
@@ -696,7 +696,7 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="card">
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>#</th><th>পণ্য</th><th>ক্যাটাগরি</th><th>মূল্য</th><th>⭐</th><th>📦 স্টক</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+            <thead><tr><th>#</th><th>পণ্য</th><th>ক্যাটাগরি</th><th>কেনা / বিক্রি মূল্য</th><th>⭐</th><th>📦 স্টক</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
             <tbody id="prodTableBody"></tbody>
           </table>
         </div>
@@ -1042,9 +1042,10 @@ textarea.form-control { resize:vertical; min-height:80px; }
       </div>
       <div class="form-group2">
         <label>ভেরিয়েন্ট / মূল্য <span>*</span></label>
-        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;padding:5px 0;margin-bottom:4px">
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:8px;padding:5px 0;margin-bottom:4px">
           <span style="font-size:.7rem;color:var(--txt3);padding-left:4px">লেবেল</span>
-          <span style="font-size:.7rem;color:var(--txt3)">মূল্য (৳)</span>
+          <span style="font-size:.7rem;color:var(--txt3)">কেনা মূল্য (৳)</span>
+          <span style="font-size:.7rem;color:var(--txt3)">বিক্রি মূল্য (৳)</span>
           <span style="font-size:.7rem;color:var(--txt3)">পুরনো মূল্য</span>
           <span style="font-size:.7rem;color:var(--txt3)">ছাড় টেক্সট</span>
           <span></span>
@@ -1376,6 +1377,15 @@ setInterval(checkHealth, 30000);
 async function loadDashboard() {
   try {
     const data = await api('GET', '/api/dashboard/stats');
+    const totalProfit = data.totalProfit ?? null;
+    const profitCard = totalProfit !== null ? `
+      <div class="stat-card" style="border-color:var(--border)">
+        <div class="stat-top">
+          <div><div class="stat-val" style="color:${totalProfit>=0?'var(--green3)':'var(--red2)'}">${totalProfit>=0?'+':''}৳${totalProfit.toLocaleString('en')}</div><div class="stat-lbl">মোট লাভ</div></div>
+          <div class="stat-icon" style="background:rgba(86,211,100,.12);color:var(--green3)"><i class="fa-solid fa-sack-dollar"></i></div>
+        </div>
+        <div class="stat-change ${totalProfit>=0?'up':'neutral'}"><i class="fa-solid fa-${totalProfit>=0?'arrow-trend-up':'arrow-trend-down'}"></i> বিক্রি − কেনা = লাভ</div>
+      </div>` : '';
     document.getElementById('statsGrid').innerHTML = `
       <div class="stat-card green">
         <div class="stat-top">
@@ -1404,7 +1414,8 @@ async function loadDashboard() {
           <div class="stat-icon purple"><i class="fa-solid fa-bangladeshi-taka-sign"></i></div>
         </div>
         <div class="stat-change up"><i class="fa-solid fa-arrow-trend-up"></i> সংগৃহীত রাজস্ব</div>
-      </div>`;
+      </div>
+      ${profitCard}`;
     pendingOrderCount = data.pendingOrders;
     document.getElementById('pendingBadge').textContent = pendingOrderCount;
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1464,8 +1475,9 @@ async function loadProducts() {
     document.getElementById('prodCount').textContent = `${filtered.length} পণ্য`;
     if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>কোনো পণ্য নেই</h3></div></td></tr>'; return; }
     tbody.innerHTML = filtered.map((p,i) => {
-      const bp = p.variants?.[0]?.p || 0;
-      const bo = p.variants?.[0]?.op;
+      const sellPrice = p.variants?.[0]?.p || 0;
+      const buyPrice = p.variants?.[0]?.bp;
+      const oldPrice = p.variants?.[0]?.op;
       return `<tr>
         <td style="color:var(--txt3);font-size:.74rem">${(prodPage-1)*15+i+1}</td>
         <td><div class="td-img">
@@ -1473,7 +1485,13 @@ async function loadProducts() {
           <div><div class="td-name">${p.nm}</div><div class="td-sub">${p.sub||''}</div></div>
         </div></td>
         <td><span class="badge orange">${p.em} ${p.cat}</span></td>
-        <td><strong>৳${bp.toLocaleString('en')}</strong>${bo?`<br><span style="font-size:.7rem;color:var(--txt3);text-decoration:line-through">৳${bo.toLocaleString('en')}</span>`:''}</td>
+        <td>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:.75rem;color:var(--orange2)">কেনা: ${buyPrice ? `<strong>৳${buyPrice.toLocaleString('en')}</strong>` : '<span style="color:var(--txt3)">—</span>'}</span>
+            <span style="font-size:.75rem;color:var(--green3)">বিক্রি: <strong>৳${sellPrice.toLocaleString('en')}</strong></span>
+            ${oldPrice?`<span style="font-size:.7rem;color:var(--txt3);text-decoration:line-through">৳${oldPrice.toLocaleString('en')}</span>`:''}
+          </div>
+        </td>
         <td><button class="icon-btn star ${p.best?'star-active':''}" onclick="toggleBest('${p._id}',this)"><i class="fa-solid fa-star"></i></button></td>
         <td><button class="icon-btn ${p.stockOut?'warn':''}" title="${p.stockOut?'স্টক আউট — ক্লিক করে ফিরিয়ে আনুন':'স্টকে আছে — ক্লিক করে স্টক আউট করুন'}" onclick="toggleStockOut('${p._id}',this)">${p.stockOut?'<i class=\'fa-solid fa-box-open\' style=\'color:var(--orange)\'></i>':'<i class=\'fa-solid fa-cubes\' style=\'color:var(--green2)\'></i>'}</button></td>
         <td><button class="icon-btn toggle ${p.active?'active-icon':''}" onclick="toggleProd('${p._id}',this)"><i class="fa-solid fa-${p.active?'eye':'eye-slash'}"></i></button></td>
@@ -1561,7 +1579,8 @@ function renderVariants(variants) {
   document.getElementById('variantsList').innerHTML = variants.map((v,i)=>`
     <div class="variant-item" id="var-${i}">
       <input type="text" placeholder="যেমন: 1 বোতল (500g)" value="${v.lbl||''}" data-field="lbl" data-idx="${i}">
-      <input type="number" placeholder="মূল্য" value="${v.p||''}" data-field="p" data-idx="${i}">
+      <input type="number" placeholder="কেনা মূল্য" value="${v.bp||''}" data-field="bp" data-idx="${i}" style="border-color:rgba(232,102,10,.4)" title="কেনা মূল্য (Cost Price)">
+      <input type="number" placeholder="বিক্রি মূল্য" value="${v.p||''}" data-field="p" data-idx="${i}" style="border-color:rgba(46,160,67,.4)" title="বিক্রি মূল্য (Sell Price)">
       <input type="number" placeholder="পুরনো" value="${v.op||''}" data-field="op" data-idx="${i}">
       <input type="text" placeholder="যেমন: 5% ছাড়" value="${v.disc||''}" data-field="disc" data-idx="${i}">
       <button class="icon-btn del" onclick="removeVariant(${i})"><i class="fa-solid fa-trash"></i></button>
@@ -1573,7 +1592,7 @@ function addVariant() {
   const count = list.querySelectorAll('.variant-item').length;
   const div = document.createElement('div');
   div.className='variant-item'; div.id='var-'+count;
-  div.innerHTML=`<input type="text" placeholder="লেবেল" data-field="lbl" data-idx="${count}"><input type="number" placeholder="মূল্য" data-field="p" data-idx="${count}"><input type="number" placeholder="পুরনো" data-field="op" data-idx="${count}"><input type="text" placeholder="ছাড় টেক্সট" data-field="disc" data-idx="${count}"><button class="icon-btn del" onclick="removeVariant(${count})"><i class="fa-solid fa-trash"></i></button>`;
+  div.innerHTML=`<input type="text" placeholder="লেবেল" data-field="lbl" data-idx="${count}"><input type="number" placeholder="কেনা মূল্য" data-field="bp" data-idx="${count}" style="border-color:rgba(232,102,10,.4)" title="কেনা মূল্য"><input type="number" placeholder="বিক্রি মূল্য" data-field="p" data-idx="${count}" style="border-color:rgba(46,160,67,.4)" title="বিক্রি মূল্য"><input type="number" placeholder="পুরনো" data-field="op" data-idx="${count}"><input type="text" placeholder="ছাড় টেক্সট" data-field="disc" data-idx="${count}"><button class="icon-btn del" onclick="removeVariant(${count})"><i class="fa-solid fa-trash"></i></button>`;
   list.appendChild(div);
 }
 
@@ -1601,9 +1620,10 @@ function getVariants() {
   items.forEach(item => {
     const lbl=item.querySelector('[data-field="lbl"]')?.value?.trim();
     const p=parseFloat(item.querySelector('[data-field="p"]')?.value)||0;
+    const bp=parseFloat(item.querySelector('[data-field="bp"]')?.value)||null;
     const op=parseFloat(item.querySelector('[data-field="op"]')?.value)||null;
     const disc=item.querySelector('[data-field="disc"]')?.value?.trim();
-    if(lbl&&p) result.push({lbl,p,op:op||undefined,disc:disc||undefined});
+    if(lbl&&p) result.push({lbl,p,bp:bp||undefined,op:op||undefined,disc:disc||undefined});
   });
   return result;
 }
@@ -1941,16 +1961,36 @@ async function viewOrder(id) {
         <div class="card-header"><h3><i class="fa-solid fa-box" style="color:var(--purple)"></i> পণ্য তালিকা</h3></div>
         <div class="card-body" style="padding:12px">
           <div class="order-items-list">
-            ${(o.items||[]).map(item => `
-              <div class="order-item-row">
+            ${(()=>{
+              let totalBuyCost = 0, totalSellAmt = 0;
+              const rows = (o.items||[]).map(item => {
+                const sellTotal = (item.cartPrice||0) * (item.qty||1);
+                const buyTotal = (item.buyPrice||0) * (item.qty||1);
+                totalSellAmt += sellTotal;
+                totalBuyCost += buyTotal;
+                return `
+              <div class="order-item-row" style="flex-wrap:wrap">
                 ${item.img ? `<img class="order-item-img" src="${item.img}" onerror="this.style.display='none'">` : `<div class="order-item-em">${item.em||'📦'}</div>`}
-                <div style="flex:1">
+                <div style="flex:1;min-width:120px">
                   <div style="font-size:.86rem;font-weight:700">${item.nm}</div>
                   <div style="font-size:.74rem;color:var(--txt2)">${item.varLabel} × ${item.qty}</div>
                 </div>
-                <div style="font-weight:700;color:var(--green2)">৳${(item.cartPrice * item.qty).toLocaleString('en')}</div>
-              </div>
-            `).join('')}
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+                  <div style="font-weight:700;color:var(--green2)">বিক্রি: ৳${sellTotal.toLocaleString('en')}</div>
+                  ${item.buyPrice ? `<div style="font-size:.74rem;color:var(--orange2)">কেনা: ৳${buyTotal.toLocaleString('en')}</div>
+                  <div style="font-size:.74rem;color:${sellTotal-buyTotal>=0?'var(--green3)':'var(--red2)'}">লাভ: ৳${(sellTotal-buyTotal).toLocaleString('en')}</div>` : ''}
+                </div>
+              </div>`;
+              }).join('');
+              const profit = totalSellAmt - totalBuyCost;
+              const profitSummary = totalBuyCost > 0 ? `
+              <div style="margin-top:10px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem">
+                <div><span style="color:var(--txt2)">মোট বিক্রি:</span> <strong style="color:var(--green2)">৳${totalSellAmt.toLocaleString('en')}</strong></div>
+                <div><span style="color:var(--txt2)">মোট কেনা:</span> <strong style="color:var(--orange2)">৳${totalBuyCost.toLocaleString('en')}</strong></div>
+                <div><span style="color:var(--txt2)">মোট লাভ:</span> <strong style="color:${profit>=0?'var(--green3)':'var(--red2)'}">৳${profit.toLocaleString('en')}</strong></div>
+              </div>` : '';
+              return rows + profitSummary;
+            })()}
           </div>
         </div>
       </div>
