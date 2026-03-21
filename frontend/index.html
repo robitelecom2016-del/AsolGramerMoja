@@ -689,6 +689,12 @@ footer p{font-size:.79rem;line-height:1.7;}
 .rel-pcard .rc-act.add:hover{color:var(--or);background:#fff5ef;}
 .rel-pcard .rc-div{width:1px;background:var(--border);margin:5px 0;}
 .error-state{text-align:center;padding:40px 20px;color:#aaa;}
+.stock-out-badge{position:absolute;top:8px;left:8px;background:#e53935;color:#fff;font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:4px;z-index:5;letter-spacing:.3px;pointer-events:none;}
+.stock-out-overlay{position:absolute;inset:0;background:rgba(0,0,0,.38);z-index:4;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.stock-out-overlay span{color:#fff;font-size:.78rem;font-weight:700;background:rgba(229,57,53,.85);padding:5px 12px;border-radius:4px;}
+.c-act.disabled-act{opacity:.4;cursor:not-allowed;pointer-events:none;}
+.pdp-stock-out-bar{background:#e53935;color:#fff;border-radius:7px;padding:12px 16px;font-size:.9rem;font-weight:700;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;}
+.pdp-btn-cart:disabled,.pdp-btn-order:disabled{opacity:.5;cursor:not-allowed;background:#aaa !important;transform:none !important;}
 .error-state i{font-size:2rem;display:block;margin-bottom:10px;color:#ccc;}
 .error-state p{font-size:.84rem;}
 .retry-btn{margin-top:12px;background:var(--gd);color:#fff;border:none;padding:9px 20px;border-radius:6px;font-family:inherit;font-size:.84rem;cursor:pointer;}
@@ -1580,11 +1586,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 function getBasePrice(p) { return p.variants?.[0]?.p || 0; }
 function getBaseOld(p) { return p.variants?.[0]?.op || null; }
+function isStockOut(p) { return p.stockOut === true; }
 function acts(id) {
+  const p = prods.find(x => (x._id||x.id) === id);
+  const so = p && isStockOut(p);
   return `<div class="c-acts">
     <button class="c-act" onclick="goProduct('${id}');event.stopPropagation()" title="বিস্তারিত"><i class="fa-regular fa-eye"></i></button>
     <span class="c-div"></span>
-    <button class="c-act ca" onclick="addToCartBase('${id}');event.stopPropagation()" title="কার্টে যোগ"><i class="fa-solid fa-cart-shopping"></i></button>
+    <button class="c-act ca${so?' disabled-act':''}" onclick="${so?'':'addToCartBase(\''+id+'\');'}event.stopPropagation()" title="${so?'স্টক নেই':'কার্টে যোগ'}"><i class="fa-solid fa-cart-shopping"></i></button>
   </div>`;
 }
 function cardBody(p) {
@@ -1597,34 +1606,40 @@ function cardBody(p) {
   </div>`;
 }
 function bestCard(p) {
+  const so = isStockOut(p);
   return `<div class="bcard">
     <div class="bcard-inner">
       ${p.best ? '<div class="b-badge">Best Seller</div>' : ''}
       <div class="c-img" style="background:${p.bg||'#c8a55a'}22;position:relative;" onclick="goProduct('${p._id}')">
         ${p.img ? imgTag(p.img, p.nm) : `<span style="font-size:3rem">${p.em}</span>`}
         <span style="position:absolute;bottom:8px;right:10px;font-size:1.4rem;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));pointer-events:none;">${p.em}</span>
+        ${so ? '<div class="stock-out-badge">স্টক আউট</div><div class="stock-out-overlay"><span>স্টক নেই</span></div>' : ''}
       </div>
       ${acts(p._id)}${cardBody(p)}
-      <button class="bcard-quick-add" onclick="addToCartBase('${p._id}');event.stopPropagation()">
-        <i class="fa-solid fa-cart-plus"></i> কার্টে যোগ করুন
+      <button class="bcard-quick-add" ${so?'disabled style="background:#aaa;cursor:not-allowed"':''} onclick="${so?'':'addToCartBase(\''+p._id+'\');event.stopPropagation()'}">
+        <i class="fa-solid fa-cart-plus"></i> ${so?'স্টক নেই':'কার্টে যোগ করুন'}
       </button>
     </div>
   </div>`;
 }
 function regCard(p) {
+  const so = isStockOut(p);
   return `<div class="pcard" onclick="goProduct('${p._id}')">
-    <div class="c-img" style="background:${p.bg||'#c8a55a'}22;">
+    <div class="c-img" style="background:${p.bg||'#c8a55a'}22;position:relative;">
       ${p.img ? imgTag(p.img, p.nm) : `<span style="font-size:2.5rem;position:absolute">${p.em}</span>`}
       <span style="position:absolute;bottom:6px;right:8px;font-size:1.2rem;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));pointer-events:none;">${p.em}</span>
+      ${so ? '<div class="stock-out-badge">স্টক আউট</div><div class="stock-out-overlay"><span>স্টক নেই</span></div>' : ''}
     </div>
     ${acts(p._id)}${cardBody(p)}
   </div>`;
 }
 function allCard(p) {
+  const so = isStockOut(p);
   return `<div class="agcard" onclick="goProduct('${p._id}')">
-    <div class="c-img" style="background:${p.bg||'#c8a55a'}22;">
+    <div class="c-img" style="background:${p.bg||'#c8a55a'}22;position:relative;">
       ${p.img ? imgTag(p.img, p.nm) : `<span style="font-size:2.5rem;position:absolute">${p.em}</span>`}
       <span style="position:absolute;bottom:6px;right:8px;font-size:1.2rem;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));pointer-events:none;">${p.em}</span>
+      ${so ? '<div class="stock-out-badge">স্টক আউট</div><div class="stock-out-overlay"><span>স্টক নেই</span></div>' : ''}
     </div>
     ${acts(p._id)}${cardBody(p)}
   </div>`;
@@ -1789,11 +1804,12 @@ function renderPdp(p) {
           </div>
         </div>
         <div class="pdp-btns">
-          <button class="pdp-btn-cart" id="pdpCartBtn" onclick="pdpAddCart('${p._id||p.id}')">
-            <i class="fa-solid fa-cart-plus"></i> কার্টে যোগ করুন
+          ${isStockOut(p) ? `<div class="pdp-stock-out-bar"><i class="fa-solid fa-ban"></i> এই পণ্যটি বর্তমানে স্টক আউট</div>` : ''}
+          <button class="pdp-btn-cart" id="pdpCartBtn" onclick="pdpAddCart('${p._id||p.id}')" ${isStockOut(p)?'disabled':''}>
+            <i class="fa-solid fa-cart-plus"></i> ${isStockOut(p)?'স্টক নেই':'কার্টে যোগ করুন'}
           </button>
-          <button class="pdp-btn-order" onclick="pdpAddCart('${p._id||p.id}');toggleCart()">
-            <i class="fa-solid fa-bag-shopping"></i> এখনই অর্ডার করুন
+          <button class="pdp-btn-order" onclick="pdpAddCart('${p._id||p.id}');toggleCart()" ${isStockOut(p)?'disabled':''}>
+            <i class="fa-solid fa-bag-shopping"></i> ${isStockOut(p)?'স্টক নেই':'এখনই অর্ডার করুন'}
           </button>
           <button class="pdp-btn-phone">
             <i class="fa-solid fa-phone"></i> কল করুন: ${p.phone || storePhone}
@@ -1835,6 +1851,7 @@ function pdpSetThumb(el, imgUrl) {
 }
 function pdpAddCart(id) {
   const p = prods.find(x => (x._id || x.id) === id); if (!p) return;
+  if (isStockOut(p)) { showToast('❌ এই পণ্যটি স্টক আউট, কার্টে যোগ করা যাবে না'); return; }
   const v = p.variants?.[pdpState.varIdx] || { p: getBasePrice(p), lbl: 'Default' };
   const cartKey = `${id}_${pdpState.varIdx}`;
   if (!cart[cartKey]) cart[cartKey] = { ...p, qty: 0, cartPrice: v.p, varLabel: v.lbl || '', cartKey };
@@ -1848,6 +1865,7 @@ let cart = {};
 let relIdx = 0, relItems = [], relTimer = null;
 function addToCartBase(id) {
   const p = prods.find(x => (x._id || x.id) === id); if (!p) return;
+  if (isStockOut(p)) { showToast('❌ এই পণ্যটি স্টক আউট, কার্টে যোগ করা যাবে না'); return; }
   const v = p.variants?.[0] || { p: getBasePrice(p), lbl: '' };
   const cartKey = `${id}_0`;
   if (!cart[cartKey]) cart[cartKey] = { ...p, qty: 0, cartPrice: v.p, varLabel: v.lbl || '', cartKey };
@@ -2124,11 +2142,14 @@ async function loadProductsPage(page) {
     if (!prodsPage.length) {
       grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa"><i class="fa-solid fa-box-open" style="font-size:2rem;display:block;margin-bottom:8px"></i>কোনো পণ্য পাওয়া যায়নি</div>';
     } else {
-      grid.innerHTML = prodsPage.map(p => `
+      grid.innerHTML = prodsPage.map(p => {
+        const so = p.stockOut === true;
+        return `
         <div class="prod-card" onclick="goProduct('${p._id}')">
-          <div class="c-img" style="background:${p.bg||'#c8a55a'}22;">
+          <div class="c-img" style="background:${p.bg||'#c8a55a'}22;position:relative;">
             ${p.img ? imgTag(p.img, p.nm) : `<span style="font-size:2.5rem;position:absolute">${p.em}</span>`}
             <span style="position:absolute;bottom:6px;right:8px;font-size:1.2rem;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));pointer-events:none;">${p.em}</span>
+            ${so ? '<div class="stock-out-badge">স্টক আউট</div><div class="stock-out-overlay"><span>স্টক নেই</span></div>' : ''}
           </div>
           <div class="c-body">
             <div class="c-name">${p.nm}</div>
@@ -2140,9 +2161,10 @@ async function loadProductsPage(page) {
           <div class="c-acts">
             <button class="c-act" onclick="goProduct('${p._id}');event.stopPropagation()"><i class="fa-regular fa-eye"></i></button>
             <span class="c-div"></span>
-            <button class="c-act ca" onclick="addToCartBase('${p._id}');event.stopPropagation()"><i class="fa-solid fa-cart-shopping"></i></button>
+            <button class="c-act ca${so?' disabled-act':''}" onclick="${so?'':'addToCartBase(\''+p._id+'\');'}event.stopPropagation()" title="${so?'স্টক নেই':'কার্টে যোগ'}"><i class="fa-solid fa-cart-shopping"></i></button>
           </div>
-        </div>`).join('');
+        </div>`;
+      }).join('');
     }
     renderProdPagination();
   } catch (err) {
