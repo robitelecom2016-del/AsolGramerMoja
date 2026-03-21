@@ -926,8 +926,8 @@ textarea.form-control { resize:vertical; min-height:80px; }
         <div class="settings-section-hd"><i class="fa-solid fa-truck" style="color:var(--orange)"></i><h3>ডেলিভারি সেটিংস</h3></div>
         <div class="settings-body">
           <div class="form-row">
-            <div class="form-group2"><label>ঢাকার ভিতরে চার্জ (৳)</label><input type="number" class="form-control" id="dlivInside" placeholder="80"></div>
-            <div class="form-group2"><label>ঢাকার বাহিরে চার্জ (৳)</label><input type="number" class="form-control" id="dlivOutside" placeholder="130"></div>
+            <div class="form-group2"><label>চট্টগ্রামের ভিতরে চার্জ (৳)</label><input type="number" class="form-control" id="dlivInside" placeholder="80"></div>
+            <div class="form-group2"><label>চট্টগ্রামের বাহিরে চার্জ (৳)</label><input type="number" class="form-control" id="dlivOutside" placeholder="130"></div>
           </div>
           <div class="form-group2"><label>ফ্রি ডেলিভারির ন্যূনতম পরিমাণ (৳)</label><input type="number" class="form-control" id="freeDlivMin" placeholder="0 = বন্ধ"></div>
           <button class="btn-primary" onclick="saveDeliverySettings()"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ করুন</button>
@@ -2849,7 +2849,7 @@ async function autoSeedContactPage() {
       active: true,
       faqs: [
         { q: 'আপনাদের পণ্য কি খাঁটি?', a: 'হ্যাঁ, আমাদের সকল পণ্য সরাসরি গ্রামীণ উৎস থেকে সংগ্রহ করা হয়। আমরা কোনো মিশ্রন বা কৃত্রিম উপাদান ব্যবহার করি না।' },
-        { q: 'ডেলিভারি কত সময় লাগে?', a: 'ঢাকার মধ্যে ২৪ ঘন্টায় এবং বাইরে ৪৮-৭২ ঘন্টায় ডেলিভারি দেওয়া হয়।' },
+        { q: 'ডেলিভারি কত সময় লাগে?', a: 'চট্টগ্রামের মধ্যে ২৪ ঘন্টায় এবং বাইরে ৪৮-৭২ ঘন্টায় ডেলিভারি দেওয়া হয়।' },
         { q: 'পণ্য ফেরত দিতে পারব?', a: 'পণ্য গ্রহণের ৭ দিনের মধ্যে কোনো প্রশ্ন ছাড়াই ফেরত দিতে পারবেন।' },
         { q: 'কোনো ছাড় বা অফার আছে?', a: 'নিয়মিত গ্রাহকদের জন্য বিশেষ ছাড় এবং সিজনাল অফার থাকে। আমাদের WhatsApp চ্যানেল ফলো করুন সর্বশেষ খবরের জন্য।' }
       ]
