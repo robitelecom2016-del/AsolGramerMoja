@@ -1378,8 +1378,17 @@ async function loadDashboard() {
   try {
     const data = await api('GET', '/api/dashboard/stats');
     const totalProfit = data.totalProfit ?? null;
+    const hasCostData = data.totalBuyCost > 0 || data.totalProfit !== undefined;
+    const buyCostCard = hasCostData ? `
+      <div class="stat-card" style="border-color:rgba(232,102,10,.3)">
+        <div class="stat-top">
+          <div><div class="stat-val" style="color:var(--orange2)">৳${(data.totalBuyCost||0).toLocaleString('en')}</div><div class="stat-lbl">মোট কেনা খরচ</div></div>
+          <div class="stat-icon" style="background:rgba(232,102,10,.12);color:var(--orange2)"><i class="fa-solid fa-cart-flatbed"></i></div>
+        </div>
+        <div class="stat-change neutral"><i class="fa-solid fa-box-open"></i> Delivered অর্ডারের কেনা মূল্য</div>
+      </div>` : '';
     const profitCard = totalProfit !== null ? `
-      <div class="stat-card" style="border-color:var(--border)">
+      <div class="stat-card" style="border-color:${totalProfit>=0?'rgba(46,160,67,.3)':'rgba(218,54,51,.3)'}">
         <div class="stat-top">
           <div><div class="stat-val" style="color:${totalProfit>=0?'var(--green3)':'var(--red2)'}">${totalProfit>=0?'+':''}৳${totalProfit.toLocaleString('en')}</div><div class="stat-lbl">মোট লাভ</div></div>
           <div class="stat-icon" style="background:rgba(86,211,100,.12);color:var(--green3)"><i class="fa-solid fa-sack-dollar"></i></div>
@@ -1415,6 +1424,7 @@ async function loadDashboard() {
         </div>
         <div class="stat-change up"><i class="fa-solid fa-arrow-trend-up"></i> সংগৃহীত রাজস্ব</div>
       </div>
+      ${buyCostCard}
       ${profitCard}`;
     pendingOrderCount = data.pendingOrders;
     document.getElementById('pendingBadge').textContent = pendingOrderCount;

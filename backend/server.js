@@ -117,6 +117,7 @@ const productSchema = new mongoose.Schema({
   variants: [{
     lbl: String,
     p: Number,
+    bp: Number,
     op: Number,
     disc: String,
   }],
@@ -138,6 +139,7 @@ const orderSchema = new mongoose.Schema({
     varLabel: String,
     qty: Number,
     cartPrice: Number,
+    buyPrice: Number,
     em: String,
     img: String,
   }],
@@ -158,6 +160,8 @@ const orderSchema = new mongoose.Schema({
   },
   subtotal: Number,
   total: Number,
+  totalBuyCost: { type: Number, default: 0 },
+  totalProfit: { type: Number, default: 0 },
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
@@ -522,14 +526,37 @@ app.post('/api/orders', async (req, res) => {
     if (!items?.length || !customer?.name || !customer?.phone || !customer?.address) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
+
+    // প্রতিটি item-এর জন্য buyPrice product থেকে নিয়ে আসি
+    const enrichedItems = await Promise.all(items.map(async (item) => {
+      try {
+        if (item.productId) {
+          const product = await Product.findById(item.productId).select('variants');
+          if (product) {
+            const variant = product.variants?.find(v => v.lbl === item.varLabel) || product.variants?.[0];
+            if (variant?.bp) {
+              return { ...item, buyPrice: variant.bp };
+            }
+          }
+        }
+      } catch {}
+      return { ...item, buyPrice: item.buyPrice || 0 };
+    }));
+
+    // মোট কেনা খরচ ও লাভ গণনা
+    const totalBuyCost = enrichedItems.reduce((sum, item) => sum + ((item.buyPrice || 0) * (item.qty || 1)), 0);
+    const totalProfit = (subtotal || 0) - totalBuyCost;
+
     const orderNum = 'ORD-' + Date.now();
     const order = await Order.create({
       orderNum,
-      items,
+      items: enrichedItems,
       customer,
       delivery,
       subtotal,
       total,
+      totalBuyCost,
+      totalProfit,
       advanceDelivery: advanceDelivery || { paid: false, trxId: '', amount: 0 },
       statusHistory: [{ status: 'pending', note: 'Order placed', time: new Date() }],
     });
@@ -752,6 +779,23 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
       { $match: { status: 'delivered' } },
       { $group: { _id: null, total: { $sum: '$total' } } },
     ]);
+
+    // মোট কেনা খরচ — delivered অর্ডার থেকে
+    const buyCostAgg = await Order.aggregate([
+      { $match: { status: 'delivered' } },
+      { $group: { _id: null, totalBuyCost: { $sum: '$totalBuyCost' } } },
+    ]);
+    // লাভ — delivered অর্ডারের totalProfit যোগ
+    const profitAgg = await Order.aggregate([
+      { $match: { status: 'delivered' } },
+      { $group: { _id: null, totalProfit: { $sum: '$totalProfit' } } },
+    ]);
+    // সব অর্ডারের মোট কেনা খরচ (delivered ছাড়াও)
+    const allBuyCostAgg = await Order.aggregate([
+      { $match: { status: { $nin: ['cancelled'] } } },
+      { $group: { _id: null, totalBuyCost: { $sum: '$totalBuyCost' } } },
+    ]);
+
     const recentOrders = await Order.find().sort({ createdAt: -1 }).limit(5);
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
@@ -760,6 +804,8 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
       { $group: {
         _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
         revenue: { $sum: '$total' },
+        buyCost: { $sum: '$totalBuyCost' },
+        profit: { $sum: '$totalProfit' },
         count: { $sum: 1 },
       }},
       { $sort: { '_id.year': 1, '_id.month': 1 } },
@@ -774,6 +820,9 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
       pendingOrders,
       deliveredOrders,
       totalRevenue: revenue[0]?.total || 0,
+      totalBuyCost: buyCostAgg[0]?.totalBuyCost || 0,
+      totalProfit: profitAgg[0]?.totalProfit || 0,
+      allOrdersBuyCost: allBuyCostAgg[0]?.totalBuyCost || 0,
       recentOrders,
       monthlyData,
       catDist,
