@@ -298,7 +298,7 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .img-prev-item:hover .img-prev-rm { opacity:1; }
 
 .variants-list { display:flex; flex-direction:column; gap:8px; }
-.variant-item { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:10px 12px; display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr auto; gap:8px; align-items:center; }
+.variant-item { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:10px 12px; display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr 0.8fr auto; gap:8px; align-items:center; }
 .variant-item input { background:var(--bg4); border:1px solid var(--border); border-radius:6px; padding:7px 9px; color:var(--txt); font-family:inherit; font-size:.82rem; outline:none; width:100%; transition:border-color .2s; }
 .variant-item input:focus { border-color:var(--green); }
 .variant-item input::placeholder { color:var(--txt3); }
@@ -426,7 +426,7 @@ textarea.form-control { resize:vertical; min-height:80px; }
   .modal { max-width:100%; max-height:96vh; }
   .modal-body { padding:14px; }
   .variant-item { grid-template-columns:1fr 1fr; }
-  .variant-item input:nth-child(n+3) { display:none; }
+  .variant-item input:nth-child(n+4) { display:none; }
   .chart-grid { grid-template-columns:1fr; }
   .cat-cards { grid-template-columns:repeat(2,1fr); }
   .topbar-right { gap:6px; }
@@ -572,6 +572,10 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="nav-section-label">কনটেন্ট</div>
       <div class="nav-item" onclick="navTo('products')" data-page="products">
         <i class="fa-solid fa-box-open"></i> পণ্য ম্যানেজ
+      </div>
+      <div class="nav-item" onclick="navTo('stock')" data-page="stock">
+        <i class="fa-solid fa-warehouse"></i> স্টক ম্যানেজ
+        <span class="nav-badge" id="lowStockBadge" style="display:none;background:var(--red)">!</span>
       </div>
       <div class="nav-item" onclick="navTo('categories')" data-page="categories">
         <i class="fa-solid fa-tags"></i> ক্যাটাগরি
@@ -777,6 +781,47 @@ textarea.form-control { resize:vertical; min-height:80px; }
         </div>
       </div>
       <div class="pagination" id="orderPagination"></div>
+    </div>
+
+    <div class="page-view" id="page-stock">
+      <div class="stats-grid" id="stockSummaryGrid" style="margin-bottom:16px">
+        <div class="loader"><i class="fa-solid fa-spinner"></i></div>
+      </div>
+      <div class="filters-bar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" id="stockSearch" placeholder="পণ্য খুঁজুন..." oninput="filterStockTable()">
+        </div>
+        <select class="select-filter" id="stockFilter" onchange="filterStockTable()">
+          <option value="all">সব পণ্য</option>
+          <option value="low">কম স্টক (≤১০)</option>
+          <option value="out">স্টক শেষ</option>
+          <option value="in">স্টকে আছে</option>
+        </select>
+        <span class="filter-count" id="stockProdCount">লোড হচ্ছে...</span>
+        <button class="btn-primary ml-auto" onclick="saveBulkStock()">
+          <i class="fa-solid fa-floppy-disk"></i> সব সংরক্ষণ করুন
+        </button>
+        <button class="btn-secondary" onclick="loadStockPage()">
+          <i class="fa-solid fa-rotate"></i> রিফ্রেশ
+        </button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table" id="stockTable">
+            <thead><tr>
+              <th>#</th>
+              <th>পণ্য</th>
+              <th>ক্যাটাগরি</th>
+              <th>ভ্যারিয়েন্ট স্টক</th>
+              <th style="color:var(--blue2)">📦 মোট স্টক</th>
+              <th>অবস্থা</th>
+              <th>আপডেট</th>
+            </tr></thead>
+            <tbody id="stockTableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <div class="page-view" id="page-categories">
@@ -1089,12 +1134,13 @@ textarea.form-control { resize:vertical; min-height:80px; }
       </div>
       <div class="form-group2">
         <label>ভেরিয়েন্ট / মূল্য <span>*</span></label>
-        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:8px;padding:5px 0;margin-bottom:4px">
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 0.8fr auto;gap:8px;padding:5px 0;margin-bottom:4px">
           <span style="font-size:.7rem;color:var(--txt3);padding-left:4px">লেবেল</span>
           <span style="font-size:.7rem;color:var(--txt3)">কেনা মূল্য (৳)</span>
           <span style="font-size:.7rem;color:var(--txt3)">বিক্রি মূল্য (৳)</span>
           <span style="font-size:.7rem;color:var(--txt3)">পুরনো মূল্য</span>
           <span style="font-size:.7rem;color:var(--txt3)">ছাড় টেক্সট</span>
+          <span style="font-size:.7rem;color:var(--blue2)">📦 স্টক</span>
           <span></span>
         </div>
         <div class="variants-list" id="variantsList"></div>
@@ -1117,6 +1163,11 @@ textarea.form-control { resize:vertical; min-height:80px; }
         <div class="form-hint">ফাঁকা রাখলে নাম থেকে অটো জেনারেট হবে।</div>
       </div>
       <div class="form-row" style="margin-top:6px">
+        <div class="form-group2">
+          <label>📦 মোট স্টক পরিমাণ</label>
+          <input type="number" class="form-control" id="pStockQty" placeholder="0" min="0" style="border-color:rgba(59,130,246,.4)">
+          <div class="form-hint" style="color:var(--blue2)">মোট পণ্য সংখ্যা। ভ্যারিয়েন্টে স্টক দিলে স্বয়ংক্রিয় যোগ হবে।</div>
+        </div>
         <div class="form-group2">
           <label>বেস্ট সেলার</label>
           <label class="toggle-switch" onclick="toggleProdField('pBest')">
@@ -1386,6 +1437,7 @@ function navTo(page) {
   const titles = {
     dashboard:['ড্যাশবোর্ড','সামগ্রিক পরিসংখ্যান'],
     products:['পণ্য ম্যানেজ','সকল পণ্য দেখুন ও সম্পাদনা করুন'],
+    stock:['স্টক ম্যানেজমেন্ট','পণ্যের স্টক পরিমাণ পরিচালনা করুন'],
     orders:['অর্ডার','সকল অর্ডার ট্র্যাক করুন'],
     categories:['ক্যাটাগরি','পণ্যের বিভাগ পরিচালনা করুন'],
     hero:['হিরো স্লাইড','হোমপেজের ব্যানার স্লাইডার পরিচালনা করুন'],
@@ -1399,6 +1451,7 @@ function navTo(page) {
   if (window.innerWidth <= 768) closeSidebar();
   if (page === 'dashboard') loadDashboard();
   if (page === 'products') loadProducts();
+  if (page === 'stock') loadStockPage();
   if (page === 'orders') loadOrders();
   if (page === 'categories') loadCategories();
   if (page === 'hero') loadHero();
@@ -1611,7 +1664,14 @@ async function loadProducts() {
           </div>
         </td>
         <td><button class="icon-btn star ${p.best?'star-active':''}" onclick="toggleBest('${p._id}',this)"><i class="fa-solid fa-star"></i></button></td>
-        <td><button class="icon-btn ${p.stockOut?'warn':''}" title="${p.stockOut?'স্টক আউট — ক্লিক করে ফিরিয়ে আনুন':'স্টকে আছে — ক্লিক করে স্টক আউট করুন'}" onclick="toggleStockOut('${p._id}',this)">${p.stockOut?'<i class=\'fa-solid fa-box-open\' style=\'color:var(--orange)\'></i>':'<i class=\'fa-solid fa-cubes\' style=\'color:var(--green2)\'></i>'}</button></td>
+        <td><button class="icon-btn ${p.stockOut?'warn':''}" title="${p.stockOut?'স্টক আউট — ক্লিক করে ফিরিয়ে আনুন':'স্টকে আছে — ক্লিক করে স্টক আউট করুন'}" onclick="toggleStockOut('${p._id}',this)">
+          ${p.stockOut
+            ? `<i class='fa-solid fa-box-open' style='color:var(--orange)'></i>`
+            : `<i class='fa-solid fa-cubes' style='color:var(--green2)'></i>`}
+        </button>
+        <span style="font-size:.72rem;font-weight:700;margin-left:4px;color:${
+          p.stockQuantity<=0?'var(--red2)':p.stockQuantity<=10?'var(--yellow2)':'var(--green3)'
+        }">${p.stockQuantity||0}</span></td>
         <td><button class="icon-btn toggle ${p.active?'active-icon':''}" onclick="toggleProd('${p._id}',this)"><i class="fa-solid fa-${p.active?'eye':'eye-slash'}"></i></button></td>
         <td><div class="td-actions">
           <button class="icon-btn edit" onclick="editProd('${p._id}')"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -1660,6 +1720,7 @@ function openProdModal(prod=null) {
   document.getElementById('pBestTrack').className='toggle-track'; document.getElementById('pActiveTrack').className='toggle-track on';
   document.getElementById('pBestLbl').textContent='না'; document.getElementById('pActiveLbl').textContent='হ্যাঁ';
   document.getElementById('pStockOut').value='false'; document.getElementById('pStockOutTrack').className='toggle-track'; document.getElementById('pStockOutLbl').textContent='না';
+  document.getElementById('pStockQty').value='0';
   document.getElementById('mainImgPreview').innerHTML=''; document.getElementById('thumbImgPreview').innerHTML='';
   document.getElementById('prodModalTitle').innerHTML='<i class="fa-solid fa-plus" style="color:var(--green)"></i> নতুন পণ্য যোগ করুন';
   document.getElementById('pMetaTitle').value = prod?.metaTitle || '';
@@ -1688,6 +1749,7 @@ function openProdModal(prod=null) {
     document.getElementById('pStockOut').value=String(isStockOut);
     document.getElementById('pStockOutTrack').className='toggle-track '+(isStockOut?'on':'');
     document.getElementById('pStockOutLbl').textContent=isStockOut?'হ্যাঁ':'না';
+    document.getElementById('pStockQty').value=prod.stockQuantity||0;
     renderVariants(prod.variants||[]); renderHighlights(prod.highlights||[]);
   } else { renderVariants([{lbl:'',p:'',op:'',disc:''}]); renderHighlights(['']); }
   openModal('prodModal');
@@ -1701,6 +1763,7 @@ function renderVariants(variants) {
       <input type="number" placeholder="বিক্রি মূল্য" value="${v.p||''}" data-field="p" data-idx="${i}" style="border-color:rgba(46,160,67,.4)" title="বিক্রি মূল্য (Sell Price)">
       <input type="number" placeholder="পুরনো" value="${v.op||''}" data-field="op" data-idx="${i}">
       <input type="text" placeholder="যেমন: 5% ছাড়" value="${v.disc||''}" data-field="disc" data-idx="${i}">
+      <input type="number" placeholder="স্টক" value="${v.stock||0}" data-field="stock" data-idx="${i}" style="border-color:rgba(59,130,246,.4)" title="এই ভ্যারিয়েন্টের স্টক সংখ্যা" min="0">
       <button class="icon-btn del" onclick="removeVariant(${i})"><i class="fa-solid fa-trash"></i></button>
     </div>`).join('');
 }
@@ -1710,7 +1773,7 @@ function addVariant() {
   const count = list.querySelectorAll('.variant-item').length;
   const div = document.createElement('div');
   div.className='variant-item'; div.id='var-'+count;
-  div.innerHTML=`<input type="text" placeholder="লেবেল" data-field="lbl" data-idx="${count}"><input type="number" placeholder="কেনা মূল্য" data-field="bp" data-idx="${count}" style="border-color:rgba(232,102,10,.4)" title="কেনা মূল্য"><input type="number" placeholder="বিক্রি মূল্য" data-field="p" data-idx="${count}" style="border-color:rgba(46,160,67,.4)" title="বিক্রি মূল্য"><input type="number" placeholder="পুরনো" data-field="op" data-idx="${count}"><input type="text" placeholder="ছাড় টেক্সট" data-field="disc" data-idx="${count}"><button class="icon-btn del" onclick="removeVariant(${count})"><i class="fa-solid fa-trash"></i></button>`;
+  div.innerHTML=`<input type="text" placeholder="লেবেল" data-field="lbl" data-idx="${count}"><input type="number" placeholder="কেনা মূল্য" data-field="bp" data-idx="${count}" style="border-color:rgba(232,102,10,.4)" title="কেনা মূল্য"><input type="number" placeholder="বিক্রি মূল্য" data-field="p" data-idx="${count}" style="border-color:rgba(46,160,67,.4)" title="বিক্রি মূল্য"><input type="number" placeholder="পুরনো" data-field="op" data-idx="${count}"><input type="text" placeholder="ছাড় টেক্সট" data-field="disc" data-idx="${count}"><input type="number" placeholder="স্টক" data-field="stock" data-idx="${count}" style="border-color:rgba(59,130,246,.4)" title="স্টক সংখ্যা" min="0" value="0"><button class="icon-btn del" onclick="removeVariant(${count})"><i class="fa-solid fa-trash"></i></button>`;
   list.appendChild(div);
 }
 
@@ -1741,7 +1804,8 @@ function getVariants() {
     const bp=parseFloat(item.querySelector('[data-field="bp"]')?.value)||null;
     const op=parseFloat(item.querySelector('[data-field="op"]')?.value)||null;
     const disc=item.querySelector('[data-field="disc"]')?.value?.trim();
-    if(lbl&&p) result.push({lbl,p,bp:bp||undefined,op:op||undefined,disc:disc||undefined});
+    const stock=parseInt(item.querySelector('[data-field="stock"]')?.value)||0;
+    if(lbl&&p) result.push({lbl,p,bp:bp||undefined,op:op||undefined,disc:disc||undefined,stock});
   });
   return result;
 }
@@ -1831,6 +1895,7 @@ async function saveProd() {
     best:document.getElementById('pBest').value==='true', 
     active:document.getElementById('pActive').value==='true', 
     stockOut:document.getElementById('pStockOut').value==='true',
+    stockQuantity: parseInt(document.getElementById('pStockQty').value)||0,
     variants, 
     highlights:getHighlights(),
     metaTitle: document.getElementById('pMetaTitle').value.trim(),
@@ -1887,6 +1952,213 @@ async function toggleStockOut(id, btn) {
     }
     toast(`পণ্য ${prod.stockOut ? '⚠️ স্টক আউট' : '✅ স্টকে আছে'} করা হয়েছে`, prod.stockOut ? 'info' : 'success');
   } catch { toast('আপডেট ব্যর্থ', 'error'); }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// স্টক ম্যানেজমেন্ট
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+let allStockData = [];
+
+async function loadStockPage() {
+  const tbody = document.getElementById('stockTableBody');
+  const summaryGrid = document.getElementById('stockSummaryGrid');
+  tbody.innerHTML = '<tr><td colspan="7"><div class="loader"><i class="fa-solid fa-spinner"></i></div></td></tr>';
+  summaryGrid.innerHTML = '<div class="loader"><i class="fa-solid fa-spinner"></i></div>';
+
+  try {
+    const data = await api('GET', '/api/stock/summary?threshold=10');
+    allStockData = data.products || [];
+
+    // Summary cards
+    const lowBadge = document.getElementById('lowStockBadge');
+    if (data.lowStock > 0) {
+      lowBadge.textContent = data.lowStock;
+      lowBadge.style.display = 'inline-flex';
+    } else {
+      lowBadge.style.display = 'none';
+    }
+
+    summaryGrid.innerHTML = `
+      <div class="stat-card blue">
+        <div class="stat-top">
+          <div><div class="stat-val">${data.total}</div><div class="stat-lbl">মোট পণ্য</div></div>
+          <div class="stat-icon blue"><i class="fa-solid fa-box-open"></i></div>
+        </div>
+        <div class="stat-change neutral"><i class="fa-solid fa-layer-group"></i> সক্রিয় পণ্য</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-top">
+          <div><div class="stat-val" style="color:var(--green3)">${data.inStock}</div><div class="stat-lbl">স্টকে আছে</div></div>
+          <div class="stat-icon green"><i class="fa-solid fa-cubes"></i></div>
+        </div>
+        <div class="stat-change up"><i class="fa-solid fa-check"></i> মোট ${data.totalUnits} ইউনিট</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(210,153,34,.3)">
+        <div class="stat-top">
+          <div><div class="stat-val" style="color:var(--yellow2)">${data.lowStock}</div><div class="stat-lbl">কম স্টক (≤১০)</div></div>
+          <div class="stat-icon" style="background:rgba(210,153,34,.12);color:var(--yellow2)"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        </div>
+        <div class="stat-change neutral"><i class="fa-solid fa-arrow-down"></i> দ্রুত রিস্টক করুন</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(218,54,51,.3)">
+        <div class="stat-top">
+          <div><div class="stat-val" style="color:var(--red2)">${data.outOfStock}</div><div class="stat-lbl">স্টক শেষ</div></div>
+          <div class="stat-icon" style="background:rgba(218,54,51,.12);color:var(--red2)"><i class="fa-solid fa-ban"></i></div>
+        </div>
+        <div class="stat-change neutral"><i class="fa-solid fa-xmark"></i> অর্ডার নেওয়া বন্ধ</div>
+      </div>`;
+
+    renderStockTable(allStockData);
+  } catch(err) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>লোড ব্যর্থ: ${err.message}</h3></div></td></tr>`;
+    toast('স্টক লোড ব্যর্থ: ' + err.message, 'error');
+  }
+}
+
+function renderStockTable(products) {
+  const tbody = document.getElementById('stockTableBody');
+  document.getElementById('stockProdCount').textContent = `${products.length} পণ্য`;
+  if (!products.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>কোনো পণ্য নেই</h3></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = products.map((p, i) => {
+    const stockColor = p.stockQuantity <= 0 ? 'var(--red2)' : p.isLow ? 'var(--yellow2)' : 'var(--green3)';
+    const statusBadgeHtml = p.stockOut
+      ? `<span class="badge red">❌ স্টক আউট</span>`
+      : p.stockQuantity <= 0
+        ? `<span class="badge red">⚠️ খালি</span>`
+        : p.isLow
+          ? `<span class="badge yellow">⚠️ কম</span>`
+          : `<span class="badge green">✅ আছে</span>`;
+
+    const variantInputs = p.variants.length > 0
+      ? p.variants.map(v => `
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+            <span style="font-size:.72rem;color:var(--txt2);min-width:90px;flex-shrink:0">${v.lbl||'ডিফল্ট'}</span>
+            <input type="number" min="0" value="${v.stock||0}"
+              data-pid="${p._id}" data-vlbl="${v.lbl}"
+              class="form-control stock-var-inp"
+              style="width:80px;padding:5px 8px;font-size:.8rem;border-color:rgba(59,130,246,.4)"
+              oninput="syncTotalStock('${p._id}')">
+          </div>`).join('')
+      : '<span style="font-size:.74rem;color:var(--txt3)">ভ্যারিয়েন্ট নেই</span>';
+
+    return `<tr id="stock-row-${p._id}">
+      <td style="color:var(--txt3);font-size:.74rem">${i+1}</td>
+      <td><div class="td-img">
+        ${p.img ? `<img src="${p.img}" alt="${p.nm}" onerror="this.style.display='none'">` : `<div class="td-img-em">${p.em}</div>`}
+        <div><div class="td-name">${p.nm}</div><div class="td-sub">${p.cat}</div></div>
+      </div></td>
+      <td><span class="badge orange">${p.em} ${p.cat}</span></td>
+      <td style="min-width:180px">${variantInputs}</td>
+      <td>
+        <input type="number" min="0" value="${p.stockQuantity||0}"
+          id="total-stock-${p._id}" data-pid="${p._id}"
+          class="form-control stock-total-inp"
+          style="width:90px;padding:6px 10px;font-size:.9rem;font-weight:700;border-color:rgba(59,130,246,.5);color:${stockColor}"
+          oninput="onTotalStockChange('${p._id}')">
+      </td>
+      <td>${statusBadgeHtml}</td>
+      <td>
+        <button class="btn-primary btn-sm" onclick="saveOneStock('${p._id}')">
+          <i class="fa-solid fa-floppy-disk"></i> সেভ
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterStockTable() {
+  const search = document.getElementById('stockSearch').value.toLowerCase();
+  const filter = document.getElementById('stockFilter').value;
+  let filtered = allStockData.filter(p => {
+    const matchSearch = !search || p.nm.toLowerCase().includes(search) || p.cat.toLowerCase().includes(search);
+    const matchFilter =
+      filter === 'all' ? true :
+      filter === 'low' ? (p.stockQuantity > 0 && p.isLow) :
+      filter === 'out' ? (p.stockOut || p.stockQuantity <= 0) :
+      filter === 'in'  ? (!p.stockOut && p.stockQuantity > 0) : true;
+    return matchSearch && matchFilter;
+  });
+  renderStockTable(filtered);
+}
+
+// ভ্যারিয়েন্ট স্টক পরিবর্তন হলে মোট হিসাব করো
+function syncTotalStock(pid) {
+  const varInputs = document.querySelectorAll(`.stock-var-inp[data-pid="${pid}"]`);
+  let total = 0;
+  varInputs.forEach(inp => total += parseInt(inp.value) || 0);
+  const totalInp = document.getElementById(`total-stock-${pid}`);
+  if (totalInp) {
+    totalInp.value = total;
+    totalInp.style.color = total <= 0 ? 'var(--red2)' : total <= 10 ? 'var(--yellow2)' : 'var(--green3)';
+  }
+}
+
+// মোট স্টক ম্যানুয়ালি পরিবর্তন হলে রঙ আপডেট
+function onTotalStockChange(pid) {
+  const inp = document.getElementById(`total-stock-${pid}`);
+  if (!inp) return;
+  const val = parseInt(inp.value) || 0;
+  inp.style.color = val <= 0 ? 'var(--red2)' : val <= 10 ? 'var(--yellow2)' : 'var(--green3)';
+}
+
+// একটি পণ্যের স্টক সেভ করো
+async function saveOneStock(pid) {
+  const totalInp = document.getElementById(`total-stock-${pid}`);
+  const stockQuantity = parseInt(totalInp?.value) || 0;
+
+  const varInputs = document.querySelectorAll(`.stock-var-inp[data-pid="${pid}"]`);
+  const variants = [];
+  varInputs.forEach(inp => {
+    variants.push({ lbl: inp.dataset.vlbl, stock: parseInt(inp.value) || 0 });
+  });
+
+  try {
+    await api('PATCH', `/api/products/${pid}/stock`, { stockQuantity, variants });
+    // allStockData আপডেট করো
+    const idx = allStockData.findIndex(p => p._id === pid);
+    if (idx !== -1) {
+      allStockData[idx].stockQuantity = stockQuantity;
+      allStockData[idx].stockOut = stockQuantity <= 0;
+      allStockData[idx].isLow = stockQuantity > 0 && stockQuantity <= 10;
+    }
+    toast('স্টক আপডেট সফল ✅', 'success');
+  } catch(err) {
+    toast('স্টক সেভ ব্যর্থ: ' + err.message, 'error');
+  }
+}
+
+// সব পণ্যের স্টক একসাথে সেভ করো
+async function saveBulkStock() {
+  const allRows = document.querySelectorAll('#stockTableBody tr[id^="stock-row-"]');
+  if (!allRows.length) { toast('সেভ করার কিছু নেই', 'info'); return; }
+
+  const updates = [];
+  allRows.forEach(row => {
+    const pid = row.id.replace('stock-row-', '');
+    const totalInp = document.getElementById(`total-stock-${pid}`);
+    const stockQuantity = parseInt(totalInp?.value) || 0;
+    const varInputs = row.querySelectorAll(`.stock-var-inp`);
+    const variants = [];
+    varInputs.forEach(inp => variants.push({ lbl: inp.dataset.vlbl, stock: parseInt(inp.value) || 0 }));
+    updates.push({ productId: pid, stockQuantity, variants });
+  });
+
+  const btn = document.querySelector('#page-stock .btn-primary');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> সেভ হচ্ছে...'; }
+
+  try {
+    const res = await api('PATCH', '/api/stock/bulk', { updates });
+    toast(`✅ ${res.updated}টি পণ্যের স্টক আপডেট হয়েছে`, 'success');
+    loadStockPage();
+  } catch(err) {
+    toast('Bulk সেভ ব্যর্থ: ' + err.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> সব সংরক্ষণ করুন'; }
+  }
 }
 
 async function loadOrders() {
