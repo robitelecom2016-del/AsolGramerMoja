@@ -656,6 +656,53 @@ textarea.form-control { resize:vertical; min-height:80px; }
           </div>
         </div>
       </div>
+      <!-- ━━━ Analytics Section ━━━ -->
+      <div class="chart-grid" style="margin-top:0">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-users" style="color:#3b82f6"></i> ভিজিটর পরিসংখ্যান</h3>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span id="analyticsDaysLabel" style="font-size:.75rem;color:var(--txt2)">শেষ ৭ দিন</span>
+              <select class="select-filter" style="font-size:.75rem;padding:3px 8px;height:28px" onchange="changeAnalyticsDays(this.value)">
+                <option value="7">৭ দিন</option>
+                <option value="14">১৪ দিন</option>
+                <option value="30">৩০ দিন</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:110px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:12px 14px">
+                <div id="totalVisitorsVal" style="font-size:1.5rem;font-weight:700;color:#3b82f6">—</div>
+                <div style="font-size:.73rem;color:var(--txt2);margin-top:2px">মোট ভিজিটর</div>
+              </div>
+              <div style="flex:1;min-width:110px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:12px 14px">
+                <div id="todayVisitorsVal" style="font-size:1.5rem;font-weight:700;color:#10b981">—</div>
+                <div style="font-size:.73rem;color:var(--txt2);margin-top:2px">আজকের ভিজিটর</div>
+              </div>
+              <div style="flex:1;min-width:110px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:12px 14px">
+                <div id="recentVisitorsVal" style="font-size:1.5rem;font-weight:700;color:#f59e0b">—</div>
+                <div style="font-size:.73rem;color:var(--txt2);margin-top:2px" id="recentVisitorsLbl">শেষ ৭ দিন</div>
+              </div>
+            </div>
+            <div class="chart-bar-wrap" id="visitorChart" style="max-height:200px">
+              <div class="loader"><i class="fa-solid fa-spinner"></i></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-computer-mouse" style="color:#8b5cf6"></i> পণ্য ক্লিক র‍্যাংকিং</h3>
+            <span id="totalClicksLabel" style="font-size:.75rem;color:var(--txt2);background:rgba(139,92,246,.1);padding:3px 8px;border-radius:20px">মোট: —</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-bar-wrap" id="productClickChart" style="max-height:260px">
+              <div class="loader"><i class="fa-solid fa-spinner"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header">
           <h3><i class="fa-solid fa-clock-rotate-left" style="color:var(--yellow)"></i> সাম্প্রতিক অর্ডার</h3>
@@ -1455,7 +1502,68 @@ async function loadDashboard() {
           <td style="font-size:.74rem;color:var(--txt2)">${timeAgo(o.createdAt)}</td>
         </tr>`).join('')
       : '<tr><td colspan="5" class="empty-state"><i class="fa-solid fa-inbox"></i><p>কোনো অর্ডার নেই</p></td></tr>';
+
+    // ━━━ Analytics ━━━
+    if (data.totalVisitors !== undefined) {
+      document.getElementById('totalVisitorsVal').textContent = (data.totalVisitors||0).toLocaleString('en');
+      document.getElementById('todayVisitorsVal').textContent = (data.todayVisitors||0).toLocaleString('en');
+      document.getElementById('recentVisitorsVal').textContent = (data.recentDailyViews||[]).reduce((s,d)=>s+d.count,0).toLocaleString('en');
+      renderVisitorChart(data.recentDailyViews||[]);
+      renderProductClickChart(data.topProductClicks||[], data.totalProductClicks||0);
+    }
   } catch(err) { toast('ড্যাশবোর্ড লোড ব্যর্থ: '+err.message,'error'); }
+}
+
+let _analyticsDays = 7;
+async function changeAnalyticsDays(days) {
+  _analyticsDays = parseInt(days);
+  document.getElementById('analyticsDaysLabel').textContent = `শেষ ${days} দিন`;
+  document.getElementById('recentVisitorsLbl').textContent = `শেষ ${days} দিন`;
+  document.getElementById('visitorChart').innerHTML = '<div class="loader"><i class="fa-solid fa-spinner"></i></div>';
+  document.getElementById('productClickChart').innerHTML = '<div class="loader"><i class="fa-solid fa-spinner"></i></div>';
+  try {
+    const data = await api('GET', `/api/analytics/summary?days=${days}`);
+    document.getElementById('recentVisitorsVal').textContent = (data.recentViewsTotal||0).toLocaleString('en');
+    renderVisitorChart(data.dailyViews||[]);
+    renderProductClickChart(data.topProducts||[], data.totalClicks||0);
+  } catch(err) { toast('Analytics লোড ব্যর্থ: '+err.message,'error'); }
+}
+
+function renderVisitorChart(dailyViews) {
+  if (!dailyViews.length) {
+    document.getElementById('visitorChart').innerHTML = '<div style="color:var(--txt2);font-size:.82rem;text-align:center;padding:20px">কোনো ডেটা নেই</div>';
+    return;
+  }
+  const maxV = Math.max(...dailyViews.map(d=>d.count), 1);
+  document.getElementById('visitorChart').innerHTML = dailyViews.map(d => {
+    const dt = new Date(d.date);
+    const lbl = `${dt.getDate()}/${dt.getMonth()+1}`;
+    return `<div class="chart-bar-item">
+      <span class="chart-bar-lbl">${lbl}</span>
+      <div class="chart-bar-outer"><div class="chart-bar-inner" style="width:${(d.count/maxV*100).toFixed(1)}%;background:linear-gradient(90deg,#3b82f6,#60a5fa)"></div></div>
+      <span class="chart-bar-val">${d.count}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderProductClickChart(topProducts, totalClicks) {
+  document.getElementById('totalClicksLabel').textContent = `মোট: ${(totalClicks||0).toLocaleString('en')}`;
+  if (!topProducts.length) {
+    document.getElementById('productClickChart').innerHTML = '<div style="color:var(--txt2);font-size:.82rem;text-align:center;padding:20px">কোনো ডেটা নেই</div>';
+    return;
+  }
+  const maxC = Math.max(...topProducts.map(p=>p.clicks), 1);
+  document.getElementById('productClickChart').innerHTML = topProducts.map((p,i) => {
+    const colors = ['#8b5cf6','#a78bfa','#c4b5fd','#6d28d9','#7c3aed'];
+    return `<div class="chart-bar-item">
+      <span class="chart-bar-lbl" style="display:flex;align-items:center;gap:5px;min-width:0">
+        ${p.img ? `<img src="${p.img}" style="width:20px;height:20px;border-radius:4px;object-fit:cover;flex-shrink:0">` : `<span style="flex-shrink:0">${p.em||'🛒'}</span>`}
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.nm}</span>
+      </span>
+      <div class="chart-bar-outer"><div class="chart-bar-inner" style="width:${(p.clicks/maxC*100).toFixed(1)}%;background:linear-gradient(90deg,${colors[i%colors.length]},${colors[(i+1)%colors.length]})"></div></div>
+      <span class="chart-bar-val">${p.clicks}</span>
+    </div>`;
+  }).join('');
 }
 
 async function loadCategoriesForFilter() {

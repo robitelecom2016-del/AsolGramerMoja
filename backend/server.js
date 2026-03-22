@@ -196,6 +196,23 @@ const settingsSchema = new mongoose.Schema({
 });
 const Settings = mongoose.model('Settings', settingsSchema);
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Analytics Schema — ভিজিটর ও প্রোডাক্ট ক্লিক
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const pageViewSchema = new mongoose.Schema({
+  date: { type: String, required: true, unique: true }, // YYYY-MM-DD
+  count: { type: Number, default: 0 },
+});
+const PageView = mongoose.model('PageView', pageViewSchema);
+
+const productClickSchema = new mongoose.Schema({
+  productId: { type: String, required: true },
+  date: { type: String, required: true }, // YYYY-MM-DD
+  count: { type: Number, default: 0 },
+});
+productClickSchema.index({ productId: 1, date: 1 }, { unique: true });
+const ProductClick = mongoose.model('ProductClick', productClickSchema);
+
 const memStorage = multer.memoryStorage();
 const upload = multer({ storage: memStorage, limits: { fileSize: 5 * 1024 * 1024 } });
 const uploadThumb = multer({ storage: memStorage, limits: { fileSize: 5 * 1024 * 1024 } });
@@ -814,6 +831,38 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
       { $group: { _id: '$cat', count: { $sum: 1 } } },
       { $sort: { count: -1 } },
     ]);
+
+    // Analytics — ভিজিটর ও ক্লিক ডেটা
+    const today = new Date().toISOString().slice(0, 10);
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const sevenDaysStr = sevenDaysAgo.toISOString().slice(0, 10);
+
+    const [totalViewsAgg, todayViewDoc, recentDailyViews, totalClicksAgg, topClicksAgg] = await Promise.all([
+      PageView.aggregate([{ $group: { _id: null, total: { $sum: '$count' } } }]),
+      PageView.findOne({ date: today }),
+      PageView.find({ date: { $gte: sevenDaysStr } }).sort({ date: 1 }).lean(),
+      ProductClick.aggregate([{ $group: { _id: null, total: { $sum: '$count' } } }]),
+      ProductClick.aggregate([
+        { $match: { date: { $gte: sevenDaysStr } } },
+        { $group: { _id: '$productId', clicks: { $sum: '$count' } } },
+        { $sort: { clicks: -1 } },
+        { $limit: 5 }
+      ]),
+    ]);
+
+    const topClickProductIds = topClicksAgg.map(c => c._id);
+    const topClickProducts = await Product.find({ _id: { $in: topClickProductIds } }).select('nm em img').lean();
+    const prodMap = {};
+    topClickProducts.forEach(p => { prodMap[p._id.toString()] = p; });
+    const topProductClicks = topClicksAgg.map(c => ({
+      productId: c._id,
+      clicks: c.clicks,
+      nm: prodMap[c._id]?.nm || 'অজানা',
+      em: prodMap[c._id]?.em || '🛒',
+      img: prodMap[c._id]?.img || '',
+    }));
+
     res.json({
       totalProducts,
       totalOrders,
@@ -826,6 +875,12 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
       recentOrders,
       monthlyData,
       catDist,
+      // Analytics ডেটা
+      totalVisitors: totalViewsAgg[0]?.total || 0,
+      todayVisitors: todayViewDoc?.count || 0,
+      totalProductClicks: totalClicksAgg[0]?.total || 0,
+      recentDailyViews,
+      topProductClicks,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -893,6 +948,110 @@ app.post('/api/seed', authMiddleware, async (req, res) => {
       ]);
     }
     res.json({ success: true, message: 'Seed completed - 6 categories with 30 products' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Analytics Routes — ভিজিটর ও প্রোডাক্ট ক্লিক
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// ফ্রন্টএন্ড পেজ ভিজিট রেকর্ড করো (public)
+app.post('/api/analytics/pageview', async (req, res) => {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    await PageView.findOneAndUpdate(
+      { date: today },
+      { $inc: { count: 1 } },
+      { upsert: true, new: true }
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// প্রোডাক্ট ক্লিক রেকর্ড করো (public)
+app.post('/api/analytics/product-click/:id', async (req, res) => {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    await ProductClick.findOneAndUpdate(
+      { productId: req.params.id, date: today },
+      { $inc: { count: 1 } },
+      { upsert: true, new: true }
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Analytics সারাংশ (admin only)
+app.get('/api/analytics/summary', authMiddleware, async (req, res) => {
+  try {
+    const days = parseInt(req.query.days) || 30;
+    const since = new Date();
+    since.setDate(since.getDate() - days);
+    const sinceStr = since.toISOString().slice(0, 10);
+
+    // মোট ভিজিটর (সব সময়)
+    const totalViewsAgg = await PageView.aggregate([
+      { $group: { _id: null, total: { $sum: '$count' } } }
+    ]);
+    const totalViews = totalViewsAgg[0]?.total || 0;
+
+    // শেষ N দিনের দৈনিক ভিজিট
+    const dailyViews = await PageView.find({ date: { $gte: sinceStr } })
+      .sort({ date: 1 }).lean();
+
+    // শেষ N দিনে মোট ভিজিট
+    const recentViewsTotal = dailyViews.reduce((s, d) => s + d.count, 0);
+
+    // আজকের ভিজিট
+    const today = new Date().toISOString().slice(0, 10);
+    const todayView = await PageView.findOne({ date: today });
+    const todayViews = todayView?.count || 0;
+
+    // সবচেয়ে বেশি ক্লিক হওয়া পণ্য (শেষ N দিন)
+    const topClicksAgg = await ProductClick.aggregate([
+      { $match: { date: { $gte: sinceStr } } },
+      { $group: { _id: '$productId', clicks: { $sum: '$count' } } },
+      { $sort: { clicks: -1 } },
+      { $limit: 10 }
+    ]);
+
+    // পণ্যের নাম যোগ করো
+    const productIds = topClicksAgg.map(c => c._id);
+    const products = await Product.find({ _id: { $in: productIds } })
+      .select('nm em img cat').lean();
+    const prodMap = {};
+    products.forEach(p => { prodMap[p._id.toString()] = p; });
+
+    const topProducts = topClicksAgg.map(c => ({
+      productId: c._id,
+      clicks: c.clicks,
+      nm: prodMap[c._id]?.nm || 'অজানা পণ্য',
+      em: prodMap[c._id]?.em || '🛒',
+      img: prodMap[c._id]?.img || '',
+      cat: prodMap[c._id]?.cat || '',
+    }));
+
+    // মোট প্রোডাক্ট ক্লিক (সব সময়)
+    const totalClicksAgg = await ProductClick.aggregate([
+      { $group: { _id: null, total: { $sum: '$count' } } }
+    ]);
+    const totalClicks = totalClicksAgg[0]?.total || 0;
+
+    res.json({
+      totalViews,
+      recentViewsTotal,
+      todayViews,
+      dailyViews,
+      topProducts,
+      totalClicks,
+      days,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
