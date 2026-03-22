@@ -120,7 +120,9 @@ const productSchema = new mongoose.Schema({
     bp: Number,
     op: Number,
     disc: String,
+    stock: { type: Number, default: 0 },  // প্রতি ভ্যারিয়েন্টের স্টক
   }],
+  stockQuantity: { type: Number, default: 0 },  // মোট স্টক পরিমাণ
   metaTitle: { type: String, default: '' },
   metaDescription: { type: String, default: '' },
   slug: { type: String, unique: true, sparse: true },
@@ -424,6 +426,122 @@ app.patch('/api/products/:id/stockout', authMiddleware, async (req, res) => {
 });
 
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// স্টক ম্যানেজমেন্ট Routes
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// একটি পণ্যের স্টক আপডেট (admin only)
+app.patch('/api/products/:id/stock', authMiddleware, async (req, res) => {
+  try {
+    const { stockQuantity, variants } = req.body;
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+
+    // মোট স্টক আপডেট
+    if (stockQuantity !== undefined) {
+      product.stockQuantity = Math.max(0, parseInt(stockQuantity) || 0);
+    }
+
+    // ভ্যারিয়েন্ট স্টক আপডেট
+    if (variants && Array.isArray(variants)) {
+      variants.forEach(({ lbl, stock }) => {
+        const vIdx = product.variants.findIndex(v => v.lbl === lbl);
+        if (vIdx !== -1) {
+          product.variants[vIdx].stock = Math.max(0, parseInt(stock) || 0);
+        }
+      });
+      // ভ্যারিয়েন্ট থেকে মোট স্টক হিসাব (যদি stockQuantity না পাঠানো হয়)
+      if (stockQuantity === undefined) {
+        product.stockQuantity = product.variants.reduce((sum, v) => sum + (v.stock || 0), 0);
+      }
+    }
+
+    // স্টক > 0 হলে stockOut = false, স্টক = 0 হলে stockOut = true
+    product.stockOut = product.stockQuantity <= 0;
+    product.updatedAt = new Date();
+    await product.save();
+    res.json({ success: true, product });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// সব পণ্যের স্টক সারাংশ (admin only)
+app.get('/api/stock/summary', authMiddleware, async (req, res) => {
+  try {
+    const products = await Product.find({ active: true })
+      .select('nm em cat stockQuantity stockOut variants img')
+      .sort({ stockQuantity: 1 }); // কম স্টক আগে
+
+    const lowStockThreshold = parseInt(req.query.threshold) || 10;
+
+    const summary = {
+      total: products.length,
+      inStock: products.filter(p => !p.stockOut && p.stockQuantity > 0).length,
+      outOfStock: products.filter(p => p.stockOut || p.stockQuantity <= 0).length,
+      lowStock: products.filter(p => p.stockQuantity > 0 && p.stockQuantity <= lowStockThreshold).length,
+      totalUnits: products.reduce((sum, p) => sum + (p.stockQuantity || 0), 0),
+      products: products.map(p => ({
+        _id: p._id,
+        nm: p.nm,
+        em: p.em,
+        cat: p.cat,
+        img: p.img,
+        stockQuantity: p.stockQuantity || 0,
+        stockOut: p.stockOut,
+        isLow: p.stockQuantity > 0 && p.stockQuantity <= lowStockThreshold,
+        variants: p.variants.map(v => ({ lbl: v.lbl, stock: v.stock || 0 })),
+      })),
+    };
+
+    res.json(summary);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// একসাথে অনেক পণ্যের স্টক আপডেট — bulk (admin only)
+app.patch('/api/stock/bulk', authMiddleware, async (req, res) => {
+  try {
+    const { updates } = req.body; // [{productId, stockQuantity, variants:[{lbl, stock}]}]
+    if (!Array.isArray(updates) || !updates.length) {
+      return res.status(400).json({ error: 'Updates array required' });
+    }
+
+    const results = [];
+    for (const upd of updates) {
+      try {
+        const product = await Product.findById(upd.productId);
+        if (!product) continue;
+
+        if (upd.stockQuantity !== undefined) {
+          product.stockQuantity = Math.max(0, parseInt(upd.stockQuantity) || 0);
+        }
+        if (upd.variants && Array.isArray(upd.variants)) {
+          upd.variants.forEach(({ lbl, stock }) => {
+            const vIdx = product.variants.findIndex(v => v.lbl === lbl);
+            if (vIdx !== -1) product.variants[vIdx].stock = Math.max(0, parseInt(stock) || 0);
+          });
+          if (upd.stockQuantity === undefined) {
+            product.stockQuantity = product.variants.reduce((sum, v) => sum + (v.stock || 0), 0);
+          }
+        }
+
+        product.stockOut = product.stockQuantity <= 0;
+        product.updatedAt = new Date();
+        await product.save();
+        results.push({ productId: upd.productId, success: true, stockQuantity: product.stockQuantity });
+      } catch (e) {
+        results.push({ productId: upd.productId, success: false, error: e.message });
+      }
+    }
+
+    res.json({ success: true, updated: results.length, results });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/upload/product-image', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
@@ -577,6 +695,42 @@ app.post('/api/orders', async (req, res) => {
       advanceDelivery: advanceDelivery || { paid: false, trxId: '', amount: 0 },
       statusHistory: [{ status: 'pending', note: 'Order placed', time: new Date() }],
     });
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // অর্ডারের পর প্রতিটি পণ্যের স্টক কমাও
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    for (const item of enrichedItems) {
+      if (!item.productId) continue;
+      try {
+        const product = await Product.findById(item.productId);
+        if (!product) continue;
+        const qty = item.qty || 1;
+
+        // variant-এর stock কমাও
+        if (item.varLabel && product.variants?.length) {
+          const vIdx = product.variants.findIndex(v => v.lbl === item.varLabel);
+          if (vIdx !== -1) {
+            const newVarStock = (product.variants[vIdx].stock || 0) - qty;
+            product.variants[vIdx].stock = Math.max(0, newVarStock);
+          }
+        }
+
+        // মোট stockQuantity কমাও
+        const newTotal = (product.stockQuantity || 0) - qty;
+        product.stockQuantity = Math.max(0, newTotal);
+
+        // স্টক শেষ হলে স্বয়ংক্রিয়ভাবে stockOut = true
+        if (product.stockQuantity <= 0) {
+          product.stockOut = true;
+        }
+
+        product.updatedAt = new Date();
+        await product.save();
+      } catch (stockErr) {
+        console.error(`Stock update failed for ${item.productId}:`, stockErr.message);
+      }
+    }
+
     res.status(201).json(order);
   } catch (err) {
     res.status(500).json({ error: err.message });
