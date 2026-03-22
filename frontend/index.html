@@ -1466,6 +1466,8 @@ function goContactPage() {
 function goProduct(idOrSlug) {
   const p = prods.find(x => x._id === idOrSlug || x.slug === idOrSlug);
   if (!p) { loadProductById(idOrSlug); return; }
+  // প্রোডাক্ট ক্লিক রেকর্ড করো
+  trackProductClick(p._id);
   buildPdp(p);
   document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
   document.getElementById('page-product').classList.add('active');
@@ -1484,6 +1486,8 @@ async function loadProductById(id) {
   window.scrollTo(0, 0);
   try {
     const p = await api(`/api/products/${id}`);
+    // প্রোডাক্ট ক্লিক রেকর্ড করো (API থেকে লোড হলেও)
+    trackProductClick(p._id);
     buildPdp(p);
     const slug = p.slug || p.nm.replace(/\s+/g, '-');
     window.history.pushState({ pid: p._id }, '', `#/product/${slug}`);
@@ -1511,7 +1515,31 @@ window.addEventListener('popstate', e => {
     goHome();
   }
 });
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Analytics: পেজ ভিউ ট্র্যাক করো
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function trackPageView() {
+  fetch(API_BASE + '/api/analytics/pageview', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  }).catch(() => {}); // নীরবে ব্যর্থ হলে চলে যাবে
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Analytics: প্রোডাক্ট ক্লিক ট্র্যাক করো
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function trackProductClick(productId) {
+  if (!productId) return;
+  fetch(API_BASE + `/api/analytics/product-click/${productId}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  }).catch(() => {}); // নীরবে ব্যর্থ হলে চলে যাবে
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+  // পেজ লোড হলেই একবার ভিউ রেকর্ড করো
+  trackPageView();
+
   const h = location.hash;
   if (h.startsWith('#/product/')) {
     const slug = h.split('/').pop();
