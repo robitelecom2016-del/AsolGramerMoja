@@ -2080,6 +2080,11 @@ function openOrderModal() {
 function closeOrderModal() {
   document.getElementById('orderOv').classList.remove('open');
   document.body.style.overflow = '';
+  // Reset success screen and submit button for next order
+  document.getElementById('omSuccess').classList.remove('show');
+  document.getElementById('omMainContent').style.display = 'block';
+  const btn = document.getElementById('omSubmitBtn');
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> অর্ডার কনফার্ম করুন'; }
 }
 function selectDelivery(charge, optId, type) {
   selectedDelivery = charge;
@@ -2148,6 +2153,8 @@ async function submitOrder() {
     if (advNote) advNote.style.display = requiresAdvanceDelivery ? 'block' : 'none';
     document.getElementById('omMainContent').style.display = 'none';
     document.getElementById('omSuccess').classList.add('show');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> অর্ডার কনফার্ম করুন';
     cart = {};
     updateCart();
   } catch (err) {
