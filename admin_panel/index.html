@@ -577,6 +577,9 @@ textarea.form-control { resize:vertical; min-height:80px; }
         <i class="fa-solid fa-warehouse"></i> স্টক ম্যানেজ
         <span class="nav-badge" id="lowStockBadge" style="display:none;background:var(--red)">!</span>
       </div>
+      <div class="nav-item" onclick="navTo('stocklog')" data-page="stocklog">
+        <i class="fa-solid fa-clipboard-list"></i> স্টক লেনদেন
+      </div>
       <div class="nav-item" onclick="navTo('categories')" data-page="categories">
         <i class="fa-solid fa-tags"></i> ক্যাটাগরি
       </div>
@@ -819,6 +822,107 @@ textarea.form-control { resize:vertical; min-height:80px; }
               <th>আপডেট</th>
             </tr></thead>
             <tbody id="stockTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- স্টক লেনদেন পেজ -->
+    <div class="page-view" id="page-stocklog">
+      <!-- ক্রয়/বিক্রয় ফর্ম -->
+      <div class="card" style="margin-bottom:16px">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
+          <i class="fa-solid fa-plus-circle" style="color:var(--green2)"></i>
+          <span style="font-weight:600;font-size:.95rem">নতুন স্টক লেনদেন রেকর্ড করুন</span>
+        </div>
+        <div style="padding:18px 20px">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+            <div>
+              <label style="font-size:.8rem;color:var(--txt2);display:block;margin-bottom:6px">পণ্য বেছে নিন *</label>
+              <select class="form-control" id="slProductId" onchange="onStockLogProductChange()">
+                <option value="">— পণ্য নির্বাচন করুন —</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:.8rem;color:var(--txt2);display:block;margin-bottom:6px">লেনদেনের ধরন *</label>
+              <select class="form-control" id="slType">
+                <option value="purchase">📥 কেনা (ক্রয়)</option>
+                <option value="sale">📤 বিক্রি (বিক্রয়)</option>
+                <option value="adjustment">🔧 সমন্বয়</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:.8rem;color:var(--txt2);display:block;margin-bottom:6px">পরিমাণ (পিস) *</label>
+              <input type="number" class="form-control" id="slQty" min="1" placeholder="যেমন: ১০" oninput="previewStockCalc()">
+            </div>
+            <div>
+              <label style="font-size:.8rem;color:var(--txt2);display:block;margin-bottom:6px">নোট (ঐচ্ছিক)</label>
+              <input type="text" class="form-control" id="slNote" placeholder="যেমন: নতুন ব্যাচ কেনা">
+            </div>
+          </div>
+          <!-- প্রিভিউ -->
+          <div id="stockCalcPreview" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px">
+            <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center">
+              <span style="font-size:.82rem;color:var(--txt2)">বর্তমান স্টক: <strong id="previewBefore" style="color:var(--txt)">—</strong></span>
+              <i class="fa-solid fa-arrow-right" style="color:var(--txt3)"></i>
+              <span style="font-size:.82rem;color:var(--txt2)">লেনদেনের পর: <strong id="previewAfter" style="color:var(--green2);font-size:1rem">—</strong></span>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px">
+            <button class="btn-primary" onclick="submitStockLog()">
+              <i class="fa-solid fa-check"></i> রেকর্ড করুন
+            </button>
+            <button class="btn-secondary" onclick="resetStockLogForm()">
+              <i class="fa-solid fa-xmark"></i> রিসেট
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ফিল্টার বার -->
+      <div class="filters-bar">
+        <select class="select-filter" id="slFilterProduct" onchange="loadStockLogs()">
+          <option value="">সব পণ্য</option>
+        </select>
+        <select class="select-filter" id="slFilterType" onchange="loadStockLogs()">
+          <option value="">সব ধরন</option>
+          <option value="purchase">📥 কেনা</option>
+          <option value="sale">📤 বিক্রি</option>
+          <option value="adjustment">🔧 সমন্বয়</option>
+        </select>
+        <select class="select-filter" id="slFilterDays" onchange="loadStockLogs()">
+          <option value="30">শেষ ৩০ দিন</option>
+          <option value="7">শেষ ৭ দিন</option>
+          <option value="90">শেষ ৯০ দিন</option>
+          <option value="365">শেষ ১ বছর</option>
+        </select>
+        <span class="filter-count" id="slLogCount">লোড হচ্ছে...</span>
+        <button class="btn-secondary ml-auto" onclick="loadStockLogs()">
+          <i class="fa-solid fa-rotate"></i> রিফ্রেশ
+        </button>
+      </div>
+
+      <!-- সারাংশ কার্ড -->
+      <div class="stats-grid" id="slSummaryGrid" style="margin-bottom:16px"></div>
+
+      <!-- লগ টেবিল -->
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr>
+              <th>তারিখ</th>
+              <th>পণ্য</th>
+              <th>ধরন</th>
+              <th style="text-align:center">পরিমাণ</th>
+              <th style="text-align:center">আগে</th>
+              <th style="text-align:center">পরে</th>
+              <th>নোট</th>
+            </tr></thead>
+            <tbody id="slLogTableBody">
+              <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--txt3)">
+                <i class="fa-solid fa-spinner"></i> লোড হচ্ছে...
+              </td></tr>
+            </tbody>
           </table>
         </div>
       </div>
@@ -1438,6 +1542,7 @@ function navTo(page) {
     dashboard:['ড্যাশবোর্ড','সামগ্রিক পরিসংখ্যান'],
     products:['পণ্য ম্যানেজ','সকল পণ্য দেখুন ও সম্পাদনা করুন'],
     stock:['স্টক ম্যানেজমেন্ট','পণ্যের স্টক পরিমাণ পরিচালনা করুন'],
+    stocklog:['স্টক লেনদেন','ক্রয় ও বিক্রয়ের সম্পূর্ণ ইতিহাস'],
     orders:['অর্ডার','সকল অর্ডার ট্র্যাক করুন'],
     categories:['ক্যাটাগরি','পণ্যের বিভাগ পরিচালনা করুন'],
     hero:['হিরো স্লাইড','হোমপেজের ব্যানার স্লাইডার পরিচালনা করুন'],
@@ -1452,6 +1557,7 @@ function navTo(page) {
   if (page === 'dashboard') loadDashboard();
   if (page === 'products') loadProducts();
   if (page === 'stock') loadStockPage();
+  if (page === 'stocklog') loadStockLogPage();
   if (page === 'orders') loadOrders();
   if (page === 'categories') loadCategories();
   if (page === 'hero') loadHero();
@@ -2158,6 +2264,150 @@ async function saveBulkStock() {
     toast('Bulk সেভ ব্যর্থ: ' + err.message, 'error');
   } finally {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> সব সংরক্ষণ করুন'; }
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// স্টক লেনদেন (Stock Log) ফাংশন
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+let slProducts = [];  // সব পণ্যের ক্যাশ
+let slCurrentStock = 0; // বর্তমান পণ্যের স্টক
+
+async function loadStockLogPage() {
+  // পণ্য লিস্ট লোড করো ড্রপডাউনে
+  try {
+    const data = await api('GET', '/api/products?active=all&limit=500');
+    slProducts = data.products || [];
+
+    const sel1 = document.getElementById('slProductId');
+    const sel2 = document.getElementById('slFilterProduct');
+    const opts = slProducts.map(p => `<option value="${p._id}">${p.em || '🛒'} ${p.nm}</option>`).join('');
+    sel1.innerHTML = '<option value="">— পণ্য নির্বাচন করুন —</option>' + opts;
+    sel2.innerHTML = '<option value="">সব পণ্য</option>' + opts;
+  } catch(err) {
+    toast('পণ্য লোড ব্যর্থ: ' + err.message, 'error');
+  }
+  loadStockLogs();
+}
+
+function onStockLogProductChange() {
+  const id = document.getElementById('slProductId').value;
+  const prod = slProducts.find(p => p._id === id);
+  slCurrentStock = prod ? (prod.stockQuantity || 0) : 0;
+  previewStockCalc();
+}
+
+function previewStockCalc() {
+  const id = document.getElementById('slProductId').value;
+  const type = document.getElementById('slType').value;
+  const qty = parseInt(document.getElementById('slQty').value) || 0;
+  const preview = document.getElementById('stockCalcPreview');
+
+  if (!id || !qty) { preview.style.display = 'none'; return; }
+
+  let after;
+  if (type === 'purchase') after = slCurrentStock + qty;
+  else if (type === 'sale') after = Math.max(0, slCurrentStock - qty);
+  else after = qty;
+
+  document.getElementById('previewBefore').textContent = slCurrentStock + ' পিস';
+  const afterEl = document.getElementById('previewAfter');
+  afterEl.textContent = after + ' পিস';
+  afterEl.style.color = after <= 0 ? 'var(--red2)' : after <= 5 ? 'var(--yellow2)' : 'var(--green2)';
+  preview.style.display = 'block';
+}
+
+async function submitStockLog() {
+  const productId = document.getElementById('slProductId').value;
+  const type = document.getElementById('slType').value;
+  const qty = parseInt(document.getElementById('slQty').value);
+  const note = document.getElementById('slNote').value.trim();
+
+  if (!productId) { toast('পণ্য বেছে নিন', 'error'); return; }
+  if (!qty || qty <= 0) { toast('সঠিক পরিমাণ দিন', 'error'); return; }
+
+  try {
+    const res = await api('POST', '/api/stock/log', { productId, type, qty, note });
+    const typeLabel = type === 'purchase' ? '📥 কেনা' : type === 'sale' ? '📤 বিক্রি' : '🔧 সমন্বয়';
+    toast(`✅ ${typeLabel} রেকর্ড হয়েছে। বর্তমান স্টক: ${res.stockAfter} পিস`, 'success');
+    // স্টক আপডেট করো ক্যাশে
+    const prod = slProducts.find(p => p._id === productId);
+    if (prod) { prod.stockQuantity = res.stockAfter; slCurrentStock = res.stockAfter; }
+    resetStockLogForm();
+    loadStockLogs();
+  } catch(err) {
+    toast('রেকর্ড ব্যর্থ: ' + err.message, 'error');
+  }
+}
+
+function resetStockLogForm() {
+  document.getElementById('slProductId').value = '';
+  document.getElementById('slType').value = 'purchase';
+  document.getElementById('slQty').value = '';
+  document.getElementById('slNote').value = '';
+  document.getElementById('stockCalcPreview').style.display = 'none';
+  slCurrentStock = 0;
+}
+
+async function loadStockLogs() {
+  const productId = document.getElementById('slFilterProduct').value;
+  const type = document.getElementById('slFilterType').value;
+  const days = document.getElementById('slFilterDays').value;
+  const tbody = document.getElementById('slLogTableBody');
+  const summaryGrid = document.getElementById('slSummaryGrid');
+
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--txt3)"><i class="fa-solid fa-spinner fa-spin"></i> লোড হচ্ছে...</td></tr>';
+
+  try {
+    let url = `/api/stock/logs?days=${days}`;
+    if (productId) url += `&productId=${productId}`;
+    if (type) url += `&type=${type}`;
+
+    const data = await api('GET', url);
+    document.getElementById('slLogCount').textContent = `${data.total} লেনদেন`;
+
+    // সারাংশ কার্ড
+    summaryGrid.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(46,160,67,.15);color:var(--green3)"><i class="fa-solid fa-arrow-down-to-line"></i></div>
+        <div><div class="stat-val" style="color:var(--green3)">${data.totalPurchased}</div><div class="stat-lbl">মোট কেনা (পিস)</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(232,102,10,.15);color:var(--orange2)"><i class="fa-solid fa-arrow-up-from-line"></i></div>
+        <div><div class="stat-val" style="color:var(--orange2)">${data.totalSold}</div><div class="stat-lbl">মোট বিক্রি (পিস)</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(56,139,253,.15);color:var(--blue2)"><i class="fa-solid fa-warehouse"></i></div>
+        <div><div class="stat-val" style="color:var(--blue2)">${Math.max(0, data.totalPurchased - data.totalSold)}</div><div class="stat-lbl">হিসাব অনুযায়ী অবশিষ্ট</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(139,71,229,.15);color:var(--purple)"><i class="fa-solid fa-list-ol"></i></div>
+        <div><div class="stat-val" style="color:var(--purple)">${data.total}</div><div class="stat-lbl">মোট লেনদেন</div></div>
+      </div>`;
+
+    if (!data.logs.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--txt3)"><i class="fa-solid fa-inbox" style="font-size:1.8rem;display:block;margin-bottom:8px"></i>কোনো লেনদেন পাওয়া যায়নি</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.logs.map(log => {
+      const typeMap = { purchase:'📥 কেনা', sale:'📤 বিক্রি', adjustment:'🔧 সমন্বয়' };
+      const typeColor = { purchase:'var(--green2)', sale:'var(--orange2)', adjustment:'var(--blue2)' };
+      const d = new Date(log.date);
+      const dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+      return `<tr>
+        <td style="font-size:.78rem;color:var(--txt2);white-space:nowrap">${dateStr}</td>
+        <td><div class="td-name">${log.productName || '—'}</div></td>
+        <td><span style="color:${typeColor[log.type]};font-weight:600;font-size:.85rem">${typeMap[log.type] || log.type}</span></td>
+        <td style="text-align:center;font-weight:700;font-size:1rem;color:${typeColor[log.type]}">${log.qty}</td>
+        <td style="text-align:center;color:var(--txt2)">${log.stockBefore}</td>
+        <td style="text-align:center;font-weight:600;color:${log.stockAfter<=0?'var(--red2)':log.stockAfter<=5?'var(--yellow2)':'var(--green2)'}">${log.stockAfter}</td>
+        <td style="font-size:.8rem;color:var(--txt2)">${log.note || '—'}</td>
+      </tr>`;
+    }).join('');
+  } catch(err) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--red2)">লোড ব্যর্থ: ${err.message}</td></tr>`;
   }
 }
 

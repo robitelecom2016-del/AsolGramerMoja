@@ -215,6 +215,23 @@ const productClickSchema = new mongoose.Schema({
 productClickSchema.index({ productId: 1, date: 1 }, { unique: true });
 const ProductClick = mongoose.model('ProductClick', productClickSchema);
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// স্টক লগ Schema — ক্রয় ও বিক্রয় ইতিহাস
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const stockLogSchema = new mongoose.Schema({
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  productName: { type: String, required: true },
+  type: { type: String, enum: ['purchase', 'sale', 'adjustment'], required: true },
+  // purchase = কেনা, sale = বিক্রি, adjustment = ম্যানুয়াল সমন্বয়
+  qty: { type: Number, required: true },           // পরিমাণ
+  stockBefore: { type: Number, default: 0 },       // আগে কত ছিল
+  stockAfter: { type: Number, default: 0 },        // পরে কত হলো
+  note: { type: String, default: '' },             // নোট
+  date: { type: Date, default: Date.now },
+  createdBy: { type: String, default: 'admin' },
+});
+const StockLog = mongoose.model('StockLog', stockLogSchema);
+
 const memStorage = multer.memoryStorage();
 const upload = multer({ storage: memStorage, limits: { fileSize: 5 * 1024 * 1024 } });
 const uploadThumb = multer({ storage: memStorage, limits: { fileSize: 5 * 1024 * 1024 } });
@@ -541,6 +558,112 @@ app.patch('/api/stock/bulk', authMiddleware, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// স্টক লগ Routes — ক্রয়/বিক্রয় ট্র্যাকিং
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// স্টক লগ তৈরি করো (কেনা বা বিক্রি রেকর্ড)
+app.post('/api/stock/log', authMiddleware, async (req, res) => {
+  try {
+    const { productId, type, qty, note } = req.body;
+    if (!productId || !type || !qty) {
+      return res.status(400).json({ error: 'productId, type, qty প্রয়োজন' });
+    }
+    if (!['purchase', 'sale', 'adjustment'].includes(type)) {
+      return res.status(400).json({ error: 'type হবে: purchase, sale, অথবা adjustment' });
+    }
+
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ error: 'পণ্য পাওয়া যায়নি' });
+
+    const stockBefore = product.stockQuantity || 0;
+    let stockAfter;
+
+    if (type === 'purchase') {
+      stockAfter = stockBefore + Math.abs(parseInt(qty));
+    } else if (type === 'sale') {
+      stockAfter = Math.max(0, stockBefore - Math.abs(parseInt(qty)));
+    } else {
+      // adjustment — সরাসরি সেট করা
+      stockAfter = Math.max(0, parseInt(qty));
+    }
+
+    // পণ্যের স্টক আপডেট
+    product.stockQuantity = stockAfter;
+    product.stockOut = stockAfter <= 0;
+    product.updatedAt = new Date();
+    await product.save();
+
+    // লগ তৈরি
+    const log = await StockLog.create({
+      productId,
+      productName: product.nm,
+      type,
+      qty: Math.abs(parseInt(qty)),
+      stockBefore,
+      stockAfter,
+      note: note || '',
+      createdBy: req.admin?.username || 'admin',
+    });
+
+    res.status(201).json({ success: true, log, stockAfter });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// একটি পণ্যের স্টক লগ দেখো
+app.get('/api/stock/log/:productId', authMiddleware, async (req, res) => {
+  try {
+    const logs = await StockLog.find({ productId: req.params.productId })
+      .sort({ date: -1 })
+      .limit(100);
+    res.json(logs);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// সব পণ্যের স্টক লগ (সারাংশ + ফিল্টার)
+app.get('/api/stock/logs', authMiddleware, async (req, res) => {
+  try {
+    const { productId, type, days = 30, page = 1, limit = 50 } = req.query;
+    const filter = {};
+    if (productId) filter.productId = productId;
+    if (type) filter.type = type;
+    if (days) {
+      const since = new Date();
+      since.setDate(since.getDate() - parseInt(days));
+      filter.date = { $gte: since };
+    }
+    const total = await StockLog.countDocuments(filter);
+    const logs = await StockLog.find(filter)
+      .sort({ date: -1 })
+      .skip((parseInt(page) - 1) * parseInt(limit))
+      .limit(parseInt(limit));
+
+    // সারাংশ
+    const totalPurchased = await StockLog.aggregate([
+      { $match: { ...filter, type: 'purchase' } },
+      { $group: { _id: null, total: { $sum: '$qty' } } }
+    ]);
+    const totalSold = await StockLog.aggregate([
+      { $match: { ...filter, type: 'sale' } },
+      { $group: { _id: null, total: { $sum: '$qty' } } }
+    ]);
+
+    res.json({
+      logs,
+      total,
+      totalPurchased: totalPurchased[0]?.total || 0,
+      totalSold: totalSold[0]?.total || 0,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 app.post('/api/upload/product-image', authMiddleware, upload.single('image'), async (req, res) => {
   try {
