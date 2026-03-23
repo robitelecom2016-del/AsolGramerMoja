@@ -580,9 +580,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="nav-item" onclick="navTo('stocklog')" data-page="stocklog">
         <i class="fa-solid fa-clipboard-list"></i> স্টক লেনদেন
       </div>
-      <div class="nav-item" onclick="navTo('salesreport')" data-page="salesreport">
-        <i class="fa-solid fa-chart-bar"></i> বিক্রয় রিপোর্ট
-      </div>
       <div class="nav-item" onclick="navTo('categories')" data-page="categories">
         <i class="fa-solid fa-tags"></i> ক্যাটাগরি
       </div>
@@ -924,60 +921,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
             <tbody id="slLogTableBody">
               <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--txt3)">
                 <i class="fa-solid fa-spinner"></i> লোড হচ্ছে...
-              </td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    </div>
-
-    <!-- বিক্রয় রিপোর্ট পেজ -->
-    <div class="page-view" id="page-salesreport">
-
-      <!-- সারাংশ কার্ড -->
-      <div class="stats-grid" id="srSummaryGrid" style="margin-bottom:16px">
-        <div class="loader"><i class="fa-solid fa-spinner"></i></div>
-      </div>
-
-      <!-- ফিল্টার বার -->
-      <div class="filters-bar">
-        <select class="select-filter" id="srFilterDays" onchange="loadSalesReport()">
-          <option value="30">শেষ ৩০ দিন</option>
-          <option value="7">শেষ ৭ দিন</option>
-          <option value="90">শেষ ৯০ দিন</option>
-          <option value="365">শেষ ১ বছর</option>
-          <option value="all">সব সময়</option>
-        </select>
-        <select class="select-filter" id="srFilterStatus" onchange="loadSalesReport()">
-          <option value="delivered">✅ ডেলিভারড</option>
-          <option value="active">📦 সক্রিয় অর্ডার</option>
-          <option value="">সব অর্ডার</option>
-        </select>
-        <span class="filter-count" id="srProdCount">লোড হচ্ছে...</span>
-        <button class="btn-secondary ml-auto" onclick="loadSalesReport()">
-          <i class="fa-solid fa-rotate"></i> রিফ্রেশ
-        </button>
-      </div>
-
-      <!-- পণ্য বিক্রয় টেবিল -->
-      <div class="card">
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead><tr>
-              <th>#</th>
-              <th>পণ্য</th>
-              <th style="text-align:center">বিক্রি (পিস)</th>
-              <th style="text-align:center">অর্ডার সংখ্যা</th>
-              <th style="text-align:right">মোট আয়</th>
-              <th style="text-align:right">মোট লাভ</th>
-              <th style="text-align:center">বর্তমান স্টক</th>
-              <th style="text-align:center">অবস্থা</th>
-            </tr></thead>
-            <tbody id="srTableBody">
-              <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--txt3)">
-                <i class="fa-solid fa-spinner fa-spin"></i> লোড হচ্ছে...
               </td></tr>
             </tbody>
           </table>
@@ -1600,7 +1543,6 @@ function navTo(page) {
     products:['পণ্য ম্যানেজ','সকল পণ্য দেখুন ও সম্পাদনা করুন'],
     stock:['স্টক ম্যানেজমেন্ট','পণ্যের স্টক পরিমাণ পরিচালনা করুন'],
     stocklog:['স্টক লেনদেন','ক্রয় ও বিক্রয়ের সম্পূর্ণ ইতিহাস'],
-    salesreport:['বিক্রয় রিপোর্ট','কোন পণ্য কত পিস বিক্রি হয়েছে'],
     orders:['অর্ডার','সকল অর্ডার ট্র্যাক করুন'],
     categories:['ক্যাটাগরি','পণ্যের বিভাগ পরিচালনা করুন'],
     hero:['হিরো স্লাইড','হোমপেজের ব্যানার স্লাইডার পরিচালনা করুন'],
@@ -1616,7 +1558,6 @@ function navTo(page) {
   if (page === 'products') loadProducts();
   if (page === 'stock') loadStockPage();
   if (page === 'stocklog') loadStockLogPage();
-  if (page === 'salesreport') loadSalesReport();
   if (page === 'orders') loadOrders();
   if (page === 'categories') loadCategories();
   if (page === 'hero') loadHero();
@@ -2467,118 +2408,6 @@ async function loadStockLogs() {
     }).join('');
   } catch(err) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--red2)">লোড ব্যর্থ: ${err.message}</td></tr>`;
-  }
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// বিক্রয় রিপোর্ট ফাংশন
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-async function loadSalesReport() {
-  const days = document.getElementById('srFilterDays').value;
-  const status = document.getElementById('srFilterStatus').value;
-  const tbody = document.getElementById('srTableBody');
-  const summaryGrid = document.getElementById('srSummaryGrid');
-
-  tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--txt3)">
-    <i class="fa-solid fa-spinner fa-spin"></i> লোড হচ্ছে...
-  </td></tr>`;
-  summaryGrid.innerHTML = `<div class="loader"><i class="fa-solid fa-spinner fa-spin"></i></div>`;
-
-  try {
-    let url = `/api/reports/product-sales?limit=100`;
-    if (days && days !== 'all') url += `&days=${days}`;
-    else if (days === 'all') url += `&days=all`;
-    if (status) url += `&status=${status}`;
-
-    const data = await api('GET', url);
-    document.getElementById('srProdCount').textContent = `${data.totalProducts} পণ্য`;
-
-    // সারাংশ কার্ড
-    summaryGrid.innerHTML = `
-      <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(232,102,10,.15);color:var(--orange2)">
-          <i class="fa-solid fa-cart-shopping"></i>
-        </div>
-        <div>
-          <div class="stat-val" style="color:var(--orange2)">${(data.overall.totalQty || 0).toLocaleString('en')}</div>
-          <div class="stat-lbl">মোট বিক্রি (পিস)</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(46,160,67,.15);color:var(--green3)">
-          <i class="fa-solid fa-bangladeshi-taka-sign"></i>
-        </div>
-        <div>
-          <div class="stat-val" style="color:var(--green3)">৳${(data.overall.totalRevenue || 0).toLocaleString('en')}</div>
-          <div class="stat-lbl">মোট আয়</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(56,139,253,.15);color:var(--blue2)">
-          <i class="fa-solid fa-sack-dollar"></i>
-        </div>
-        <div>
-          <div class="stat-val" style="color:var(--blue2)">৳${(data.overall.totalProfit || 0).toLocaleString('en')}</div>
-          <div class="stat-lbl">মোট লাভ</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(139,71,229,.15);color:var(--purple)">
-          <i class="fa-solid fa-boxes-stacked"></i>
-        </div>
-        <div>
-          <div class="stat-val" style="color:var(--purple)">${data.totalProducts}</div>
-          <div class="stat-lbl">পণ্যের ধরন</div>
-        </div>
-      </div>`;
-
-    if (!data.products.length) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:36px;color:var(--txt3)">
-        <i class="fa-solid fa-inbox" style="font-size:2rem;display:block;margin-bottom:10px"></i>
-        এই সময়ের মধ্যে কোনো বিক্রয় পাওয়া যায়নি
-      </td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = data.products.map((p, i) => {
-      const stockColor = p.stockQuantity <= 0 ? 'var(--red2)' : p.stockQuantity <= 5 ? 'var(--yellow2)' : 'var(--green3)';
-      const statusBadge = p.stockOut || p.stockQuantity <= 0
-        ? `<span class="badge red">❌ শেষ</span>`
-        : p.stockQuantity <= 5
-          ? `<span class="badge yellow">⚠️ কম</span>`
-          : `<span class="badge green">✅ আছে</span>`;
-
-      return `<tr>
-        <td style="color:var(--txt3);font-size:.82rem">${i + 1}</td>
-        <td>
-          <div style="display:flex;align-items:center;gap:8px">
-            ${p.img
-              ? `<img src="${p.img}" style="width:34px;height:34px;border-radius:6px;object-fit:cover;border:1px solid var(--border)">`
-              : `<span style="font-size:1.4rem">${p.em}</span>`}
-            <div>
-              <div class="td-name">${p.nm}</div>
-              <div class="td-sub" style="color:var(--txt3)">${p.cat || ''}</div>
-            </div>
-          </div>
-        </td>
-        <td style="text-align:center">
-          <span style="font-size:1.1rem;font-weight:700;color:var(--orange2)">${p.totalQty}</span>
-          <span style="font-size:.75rem;color:var(--txt3)"> পিস</span>
-        </td>
-        <td style="text-align:center;color:var(--txt2);font-size:.88rem">${p.orderCount} টি</td>
-        <td style="text-align:right;font-weight:600;color:var(--green2)">৳${(p.totalRevenue || 0).toLocaleString('en')}</td>
-        <td style="text-align:right;font-weight:600;color:var(--blue2)">৳${(p.totalProfit || 0).toLocaleString('en')}</td>
-        <td style="text-align:center;font-weight:700;color:${stockColor}">${p.stockQuantity} পিস</td>
-        <td style="text-align:center">${statusBadge}</td>
-      </tr>`;
-    }).join('');
-
-  } catch(err) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--red2)">
-      লোড ব্যর্থ: ${err.message}
-    </td></tr>`;
-    summaryGrid.innerHTML = '';
-    toast('রিপোর্ট লোড ব্যর্থ: ' + err.message, 'error');
   }
 }
 
