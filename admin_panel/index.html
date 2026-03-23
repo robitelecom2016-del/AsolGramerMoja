@@ -153,6 +153,10 @@ body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); color: v
 .btn-danger:hover { background:var(--red); color:#fff; border-color:var(--red); }
 .btn-warning { background:rgba(210,153,34,.12); color:var(--yellow2); border:1px solid rgba(210,153,34,.3); padding:6px 12px; border-radius:6px; cursor:pointer; font-family:inherit; font-size:.78rem; display:flex; align-items:center; gap:5px; transition:all .15s; }
 .btn-sm { padding:5px 10px; font-size:.74rem; }
+.btn-icon { background:var(--bg3); color:var(--txt2); border:1px solid var(--border); width:30px; height:30px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:.75rem; transition:all .15s; flex-shrink:0; }
+.btn-icon:hover { background:var(--bg4); color:var(--txt); border-color:var(--border2); }
+.btn-icon.danger:hover { background:rgba(218,54,51,.15); color:var(--red2); border-color:rgba(218,54,51,.3); }
+.filter-bar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
 
 .main-content {
   position: absolute;
@@ -1101,6 +1105,75 @@ textarea.form-control { resize:vertical; min-height:80px; }
       </div>
     </div>
 
+    <div class="page-view" id="page-websitecost">
+      <div class="page-hd">
+        <h1 class="page-title"><i class="fa-solid fa-receipt" style="color:var(--green)"></i> ওয়েবসাইট খরচের হিসাব</h1>
+        <button class="btn-primary" onclick="openCostModal()"><i class="fa-solid fa-plus"></i> নতুন খরচ যোগ</button>
+      </div>
+
+      <!-- সারাংশ কার্ড -->
+      <div class="stats-grid" id="costSummaryGrid" style="margin-bottom:20px">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(46,160,67,.15);color:var(--green3)"><i class="fa-solid fa-bangladeshi-taka-sign"></i></div>
+          <div class="stat-info"><div class="stat-val" id="csTotalAmt">৳০</div><div class="stat-lbl">মোট খরচ</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(31,111,235,.15);color:var(--blue2)"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="stat-info"><div class="stat-val" id="csTotalPaid">৳০</div><div class="stat-lbl">পরিশোধিত</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(210,153,34,.15);color:var(--yellow2)"><i class="fa-solid fa-clock"></i></div>
+          <div class="stat-info"><div class="stat-val" id="csPending">৳০</div><div class="stat-lbl">বাকি/মুলতুবি</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(137,87,229,.15);color:var(--purple)"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+          <div class="stat-info"><div class="stat-val" id="csUpdateCost">৳০</div><div class="stat-lbl">আপডেট খরচ</div></div>
+        </div>
+      </div>
+
+      <!-- ফিল্টার -->
+      <div class="filter-bar" style="margin-bottom:16px">
+        <select class="form-control" id="costTypeFilter" onchange="loadCosts()" style="max-width:160px">
+          <option value="all">সব ধরন</option>
+          <option value="creation">তৈরি</option>
+          <option value="update">আপডেট</option>
+          <option value="maintenance">রক্ষণাবেক্ষণ</option>
+          <option value="domain">ডোমেইন</option>
+          <option value="hosting">হোস্টিং</option>
+          <option value="other">অন্যান্য</option>
+        </select>
+        <select class="form-control" id="costStatusFilter" onchange="loadCosts()" style="max-width:140px">
+          <option value="all">সব স্ট্যাটাস</option>
+          <option value="paid">পরিশোধিত</option>
+          <option value="pending">বাকি</option>
+          <option value="partial">আংশিক</option>
+        </select>
+        <select class="form-control" id="costYearFilter" onchange="loadCosts()" style="max-width:120px">
+          <option value="">সব বছর</option>
+        </select>
+      </div>
+
+      <!-- লিস্ট টেবিল -->
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>তারিখ</th>
+              <th>শিরোনাম</th>
+              <th>ধরন</th>
+              <th>পরিমাণ</th>
+              <th>স্ট্যাটাস</th>
+              <th>নোট</th>
+              <th>অ্যাকশন</th>
+            </tr>
+          </thead>
+          <tbody id="costTableBody">
+            <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--txt2)"><i class="fa-solid fa-spinner fa-spin"></i> লোড হচ্ছে...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <div class="page-view" id="page-settings">
       <div class="settings-section">
         <div class="settings-section-hd"><i class="fa-solid fa-store" style="color:var(--green)"></i><h3>স্টোর তথ্য</h3></div>
@@ -1140,55 +1213,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-hd"><i class="fa-solid fa-money-bill-trend-up" style="color:var(--yellow)"></i><h3>ওয়েবসাইট খরচ ও আপডেট ইতিহাস</h3></div>
-        <div class="settings-body">
-          <!-- তৈরির তথ্য -->
-          <div class="form-row">
-            <div class="form-group2">
-              <label>ওয়েবসাইট তৈরির তারিখ</label>
-              <input type="date" class="form-control" id="websiteCreatedDate">
-            </div>
-            <div class="form-group2">
-              <label>তৈরিতে মোট খরচ (৳)</label>
-              <input type="number" class="form-control" id="websiteCreatedCost" placeholder="যেমন: ৫০০০">
-            </div>
-          </div>
-          <div class="form-group2">
-            <label>তৈরির নোট / বিবরণ</label>
-            <textarea class="form-control" id="websiteCreatedNote" rows="2" placeholder="যেমন: প্রথম ভার্সন তৈরি, হোমপেজ + প্রোডাক্ট পেজ"></textarea>
-          </div>
-          <button class="btn-primary" onclick="saveWebsiteCostInfo()"><i class="fa-solid fa-floppy-disk"></i> তৈরির তথ্য সংরক্ষণ</button>
-
-          <!-- আপডেট লগ -->
-          <div style="margin-top:22px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-            <h4 style="font-size:.88rem;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:6px;"><i class="fa-solid fa-clock-rotate-left" style="color:var(--orange2)"></i> আপডেট ইতিহাস</h4>
-            <button class="btn-secondary btn-sm" onclick="openAddUpdateModal()"><i class="fa-solid fa-plus"></i> নতুন আপডেট যোগ</button>
-          </div>
-          <div id="updateHistoryList" style="display:flex;flex-direction:column;gap:8px;">
-            <div style="text-align:center;padding:20px;color:var(--txt3);font-size:.82rem;">লোড হচ্ছে...</div>
-          </div>
-
-          <!-- সারসংক্ষেপ -->
-          <div id="websiteCostSummary" style="margin-top:16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;display:none;">
-            <div style="display:flex;flex-wrap:wrap;gap:14px;">
-              <div style="flex:1;min-width:140px;">
-                <div style="font-size:.7rem;color:var(--txt2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;">তৈরির খরচ</div>
-                <div id="summaryCreatedCost" style="font-size:1.1rem;font-weight:700;color:var(--green3);font-family:'JetBrains Mono',monospace;">৳০</div>
-              </div>
-              <div style="flex:1;min-width:140px;">
-                <div style="font-size:.7rem;color:var(--txt2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;">আপডেটে মোট খরচ</div>
-                <div id="summaryUpdateCost" style="font-size:1.1rem;font-weight:700;color:var(--orange2);font-family:'JetBrains Mono',monospace;">৳০</div>
-              </div>
-              <div style="flex:1;min-width:140px;">
-                <div style="font-size:.7rem;color:var(--txt2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;">সর্বমোট খরচ</div>
-                <div id="summaryTotalCost" style="font-size:1.1rem;font-weight:700;color:var(--yellow2);font-family:'JetBrains Mono',monospace;">৳০</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="settings-section">
         <div class="settings-section-hd"><i class="fa-solid fa-database" style="color:var(--blue)"></i><h3>সিস্টেম ও ডেটা</h3></div>
         <div class="settings-body">
           <div class="settings-row">
@@ -1214,32 +1238,62 @@ textarea.form-control { resize:vertical; min-height:80px; }
   </main>
 </div>
 
-<!-- ওয়েবসাইট আপডেট যোগের মডাল -->
-<div class="modal-ov" id="updateModal">
+<!-- ওয়েবসাইট খরচ Modal -->
+<div class="modal-ov" id="costModal">
   <div class="modal">
     <div class="modal-hd">
-      <h2><i class="fa-solid fa-plus-circle" style="color:var(--orange2)"></i> নতুন আপডেট রেকর্ড</h2>
-      <button class="modal-cls" onclick="closeModal('updateModal')"><i class="fa-solid fa-times"></i></button>
+      <h2 id="costModalTitle"><i class="fa-solid fa-receipt" style="color:var(--green)"></i> নতুন খরচ যোগ</h2>
+      <button class="modal-cls" onclick="closeModal('costModal')"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
+      <input type="hidden" id="costId">
       <div class="form-row">
         <div class="form-group2">
-          <label>আপডেটের তারিখ <span>*</span></label>
-          <input type="date" class="form-control" id="updateDateInp">
+          <label>খরচের ধরন <span>*</span></label>
+          <select class="form-control" id="costType">
+            <option value="creation">🏗️ তৈরি (Creation)</option>
+            <option value="update">🔧 আপডেট (Update)</option>
+            <option value="maintenance">🛠️ রক্ষণাবেক্ষণ</option>
+            <option value="domain">🌐 ডোমেইন</option>
+            <option value="hosting">☁️ হোস্টিং</option>
+            <option value="other">📌 অন্যান্য</option>
+          </select>
         </div>
         <div class="form-group2">
-          <label>খরচ (৳) <span>*</span></label>
-          <input type="number" class="form-control" id="updateCostInp" placeholder="যেমন: ২০০০">
+          <label>তারিখ <span>*</span></label>
+          <input type="date" class="form-control" id="costDate">
         </div>
       </div>
       <div class="form-group2">
-        <label>আপডেটের বিবরণ <span>*</span></label>
-        <textarea class="form-control" id="updateDescInp" rows="3" placeholder="যেমন: নতুন পেমেন্ট গেটওয়ে যোগ, প্রোডাক্ট ফিল্টার উন্নত করা হয়েছে..."></textarea>
+        <label>শিরোনাম <span>*</span></label>
+        <input type="text" class="form-control" id="costTitle" placeholder="যেমন: ওয়েবসাইট তৈরি, নতুন ফিচার আপডেট...">
+      </div>
+      <div class="form-row">
+        <div class="form-group2">
+          <label>মোট পরিমাণ (৳) <span>*</span></label>
+          <input type="number" class="form-control" id="costAmount" placeholder="0" min="0">
+        </div>
+        <div class="form-group2">
+          <label>পেমেন্ট স্ট্যাটাস</label>
+          <select class="form-control" id="costStatus" onchange="togglePaidAmount()">
+            <option value="paid">✅ পরিশোধিত</option>
+            <option value="pending">⏳ বাকি/মুলতুবি</option>
+            <option value="partial">🔄 আংশিক পরিশোধ</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group2" id="paidAmountRow" style="display:none">
+        <label>পরিশোধিত পরিমাণ (৳)</label>
+        <input type="number" class="form-control" id="costPaidAmount" placeholder="0" min="0">
+      </div>
+      <div class="form-group2">
+        <label>বিস্তারিত নোট</label>
+        <textarea class="form-control" id="costNote" rows="3" placeholder="কে কাজ করেছে, কী কী করা হয়েছে, কোথায় পেমেন্ট করা হয়েছে..."></textarea>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('updateModal')">বাতিল</button>
-      <button class="btn-primary" onclick="saveNewUpdate()"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ</button>
+      <button class="btn-secondary" onclick="closeModal('costModal')">বাতিল</button>
+      <button class="btn-primary" onclick="saveCost()"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ</button>
     </div>
   </div>
 </div>
@@ -1628,6 +1682,7 @@ function navTo(page) {
     about:['আমাদের সম্পর্কে','পেজ কনটেন্ট পরিচালনা করুন'],
     contact:['যোগাযোগ পেজ','যোগাযোগ তথ্য পরিচালনা করুন'],
     settings:['সেটিংস','স্টোর কনফিগারেশন'],
+    websitecost:['ওয়েবসাইট খরচ','তৈরি ও আপডেটের সম্পূর্ণ খরচের হিসাব'],
   };
   const [title, sub] = titles[page] || ['Admin', ''];
   document.getElementById('topbarTitle').textContent = title;
@@ -1643,6 +1698,7 @@ function navTo(page) {
   if (page === 'about') loadAboutPage();
   if (page === 'contact') loadContactPage();
   if (page === 'settings') loadSettings();
+  if (page === 'websitecost') loadCosts();
 }
 
 async function checkHealth() {
@@ -3207,103 +3263,7 @@ async function loadSettings() {
     document.getElementById('freeDlivMin').value=s.freeDeliveryMin||0;
     document.getElementById('apiUrlDisp').textContent=API;
     document.getElementById('apiUrlInp').value=API;
-    // ওয়েবসাইট খরচ তথ্য লোড
-    if(s.websiteCreatedDate) document.getElementById('websiteCreatedDate').value=s.websiteCreatedDate;
-    if(s.websiteCreatedCost) document.getElementById('websiteCreatedCost').value=s.websiteCreatedCost;
-    if(s.websiteCreatedNote) document.getElementById('websiteCreatedNote').value=s.websiteCreatedNote;
-    renderUpdateHistory(s.websiteUpdates||[]);
-    renderCostSummary(s.websiteCreatedCost||0, s.websiteUpdates||[]);
   } catch{}
-}
-
-async function saveWebsiteCostInfo() {
-  try {
-    const date=document.getElementById('websiteCreatedDate').value;
-    const cost=parseFloat(document.getElementById('websiteCreatedCost').value)||0;
-    const note=document.getElementById('websiteCreatedNote').value.trim();
-    if(!date) { toast('তারিখ দিন','error'); return; }
-    await api('PUT','/api/settings',{websiteCreatedDate:date,websiteCreatedCost:cost,websiteCreatedNote:note});
-    toast('তৈরির তথ্য সংরক্ষিত','success');
-    const s=await api('GET','/api/settings');
-    renderCostSummary(s.websiteCreatedCost||0, s.websiteUpdates||[]);
-  } catch(err){ toast('ব্যর্থ: '+err.message,'error'); }
-}
-
-function openAddUpdateModal() {
-  // আজকের তারিখ সেট করি
-  const today=new Date().toISOString().split('T')[0];
-  document.getElementById('updateDateInp').value=today;
-  document.getElementById('updateCostInp').value='';
-  document.getElementById('updateDescInp').value='';
-  openModal('updateModal');
-}
-
-async function saveNewUpdate() {
-  const date=document.getElementById('updateDateInp').value;
-  const cost=parseFloat(document.getElementById('updateCostInp').value)||0;
-  const desc=document.getElementById('updateDescInp').value.trim();
-  if(!date||!desc) { toast('তারিখ ও বিবরণ আবশ্যক','error'); return; }
-  try {
-    const s=await api('GET','/api/settings');
-    const updates=s.websiteUpdates||[];
-    updates.unshift({ id:Date.now(), date, cost, desc });
-    await api('PUT','/api/settings',{websiteUpdates:updates});
-    closeModal('updateModal');
-    toast('আপডেট রেকর্ড সংরক্ষিত','success');
-    renderUpdateHistory(updates);
-    renderCostSummary(s.websiteCreatedCost||0, updates);
-  } catch(err){ toast('ব্যর্থ: '+err.message,'error'); }
-}
-
-async function deleteUpdateRecord(id) {
-  if(!confirm('এই রেকর্ডটি মুছবেন?')) return;
-  try {
-    const s=await api('GET','/api/settings');
-    const updates=(s.websiteUpdates||[]).filter(u=>u.id!==id);
-    await api('PUT','/api/settings',{websiteUpdates:updates});
-    toast('রেকর্ড মুছে গেছে','success');
-    renderUpdateHistory(updates);
-    renderCostSummary(s.websiteCreatedCost||0, updates);
-  } catch(err){ toast('ব্যর্থ: '+err.message,'error'); }
-}
-
-function renderUpdateHistory(updates) {
-  const el=document.getElementById('updateHistoryList');
-  if(!updates||updates.length===0){
-    el.innerHTML='<div style="text-align:center;padding:20px;color:var(--txt3);font-size:.82rem;border:1px dashed var(--border);border-radius:8px;">কোনো আপডেট রেকর্ড নেই। উপরের বোতামে ক্লিক করে যোগ করুন।</div>';
-    return;
-  }
-  el.innerHTML=updates.map((u,i)=>`
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px;">
-      <div style="width:28px;height:28px;border-radius:50%;background:rgba(232,102,10,.15);border:1px solid rgba(232,102,10,.3);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--orange2);flex-shrink:0;">${updates.length-i}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
-          <span style="font-size:.78rem;font-weight:700;color:var(--txt2);"><i class="fa-solid fa-calendar-day" style="margin-right:4px;color:var(--blue2)"></i>${formatDateBn(u.date)}</span>
-          <span style="font-size:.82rem;font-weight:700;color:var(--orange2);font-family:'JetBrains Mono',monospace;">৳${(u.cost||0).toLocaleString('bn-BD')}</span>
-        </div>
-        <div style="font-size:.82rem;color:var(--txt);line-height:1.5;">${u.desc}</div>
-      </div>
-      <button class="icon-btn del" onclick="deleteUpdateRecord(${u.id})" title="মুছুন"><i class="fa-solid fa-trash"></i></button>
-    </div>
-  `).join('');
-}
-
-function renderCostSummary(createdCost, updates) {
-  const el=document.getElementById('websiteCostSummary');
-  const updateTotal=(updates||[]).reduce((s,u)=>s+(u.cost||0),0);
-  const grand=parseFloat(createdCost||0)+updateTotal;
-  document.getElementById('summaryCreatedCost').textContent='৳'+(parseFloat(createdCost||0)).toLocaleString('bn-BD');
-  document.getElementById('summaryUpdateCost').textContent='৳'+updateTotal.toLocaleString('bn-BD');
-  document.getElementById('summaryTotalCost').textContent='৳'+grand.toLocaleString('bn-BD');
-  el.style.display='block';
-}
-
-function formatDateBn(dateStr) {
-  if(!dateStr) return '';
-  try {
-    const d=new Date(dateStr);
-    return d.toLocaleDateString('bn-BD',{year:'numeric',month:'long',day:'numeric'});
-  } catch { return dateStr; }
 }
 
 async function saveStoreSettings() {
@@ -3838,6 +3798,156 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(TOKEN) showApp();
   document.getElementById('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginPass').focus();});
 });
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ওয়েবসাইট খরচের হিসাব — JavaScript Functions
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const COST_TYPE_LABELS = {
+  creation: { label: 'তৈরি', icon: '🏗️', color: 'var(--green)' },
+  update:   { label: 'আপডেট', icon: '🔧', color: 'var(--blue2)' },
+  maintenance: { label: 'রক্ষণাবেক্ষণ', icon: '🛠️', color: 'var(--orange)' },
+  domain:   { label: 'ডোমেইন', icon: '🌐', color: 'var(--purple)' },
+  hosting:  { label: 'হোস্টিং', icon: '☁️', color: 'var(--yellow2)' },
+  other:    { label: 'অন্যান্য', icon: '📌', color: 'var(--txt2)' },
+};
+const COST_STATUS_LABELS = {
+  paid:    { label: 'পরিশোধিত', badge: 'badge green' },
+  pending: { label: 'বাকি', badge: 'badge red' },
+  partial: { label: 'আংশিক', badge: 'badge yellow' },
+};
+
+async function loadCosts() {
+  const type   = document.getElementById('costTypeFilter')?.value || 'all';
+  const status = document.getElementById('costStatusFilter')?.value || 'all';
+  const year   = document.getElementById('costYearFilter')?.value || '';
+  const tbody  = document.getElementById('costTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--txt2)"><i class="fa-solid fa-spinner fa-spin"></i> লোড হচ্ছে...</td></tr>';
+  try {
+    let path = '/api/website-costs?type=' + type + '&status=' + status;
+    if (year) path += '&year=' + year;
+    const data = await api('GET', path);
+
+    const fmt = n => '৳' + (n || 0).toLocaleString('bn-BD');
+    document.getElementById('csTotalAmt').textContent   = fmt(data.summary.totalAmount);
+    document.getElementById('csTotalPaid').textContent  = fmt(data.summary.totalPaid);
+    document.getElementById('csPending').textContent    = fmt(data.summary.totalPending);
+    document.getElementById('csUpdateCost').textContent = fmt(data.summary.updateCost);
+
+    populateCostYears(data.costs);
+
+    if (!data.costs.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--txt2)"><i class="fa-solid fa-receipt" style="font-size:2rem;opacity:.3"></i><br><br>কোনো খরচ নেই। উপরের বোতাম থেকে নতুন খরচ যোগ করুন।</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.costs.map(c => {
+      const t = COST_TYPE_LABELS[c.type] || COST_TYPE_LABELS.other;
+      const s = COST_STATUS_LABELS[c.status] || COST_STATUS_LABELS.paid;
+      const dt = new Date(c.date);
+      const dateStr = dt.toLocaleDateString('bn-BD', { year:'numeric', month:'long', day:'numeric' });
+      const amount = '৳' + (c.amount || 0).toLocaleString('bn-BD');
+      const paidInfo = c.status === 'partial'
+        ? '<br><small style="color:var(--txt2)">পরিশোধ: ৳' + (c.paidAmount||0).toLocaleString('bn-BD') + '</small>'
+        : '';
+      const noteDisplay = c.note ? `<span title="${c.note.replace(/"/g,"'")}">${c.note.length>30 ? c.note.slice(0,30)+'…' : c.note}</span>` : '—';
+      return `<tr>
+        <td style="white-space:nowrap;font-size:.82rem">${dateStr}</td>
+        <td><strong>${c.title}</strong></td>
+        <td><span style="color:${t.color};font-weight:600">${t.icon} ${t.label}</span></td>
+        <td><strong style="color:var(--green3)">${amount}</strong>${paidInfo}</td>
+        <td><span class="${s.badge}">${s.label}</span></td>
+        <td style="max-width:180px;font-size:.8rem;color:var(--txt2)">${noteDisplay}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button class="btn-icon" onclick="openEditCost('${c._id}')" title="সম্পাদনা"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn-icon danger" onclick="deleteCost('${c._id}','${c.title.replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--red2)">লোড করতে সমস্যা হয়েছে।</td></tr>';
+  }
+}
+
+let _costsCache = [];
+function populateCostYears(costs) {
+  _costsCache = costs;
+  const sel = document.getElementById('costYearFilter');
+  if (!sel) return;
+  const currentVal = sel.value;
+  const years = [...new Set(costs.map(c => new Date(c.date).getFullYear()))].sort((a,b)=>b-a);
+  const now = new Date().getFullYear();
+  if (!years.includes(now)) years.unshift(now);
+  const opts = '<option value="">সব বছর</option>' + years.map(y=>`<option value="${y}"${currentVal==y?' selected':''}>${y}</option>`).join('');
+  sel.innerHTML = opts;
+}
+
+function togglePaidAmount() {
+  const status = document.getElementById('costStatus')?.value;
+  const row = document.getElementById('paidAmountRow');
+  if (row) row.style.display = status === 'partial' ? 'block' : 'none';
+}
+
+function openCostModal(cost = null) {
+  document.getElementById('costId').value = cost?._id || '';
+  document.getElementById('costModalTitle').innerHTML = cost
+    ? '<i class="fa-solid fa-pen" style="color:var(--blue2)"></i> খরচ সম্পাদনা'
+    : '<i class="fa-solid fa-receipt" style="color:var(--green)"></i> নতুন খরচ যোগ';
+  document.getElementById('costType').value       = cost?.type || 'creation';
+  document.getElementById('costTitle').value      = cost?.title || '';
+  document.getElementById('costAmount').value     = cost?.amount || '';
+  document.getElementById('costStatus').value     = cost?.status || 'paid';
+  document.getElementById('costPaidAmount').value = cost?.paidAmount || '';
+  document.getElementById('costNote').value       = cost?.note || '';
+  const dateVal = cost?.date
+    ? new Date(cost.date).toISOString().split('T')[0]
+    : new Date().toISOString().split('T')[0];
+  document.getElementById('costDate').value = dateVal;
+  togglePaidAmount();
+  document.getElementById('costModal').classList.add('show');
+}
+
+function openEditCost(id) {
+  const cost = _costsCache.find(c => c._id === id);
+  if (cost) openCostModal(cost);
+  else toast('তথ্য পাওয়া যায়নি', 'error');
+}
+
+async function saveCost() {
+  const id         = document.getElementById('costId').value;
+  const type       = document.getElementById('costType').value;
+  const title      = document.getElementById('costTitle').value.trim();
+  const amount     = document.getElementById('costAmount').value;
+  const date       = document.getElementById('costDate').value;
+  const status     = document.getElementById('costStatus').value;
+  const paidAmount = document.getElementById('costPaidAmount').value;
+  const note       = document.getElementById('costNote').value.trim();
+
+  if (!title || !amount || !date) { toast('শিরোনাম, পরিমাণ ও তারিখ আবশ্যক', 'error'); return; }
+
+  const body = { type, title, amount: parseFloat(amount), date, status,
+    paidAmount: parseFloat(paidAmount || 0), note };
+  try {
+    if (id) await api('PUT', '/api/website-costs/' + id, body);
+    else    await api('POST', '/api/website-costs', body);
+    toast(id ? 'খরচ আপডেট হয়েছে ✓' : 'নতুন খরচ যোগ হয়েছে ✓', 'success');
+    closeModal('costModal');
+    loadCosts();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function deleteCost(id, title) {
+  if (!confirm('"' + title + '" — এই এন্ট্রি মুছে ফেলবেন?')) return;
+  try {
+    await api('DELETE', '/api/website-costs/' + id);
+    toast('খরচ মুছে গেছে', 'success');
+    loadCosts();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
 </script>
 </body>
 </html>
