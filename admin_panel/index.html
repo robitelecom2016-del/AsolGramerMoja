@@ -3895,7 +3895,7 @@ function openCostModal(id) {
   document.getElementById('costDesc').value       = '';
   document.getElementById('paidAmountWrap').style.display = 'none';
   document.getElementById('costModalTitle').innerHTML     = '<i class="fa-solid fa-plus" style="color:var(--blue2)"></i> নতুন খরচ এন্ট্রি';
-  document.getElementById('costModal').classList.add('show');
+  document.getElementById('costModal').classList.add('open'); document.body.style.overflow='hidden';
 }
 
 async function editCost(id) {
@@ -3915,7 +3915,7 @@ async function editCost(id) {
     document.getElementById('costDesc').value       = c.description || '';
     document.getElementById('paidAmountWrap').style.display = c.status === 'partial' ? 'block' : 'none';
     document.getElementById('costModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square" style="color:var(--blue2)"></i> খরচ এন্ট্রি সম্পাদনা';
-    document.getElementById('costModal').classList.add('show');
+    document.getElementById('costModal').classList.add('open'); document.body.style.overflow='hidden';
   } catch(err) { toast('লোড ব্যর্থ: ' + err.message, 'error'); }
 }
 
