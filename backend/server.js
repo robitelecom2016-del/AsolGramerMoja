@@ -199,7 +199,7 @@ const settingsSchema = new mongoose.Schema({
 const Settings = mongoose.model('Settings', settingsSchema);
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ওয়েবসাইট খরচের হিসাব Schema
+// ওয়েবসাইট খরচ ট্র্যাকার Schema
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const websiteCostSchema = new mongoose.Schema({
   type: {
@@ -207,18 +207,19 @@ const websiteCostSchema = new mongoose.Schema({
     enum: ['creation', 'update', 'maintenance', 'domain', 'hosting', 'other'],
     required: true,
   },
-  // creation = তৈরি, update = আপডেট, maintenance = রক্ষণাবেক্ষণ,
+  // creation = তৈরি খরচ, update = আপডেট, maintenance = রক্ষণাবেক্ষণ
   // domain = ডোমেইন, hosting = হোস্টিং, other = অন্যান্য
-  title: { type: String, required: true },     // খরচের শিরোনাম
-  amount: { type: Number, required: true },     // টাকার পরিমাণ
-  date: { type: Date, required: true },         // তারিখ
-  note: { type: String, default: '' },          // বিস্তারিত নোট
+  title: { type: String, required: true },        // সংক্ষিপ্ত বিবরণ
+  amount: { type: Number, required: true },        // টাকার পরিমাণ
+  date: { type: Date, required: true },            // তারিখ
+  description: { type: String, default: '' },      // বিস্তারিত বিবরণ
   status: {
     type: String,
     enum: ['paid', 'pending', 'partial'],
     default: 'paid',
   },
-  paidAmount: { type: Number, default: 0 },     // পরিশোধিত পরিমাণ
+  paidAmount: { type: Number, default: 0 },        // পরিশোধিত পরিমাণ (partial-এর ক্ষেত্রে)
+  developer: { type: String, default: '' },        // ডেভেলপার/ভেন্ডর
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -1257,72 +1258,64 @@ app.post('/api/seed', authMiddleware, async (req, res) => {
 });
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ওয়েবসাইট খরচের হিসাব Routes
+// ওয়েবসাইট খরচ ট্র্যাকার Routes
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-// সব খরচ লিস্ট (admin only)
+// সব খরচ দেখো (admin only)
 app.get('/api/website-costs', authMiddleware, async (req, res) => {
   try {
-    const { type, status, year } = req.query;
-    const filter = {};
-    if (type && type !== 'all') filter.type = type;
-    if (status && status !== 'all') filter.status = status;
-    if (year) {
-      const y = parseInt(year);
-      filter.date = { $gte: new Date(y, 0, 1), $lt: new Date(y + 1, 0, 1) };
-    }
-    const costs = await WebsiteCost.find(filter).sort({ date: -1 });
-    const allCosts = await WebsiteCost.find({});
-    const summary = {
-      totalAmount: allCosts.reduce((s, c) => s + c.amount, 0),
-      totalPaid: allCosts.filter(c => c.status === 'paid').reduce((s, c) => s + c.amount, 0)
-        + allCosts.filter(c => c.status === 'partial').reduce((s, c) => s + (c.paidAmount || 0), 0),
-      totalPending: allCosts.filter(c => c.status === 'pending').reduce((s, c) => s + c.amount, 0),
-      creationCost: allCosts.filter(c => c.type === 'creation').reduce((s, c) => s + c.amount, 0),
-      updateCost: allCosts.filter(c => c.type === 'update').reduce((s, c) => s + c.amount, 0),
-      count: allCosts.length,
-    };
-    res.json({ costs, summary });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+    const costs = await WebsiteCost.find().sort({ date: -1 });
+    const totalAmount = costs.reduce((s, c) => s + c.amount, 0);
+    const totalPaid = costs.reduce((s, c) => {
+      if (c.status === 'paid') return s + c.amount;
+      if (c.status === 'partial') return s + (c.paidAmount || 0);
+      return s;
+    }, 0);
+    const totalPending = costs.reduce((s, c) => {
+      if (c.status === 'pending') return s + c.amount;
+      if (c.status === 'partial') return s + (c.amount - (c.paidAmount || 0));
+      return s;
+    }, 0);
+    res.json({ costs, totalAmount, totalPaid, totalPending });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// নতুন খরচ যোগ (admin only)
+// নতুন খরচ যোগ করো (admin only)
 app.post('/api/website-costs', authMiddleware, async (req, res) => {
   try {
-    const { type, title, amount, date, note, status, paidAmount } = req.body;
-    if (!type || !title || !amount || !date)
-      return res.status(400).json({ error: 'type, title, amount, date আবশ্যক' });
-    const cost = await WebsiteCost.create({
-      type, title, amount: parseFloat(amount), date: new Date(date),
-      note: note || '', status: status || 'paid', paidAmount: parseFloat(paidAmount || 0),
-    });
+    const cost = await WebsiteCost.create({ ...req.body, updatedAt: new Date() });
     res.status(201).json(cost);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// খরচ আপডেট (admin only)
+// খরচ আপডেট করো (admin only)
 app.put('/api/website-costs/:id', authMiddleware, async (req, res) => {
   try {
-    const { type, title, amount, date, note, status, paidAmount } = req.body;
     const cost = await WebsiteCost.findByIdAndUpdate(
       req.params.id,
-      { type, title, amount: parseFloat(amount), date: new Date(date),
-        note: note || '', status: status || 'paid',
-        paidAmount: parseFloat(paidAmount || 0), updatedAt: new Date() },
+      { ...req.body, updatedAt: new Date() },
       { new: true, runValidators: true }
     );
-    if (!cost) return res.status(404).json({ error: 'খরচ পাওয়া যায়নি' });
+    if (!cost) return res.status(404).json({ error: 'Record not found' });
     res.json(cost);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // খরচ মুছো (admin only)
 app.delete('/api/website-costs/:id', authMiddleware, async (req, res) => {
   try {
     const cost = await WebsiteCost.findByIdAndDelete(req.params.id);
-    if (!cost) return res.status(404).json({ error: 'খরচ পাওয়া যায়নি' });
+    if (!cost) return res.status(404).json({ error: 'Record not found' });
     res.json({ success: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
