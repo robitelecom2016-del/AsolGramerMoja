@@ -664,6 +664,110 @@ app.get('/api/stock/logs', authMiddleware, async (req, res) => {
   }
 });
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// পণ্য বিক্রয় রিপোর্ট — কোন পণ্য কত পিস বিক্রি হয়েছে
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app.get('/api/reports/product-sales', authMiddleware, async (req, res) => {
+  try {
+    const { days = 30, status = 'delivered', limit = 50, page = 1 } = req.query;
+
+    const matchFilter = {};
+    // স্ট্যাটাস ফিল্টার (delivered / all / cancelled বাদে)
+    if (status === 'delivered') {
+      matchFilter.status = 'delivered';
+    } else if (status === 'active') {
+      matchFilter.status = { $in: ['confirmed', 'processing', 'shipped', 'delivered'] };
+    }
+    // তারিখ ফিল্টার
+    if (days && days !== 'all') {
+      const since = new Date();
+      since.setDate(since.getDate() - parseInt(days));
+      matchFilter.createdAt = { $gte: since };
+    }
+
+    // প্রতিটি পণ্যের মোট বিক্রয় সংখ্যা বের করো অর্ডার থেকে
+    const salesAgg = await Order.aggregate([
+      { $match: matchFilter },
+      { $unwind: '$items' },
+      {
+        $group: {
+          _id: '$items.productId',
+          productName: { $first: '$items.nm' },
+          em: { $first: '$items.em' },
+          img: { $first: '$items.img' },
+          totalQty: { $sum: '$items.qty' },
+          totalRevenue: { $sum: { $multiply: ['$items.cartPrice', '$items.qty'] } },
+          totalCost: { $sum: { $multiply: [{ $ifNull: ['$items.buyPrice', 0] }, '$items.qty'] } },
+          orderCount: { $sum: 1 },
+        },
+      },
+      { $sort: { totalQty: -1 } },
+      { $skip: (parseInt(page) - 1) * parseInt(limit) },
+      { $limit: parseInt(limit) },
+    ]);
+
+    // মোট পণ্য ধরন গণনা
+    const totalCountAgg = await Order.aggregate([
+      { $match: matchFilter },
+      { $unwind: '$items' },
+      { $group: { _id: '$items.productId' } },
+      { $count: 'total' },
+    ]);
+    const totalProducts = totalCountAgg[0]?.total || 0;
+
+    // মোট বিক্রি পিস ও রাজস্ব
+    const overallAgg = await Order.aggregate([
+      { $match: matchFilter },
+      { $unwind: '$items' },
+      {
+        $group: {
+          _id: null,
+          totalQty: { $sum: '$items.qty' },
+          totalRevenue: { $sum: { $multiply: ['$items.cartPrice', '$items.qty'] } },
+          totalCost: { $sum: { $multiply: [{ $ifNull: ['$items.buyPrice', 0] }, '$items.qty'] } },
+        },
+      },
+    ]);
+    const overall = overallAgg[0] || { totalQty: 0, totalRevenue: 0, totalCost: 0 };
+
+    // প্রতিটি পণ্যের বর্তমান স্টক যোগ করো
+    const productIds = salesAgg.map(s => s._id).filter(Boolean);
+    const products = await Product.find({ _id: { $in: productIds } })
+      .select('nm em img stockQuantity stockOut cat').lean();
+    const prodMap = {};
+    products.forEach(p => { prodMap[p._id.toString()] = p; });
+
+    const result = salesAgg.map(s => {
+      const prod = prodMap[s._id] || {};
+      return {
+        productId: s._id,
+        nm: prod.nm || s.productName || '—',
+        em: prod.em || s.em || '🛒',
+        img: prod.img || s.img || '',
+        cat: prod.cat || '',
+        totalQty: s.totalQty,
+        totalRevenue: s.totalRevenue,
+        totalCost: s.totalCost,
+        totalProfit: s.totalRevenue - s.totalCost,
+        orderCount: s.orderCount,
+        stockQuantity: prod.stockQuantity ?? 0,
+        stockOut: prod.stockOut ?? false,
+      };
+    });
+
+    res.json({
+      products: result,
+      totalProducts,
+      overall: {
+        totalQty: overall.totalQty,
+        totalRevenue: overall.totalRevenue,
+        totalProfit: overall.totalRevenue - overall.totalCost,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.post('/api/upload/product-image', authMiddleware, upload.single('image'), async (req, res) => {
   try {
