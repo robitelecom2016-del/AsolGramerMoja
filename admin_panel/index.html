@@ -1561,7 +1561,8 @@ textarea.form-control { resize:vertical; min-height:80px; }
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-let API = localStorage.getItem('adminApiUrl') || 'https://asolgramermoja-jysj.onrender.com';
+const RENDER_URL = 'https://asolgramermoja-jysj.onrender.com';
+let API = localStorage.getItem('adminApiUrl') || RENDER_URL;
 let TOKEN = localStorage.getItem('adminToken') || '';
 let FRONTEND_URL = localStorage.getItem('frontendUrl') || '';
 
@@ -1572,7 +1573,19 @@ const api = async (method, path, body, isFormData = false) => {
   const opts = { method, headers: { 'Authorization': `Bearer ${TOKEN}` } };
   if (body && !isFormData) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
   else if (body && isFormData) { opts.body = body; }
-  const res = await fetch(API + path, opts);
+  let res;
+  try {
+    res = await fetch(API + path, opts);
+  } catch (networkErr) {
+    throw new Error('সার্ভারের সাথে সংযোগ করা যাচ্ছে না। ইন্টারনেট চেক করুন অথবা ব্যাকএন্ড সার্ভার চালু আছে কিনা দেখুন।');
+  }
+  // 401 হলে টোকেন মুছে লগইন পেজে পাঠাও
+  if (res.status === 401) {
+    TOKEN = ''; localStorage.removeItem('adminToken');
+    document.getElementById('appLayout').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'flex';
+    throw new Error('সেশন শেষ হয়ে গেছে। আবার লগইন করুন।');
+  }
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'API Error');
   return data;
@@ -1697,16 +1710,18 @@ function navTo(page) {
 }
 
 async function checkHealth() {
+  const el = document.getElementById('dbStatus');
   try {
-    const res = await fetch(API + '/api/health');
+    const res = await fetch(API + '/api/health', { signal: AbortSignal.timeout(8000) });
     const data = await res.json();
-    const el = document.getElementById('dbStatus');
     if (data.db === 'connected') {
       el.innerHTML = '<span class="dot"></span><span>DB: <span class="val">connected</span></span>';
     } else {
       el.innerHTML = '<span class="dot" style="background:var(--red)"></span><span>DB: <span class="val" style="color:var(--red2)">disconnected</span></span>';
     }
-  } catch {}
+  } catch (err) {
+    el.innerHTML = '<span class="dot" style="background:var(--red);animation:none"></span><span>Server: <span class="val" style="color:var(--red2)">offline</span></span>';
+  }
 }
 setInterval(checkHealth, 30000);
 
@@ -3305,12 +3320,29 @@ function toggleApiInput() {
   el.style.display=el.style.display==='none'?'block':'none';
 }
 
-function saveApiUrl() {
+async function saveApiUrl() {
   const url=document.getElementById('apiUrlInp').value.trim().replace(/\/$/,'');
-  if (!url) return;
-  API=url; localStorage.setItem('adminApiUrl',API);
-  document.getElementById('apiUrlDisp').textContent=API;
-  toast('API URL সংরক্ষিত','success');
+  if (!url) { toast('একটি বৈধ URL দিন','error'); return; }
+  // URL ফরম্যাট চেক করো
+  try { new URL(url); } catch { toast('URL সঠিক নয় (https:// দিয়ে শুরু করুন)','error'); return; }
+  // সংযোগ পরীক্ষা করো
+  toast('সংযোগ পরীক্ষা করা হচ্ছে...','info');
+  try {
+    const res = await fetch(url + '/api/health', { signal: AbortSignal.timeout(6000) });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      API = url;
+      localStorage.setItem('adminApiUrl', API);
+      document.getElementById('apiUrlDisp').textContent = API;
+      document.getElementById('apiUrlInput').style.display = 'none';
+      toast('✅ সংযোগ সফল! API URL সংরক্ষিত হয়েছে','success');
+      checkHealth();
+    } else {
+      toast('সার্ভার সাড়া দিচ্ছে না','error');
+    }
+  } catch(err) {
+    toast('সংযোগ ব্যর্থ — URL সঠিক কিনা যাচাই করুন','error');
+  }
 }
 
 
@@ -3787,11 +3819,29 @@ function toast(msg,type='info') {
 
 function debounce(fn,delay) { let timer; return (...args)=>{clearTimeout(timer);timer=setTimeout(()=>fn(...args),delay);}; }
 
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('apiUrlDisp').textContent=API;
-  document.getElementById('apiUrlInp').value=API;
-  if(TOKEN) showApp();
-  document.getElementById('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginPass').focus();});
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('apiUrlDisp').textContent = API;
+  document.getElementById('apiUrlInp').value = API;
+
+  // পেজ লোডে সার্ভার কানেকশন চেক করো
+  fetch(API + '/api/health', { signal: AbortSignal.timeout(8000) })
+    .then(r => r.json())
+    .then(data => {
+      const el = document.getElementById('dbStatus');
+      if (data.db === 'connected') {
+        el.innerHTML = '<span class="dot"></span><span>DB: <span class="val">connected</span></span>';
+      } else {
+        el.innerHTML = '<span class="dot" style="background:var(--red)"></span><span>DB: <span class="val" style="color:var(--red2)">disconnected</span></span>';
+      }
+    })
+    .catch(() => {
+      const el = document.getElementById('dbStatus');
+      if (el) el.innerHTML = '<span class="dot" style="background:var(--red);animation:none"></span><span>Server: <span class="val" style="color:var(--red2)">offline</span></span>';
+    });
+
+  if (TOKEN) showApp();
+  document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginPass').focus(); });
+  document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 });
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -21,19 +21,35 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5500',
   'http://127.0.0.1:5500',
+  'http://localhost:5173',
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
 ].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.some(o => origin.startsWith(o))) {
+    // origin না থাকলে (same-origin বা Postman) allow করো
+    if (!origin) return callback(null, true);
+    // exact match অথবা শেষে / ছাড়াও match করো
+    const isAllowed = allowedOrigins.some(o => {
+      const base = o.replace(/\/$/, '');
+      return origin === base || origin === base + '/';
+    });
+    if (isAllowed) {
       callback(null, true);
     } else {
-      callback(null, true);
+      console.warn(`CORS blocked: ${origin}`);
+      // Production-এ block করো, development-এ allow করো
+      if (process.env.NODE_ENV === 'production') {
+        callback(new Error('Not allowed by CORS'));
+      } else {
+        callback(null, true);
+      }
     }
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.use(express.json({ limit: '10mb' }));
@@ -259,6 +275,8 @@ const stockLogSchema = new mongoose.Schema({
 });
 const StockLog = mongoose.model('StockLog', stockLogSchema);
 
+const JWT_SECRET = process.env.JWT_SECRET || 'asolgramer_super_secret_jwt_key_2024_secure';
+
 const memStorage = multer.memoryStorage();
 const upload = multer({ storage: memStorage, limits: { fileSize: 5 * 1024 * 1024 } });
 const uploadThumb = multer({ storage: memStorage, limits: { fileSize: 5 * 1024 * 1024 } });
@@ -280,7 +298,7 @@ const authMiddleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'Token required' });
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'asolgramer_secret_2024');
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.admin = decoded;
     next();
   } catch {
@@ -331,7 +349,7 @@ app.post('/api/auth/login', async (req, res) => {
     if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
     const token = jwt.sign(
       { id: admin._id, username: admin.username, name: admin.name },
-      process.env.JWT_SECRET || 'asolgramer_secret_2024',
+      JWT_SECRET,
       { expiresIn: '7d' }
     );
     res.json({ token, admin: { username: admin.username, name: admin.name } });
