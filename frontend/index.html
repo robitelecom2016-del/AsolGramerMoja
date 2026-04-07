@@ -2038,8 +2038,6 @@ function openOrderModal() {
   document.querySelectorAll('.om-del-opt').forEach(o => o.classList.remove('selected'));
   document.getElementById('omMainContent').style.display = 'block';
   document.getElementById('omSuccess').classList.remove('show');
-  const submitBtn = document.getElementById('omSubmitBtn');
-  if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> অর্ডার কনফার্ম করুন'; }
   const subtotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
   document.getElementById('omItems').innerHTML = items.map(i => `
     <div class="om-item">
