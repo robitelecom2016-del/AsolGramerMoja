@@ -858,10 +858,6 @@ textarea.form-control { resize:vertical; min-height:80px; }
         <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
           <i class="fa-solid fa-plus-circle" style="color:var(--green2)"></i>
           <span style="font-weight:600;font-size:.95rem">নতুন স্টক লেনদেন রেকর্ড করুন</span>
-          <span style="margin-left:auto;font-size:.75rem;color:var(--txt2);background:rgba(46,160,67,.1);border:1px solid rgba(46,160,67,.2);padding:3px 10px;border-radius:20px">
-            <i class="fa-solid fa-circle-info" style="color:var(--green2)"></i>
-            পণ্য ম্যানেজ থেকে স্টক দিলে এখানে স্বয়ংক্রিয় রেকর্ড হয়
-          </span>
         </div>
         <div style="padding:18px 20px">
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
@@ -1402,7 +1398,7 @@ textarea.form-control { resize:vertical; min-height:80px; }
         <div class="form-group2">
           <label>📦 মোট স্টক পরিমাণ</label>
           <input type="number" class="form-control" id="pStockQty" placeholder="0" min="0" style="border-color:rgba(59,130,246,.4)">
-          <div class="form-hint" style="color:var(--green2)">✅ এখানে স্টক দিলে "স্টক লেনদেন"-এ স্বয়ংক্রিয় 📥 কেনা হিসেবে রেকর্ড হবে।</div>
+          <div class="form-hint" style="color:var(--blue2)">মোট পণ্য সংখ্যা। ভ্যারিয়েন্টে স্টক দিলে স্বয়ংক্রিয় যোগ হবে।</div>
         </div>
         <div class="form-group2">
           <label>বেস্ট সেলার</label>
@@ -2140,7 +2136,6 @@ async function saveProd() {
   if (!variants.length) { toast('কমপক্ষে একটি ভেরিয়েন্ট যোগ করুন','error'); return; }
   let slug = document.getElementById('pSlug').value.trim();
   if (!slug && nm) slug = generateSlug(nm);
-  const newStockQty = parseInt(document.getElementById('pStockQty').value)||0;
   const data = { 
     nm, cat, sub:document.getElementById('pSub').value.trim(), em:document.getElementById('pEm').value.trim()||'🛒', 
     bg:document.getElementById('pBg').value.trim(), phone:document.getElementById('pPhone').value.trim(), 
@@ -2151,7 +2146,7 @@ async function saveProd() {
     best:document.getElementById('pBest').value==='true', 
     active:document.getElementById('pActive').value==='true', 
     stockOut:document.getElementById('pStockOut').value==='true',
-    stockQuantity: newStockQty,
+    stockQuantity: parseInt(document.getElementById('pStockQty').value)||0,
     variants, 
     highlights:getHighlights(),
     metaTitle: document.getElementById('pMetaTitle').value.trim(),
@@ -2165,39 +2160,8 @@ async function saveProd() {
   
   btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> সংরক্ষণ হচ্ছে...'; btn.disabled=true;
   try {
-    let savedProd;
-    if(id) {
-      // এডিট: আগের স্টক জানতে হবে
-      const oldProd = allProds.find(p => p._id === id) || slProducts.find(p => p._id === id);
-      const oldStockQty = oldProd ? (oldProd.stockQuantity || 0) : 0;
-      savedProd = await api('PUT',`/api/products/${id}`,data);
-      // স্টক পরিবর্তন হলে স্বয়ংক্রিয় stock log তৈরি করো
-      const stockDiff = newStockQty - oldStockQty;
-      if (stockDiff !== 0) {
-        const logType = stockDiff > 0 ? 'purchase' : 'adjustment';
-        const logQty = Math.abs(stockDiff);
-        const logNote = stockDiff > 0
-          ? `পণ্য আপডেট থেকে স্বয়ংক্রিয় — স্টক ${oldStockQty} → ${newStockQty}`
-          : `পণ্য আপডেট থেকে স্বয়ংক্রিয় — স্টক সমন্বয় ${oldStockQty} → ${newStockQty}`;
-        await api('POST', '/api/stock/log', {
-          productId: id,
-          type: logType,
-          qty: logQty,
-          note: logNote
-        }).catch(() => {}); // log ব্যর্থ হলেও পণ্য সেভ বাতিল হবে না
-      }
-    } else {
-      savedProd = await api('POST','/api/products',data);
-      // নতুন পণ্য: স্টক > 0 হলে স্বয়ংক্রিয় purchase log তৈরি করো
-      if (newStockQty > 0 && savedProd && savedProd._id) {
-        await api('POST', '/api/stock/log', {
-          productId: savedProd._id,
-          type: 'purchase',
-          qty: newStockQty,
-          note: `নতুন পণ্য যোগ — প্রাথমিক স্টক ${newStockQty} পিস`
-        }).catch(() => {}); // log ব্যর্থ হলেও পণ্য সেভ বাতিল হবে না
-      }
-    }
+    if(id) await api('PUT',`/api/products/${id}`,data);
+    else await api('POST','/api/products',data);
     closeModal('prodModal'); toast(id?'পণ্য আপডেট সফল':'নতুন পণ্য যোগ সফল','success'); loadProducts();
   } catch(err) { toast('সংরক্ষণ ব্যর্থ: '+err.message,'error'); }
   finally { btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ করুন'; btn.disabled=false; }
@@ -2404,29 +2368,7 @@ async function saveOneStock(pid) {
   });
 
   try {
-    // আগের স্টক মনে রাখো
-    const oldProd = allStockData.find(p => p._id === pid);
-    const oldStockQty = oldProd ? (oldProd.stockQuantity || 0) : 0;
-
     await api('PATCH', `/api/products/${pid}/stock`, { stockQuantity, variants });
-
-    // স্টক পরিবর্তন হলে স্বয়ংক্রিয় stock log তৈরি করো
-    const stockDiff = stockQuantity - oldStockQty;
-    if (stockDiff !== 0) {
-      const logType = stockDiff > 0 ? 'purchase' : 'adjustment';
-      const logQty = Math.abs(stockDiff);
-      const prodName = oldProd ? oldProd.nm : '';
-      const logNote = stockDiff > 0
-        ? `স্টক ম্যানেজ থেকে স্বয়ংক্রিয় — ${oldStockQty} → ${stockQuantity}`
-        : `স্টক ম্যানেজ থেকে স্বয়ংক্রিয় — সমন্বয় ${oldStockQty} → ${stockQuantity}`;
-      await api('POST', '/api/stock/log', {
-        productId: pid,
-        type: logType,
-        qty: logQty,
-        note: logNote
-      }).catch(() => {});
-    }
-
     // allStockData আপডেট করো
     const idx = allStockData.findIndex(p => p._id === pid);
     if (idx !== -1) {
@@ -2452,7 +2394,6 @@ async function saveBulkStock() {
   if (!allRows.length) { toast('সেভ করার কিছু নেই', 'info'); return; }
 
   const updates = [];
-  const logEntries = []; // স্বয়ংক্রিয় log-এর জন্য
   allRows.forEach(row => {
     const pid = row.id.replace('stock-row-', '');
     const totalInp = document.getElementById(`total-stock-${pid}`);
@@ -2461,21 +2402,6 @@ async function saveBulkStock() {
     const variants = [];
     varInputs.forEach(inp => variants.push({ lbl: inp.dataset.vlbl, stock: parseInt(inp.value) || 0 }));
     updates.push({ productId: pid, stockQuantity, variants });
-
-    // আগের স্টক হিসাব
-    const oldProd = allStockData.find(p => p._id === pid);
-    const oldStockQty = oldProd ? (oldProd.stockQuantity || 0) : 0;
-    const stockDiff = stockQuantity - oldStockQty;
-    if (stockDiff !== 0) {
-      logEntries.push({
-        productId: pid,
-        type: stockDiff > 0 ? 'purchase' : 'adjustment',
-        qty: Math.abs(stockDiff),
-        note: stockDiff > 0
-          ? `বাল্ক স্টক আপডেট — ${oldStockQty} → ${stockQuantity}`
-          : `বাল্ক স্টক সমন্বয় — ${oldStockQty} → ${stockQuantity}`
-      });
-    }
   });
 
   const btn = document.querySelector('#page-stock .btn-primary');
@@ -2484,12 +2410,6 @@ async function saveBulkStock() {
   try {
     const res = await api('PATCH', '/api/stock/bulk', { updates });
     toast(`✅ ${res.updated}টি পণ্যের স্টক আপডেট হয়েছে`, 'success');
-
-    // স্বয়ংক্রিয় stock log তৈরি করো
-    for (const entry of logEntries) {
-      await api('POST', '/api/stock/log', entry).catch(() => {});
-    }
-
     // slProducts (লেনদেন পেজের ক্যাশ) আপডেট করো
     updates.forEach(upd => {
       const slIdx = slProducts.findIndex(p => p._id === upd.productId);
