@@ -20,6 +20,7 @@
 <meta name="twitter:description" content="খাঁটি গ্রামীণ পণ্য সরাসরি কৃষক থেকে। gramerasolmoja.shop">
 <meta name="twitter:image" content="https://gramerasolmoja.shop/images/logo-g.png">
 <link rel="canonical" href="https://gramerasolmoja.shop">
+<!-- JSON-LD Structured Data for Google -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -38,6 +39,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-F5MDVLE0LH"></script>
+<!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -53,6 +55,7 @@ fbq('track', 'PageView');
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=1396042442297865&ev=PageView&noscript=1"
 /></noscript>
+<!-- End Meta Pixel Code -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -768,7 +771,10 @@ footer p{font-size:.79rem;line-height:1.7;}
 .om-trx-input::placeholder{color:#bbb;font-weight:400;}
 .om-advance-amt{font-size:.8rem;color:#7a4500;background:#fff0cc;padding:7px 12px;border-radius:6px;margin-top:6px;text-align:center;font-weight:600;}
 .order-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;align-items:center;justify-content:center;padding:16px;}
-.order-ov.open{opacity:1;pointer-events:all;}
+.order-ov.open {
+  opacity: 1;
+  pointer-events: all;
+}
 .order-modal{background:#fff;border-radius:0;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;transform:translateY(30px) scale(.97);transition:transform .3s ease;box-shadow:0 20px 60px rgba(0,0,0,.3);scrollbar-width:thin;scrollbar-color:#b0c8aa #f0ede6;}
 .order-modal::-webkit-scrollbar{width:5px;}
 .order-modal::-webkit-scrollbar-track{background:#f0ede6;}
@@ -1463,6 +1469,7 @@ function goContactPage() {
 function goProduct(idOrSlug) {
   const p = prods.find(x => x._id === idOrSlug || x.slug === idOrSlug);
   if (!p) { loadProductById(idOrSlug); return; }
+  // প্রোডাক্ট ক্লিক রেকর্ড করো
   trackProductClick(p._id);
   buildPdp(p);
   document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
@@ -1482,6 +1489,7 @@ async function loadProductById(id) {
   window.scrollTo(0, 0);
   try {
     const p = await api(`/api/products/${id}`);
+    // প্রোডাক্ট ক্লিক রেকর্ড করো (API থেকে লোড হলেও)
     trackProductClick(p._id);
     buildPdp(p);
     const slug = p.slug || p.nm.replace(/\s+/g, '-');
@@ -1510,15 +1518,31 @@ window.addEventListener('popstate', e => {
     goHome();
   }
 });
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Analytics: পেজ ভিউ ট্র্যাক করো
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function trackPageView() {
-  fetch(API_BASE + '/api/analytics/pageview', { method: 'POST', headers: { 'Content-Type': 'application/json' } }).catch(() => {});
+  fetch(API_BASE + '/api/analytics/pageview', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  }).catch(() => {}); // নীরবে ব্যর্থ হলে চলে যাবে
 }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Analytics: প্রোডাক্ট ক্লিক ট্র্যাক করো
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function trackProductClick(productId) {
   if (!productId) return;
-  fetch(API_BASE + `/api/analytics/product-click/${productId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } }).catch(() => {});
+  fetch(API_BASE + `/api/analytics/product-click/${productId}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  }).catch(() => {}); // নীরবে ব্যর্থ হলে চলে যাবে
 }
+
 window.addEventListener('DOMContentLoaded', () => {
+  // পেজ লোড হলেই একবার ভিউ রেকর্ড করো
   trackPageView();
+
   const h = location.hash;
   if (h.startsWith('#/product/')) {
     const slug = h.split('/').pop();
@@ -1614,148 +1638,62 @@ function cardBody(p) {
 }
 function bestCard(p) {
   const so = isStockOut(p);
-
-  return `
-  <div class="bcard">
+  return `<div class="bcard">
     <div class="bcard-inner">
       ${p.best ? '<div class="b-badge">Best Seller</div>' : ''}
-
-      <div class="c-img" 
-        style="background:${p.bg || '#c8a55a'}22;position:relative;" 
-        onclick="goProduct('${p._id}')">
-
-        ${p.img 
-          ? imgTag(p.img, p.nm) 
-          : `<span style="font-size:3rem">${p.em || ''}</span>`}
-
-        <span style="position:absolute;bottom:8px;right:10px;font-size:1.4rem;z-index:3;">
-          ${p.em || ''}
-        </span>
-
-        ${so ? `
-          <div class="stock-out-badge">স্টক আউট</div>
-          <div class="stock-out-overlay"><span>স্টক নেই</span></div>
-        ` : ''}
+      <div class="c-img" style="background:${p.bg||'#c8a55a'}22;position:relative;" onclick="goProduct('${p._id}')">
+        ${p.img ? imgTag(p.img, p.nm) : `<span style="font-size:3rem">${p.em}</span>`}
+        <span style="position:absolute;bottom:8px;right:10px;font-size:1.4rem;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));pointer-events:none;">${p.em}</span>
+        ${so ? '<div class="stock-out-badge">স্টক আউট</div><div class="stock-out-overlay"><span>স্টক নেই</span></div>' : ''}
       </div>
-
-      ${acts(p._id)}
-      ${cardBody(p)}
-
-      <button class="bcard-quick-add"
-        ${so ? 'disabled style="background:#aaa;cursor:not-allowed"' : ''}
-        onclick="event.stopPropagation(); ${so ? '' : `addToCartBase('${p._id}')`}">
-
-        <i class="fa-solid fa-cart-plus"></i>
-        ${so ? 'স্টক নেই' : 'কার্টে যোগ করুন'}
+      ${acts(p._id)}${cardBody(p)}
+      <button class="bcard-quick-add" ${so?'disabled style="background:#aaa;cursor:not-allowed"':''} onclick="${so?'':'addToCartBase(\''+p._id+'\');event.stopPropagation()'}">
+        <i class="fa-solid fa-cart-plus"></i> ${so?'স্টক নেই':'কার্টে যোগ করুন'}
       </button>
     </div>
   </div>`;
 }
-
-
 function regCard(p) {
   const so = isStockOut(p);
-
-  return `
-  <div class="pcard" onclick="goProduct('${p._id}')">
-    <div class="c-img" style="background:${p.bg || '#c8a55a'}22;position:relative;">
-
-      ${p.img 
-        ? imgTag(p.img, p.nm) 
-        : `<span style="font-size:2.5rem;position:absolute">${p.em || ''}</span>`}
-
-      <span style="position:absolute;bottom:6px;right:8px;font-size:1.2rem;">
-        ${p.em || ''}
-      </span>
-
-      ${so ? `
-        <div class="stock-out-badge">স্টক আউট</div>
-        <div class="stock-out-overlay"><span>স্টক নেই</span></div>
-      ` : ''}
+  return `<div class="pcard" onclick="goProduct('${p._id}')">
+    <div class="c-img" style="background:${p.bg||'#c8a55a'}22;position:relative;">
+      ${p.img ? imgTag(p.img, p.nm) : `<span style="font-size:2.5rem;position:absolute">${p.em}</span>`}
+      <span style="position:absolute;bottom:6px;right:8px;font-size:1.2rem;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));pointer-events:none;">${p.em}</span>
+      ${so ? '<div class="stock-out-badge">স্টক আউট</div><div class="stock-out-overlay"><span>স্টক নেই</span></div>' : ''}
     </div>
-
-    ${acts(p._id)}
-    ${cardBody(p)}
+    ${acts(p._id)}${cardBody(p)}
   </div>`;
 }
-
-
 function allCard(p) {
   const so = isStockOut(p);
-
-  return `
-  <div class="agcard" onclick="goProduct('${p._id}')">
-    <div class="c-img" style="background:${p.bg || '#c8a55a'}22;position:relative;">
-
-      ${p.img 
-        ? imgTag(p.img, p.nm) 
-        : `<span style="font-size:2.5rem;position:absolute">${p.em || ''}</span>`}
-
-      <span style="position:absolute;bottom:6px;right:8px;font-size:1.2rem;">
-        ${p.em || ''}
-      </span>
-
-      ${so ? `
-        <div class="stock-out-badge">স্টক আউট</div>
-        <div class="stock-out-overlay"><span>স্টক নেই</span></div>
-      ` : ''}
+  return `<div class="agcard" onclick="goProduct('${p._id}')">
+    <div class="c-img" style="background:${p.bg||'#c8a55a'}22;position:relative;">
+      ${p.img ? imgTag(p.img, p.nm) : `<span style="font-size:2.5rem;position:absolute">${p.em}</span>`}
+      <span style="position:absolute;bottom:6px;right:8px;font-size:1.2rem;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));pointer-events:none;">${p.em}</span>
+      ${so ? '<div class="stock-out-badge">স্টক আউট</div><div class="stock-out-overlay"><span>স্টক নেই</span></div>' : ''}
     </div>
-
-    ${acts(p._id)}
-    ${cardBody(p)}
+    ${acts(p._id)}${cardBody(p)}
   </div>`;
 }
-
-
 function renderBest() {
   const best = prods.filter(p => p.best && p.active !== false);
-
-  const el = document.getElementById('slider-best');
-
-  if (!el) return; // ❗ fix: element না থাকলে error বন্ধ
-
-  if (!best.length) {
-    el.innerHTML = `
-      <div style="padding:20px;text-align:center;color:#aaa;width:100%">
-        কোনো বেস্ট সেলার পণ্য নেই
-      </div>`;
-    return;
-  }
-
-  el.innerHTML = best.map(bestCard).join('');
-
+  if (!best.length) { document.getElementById('slider-best').innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;width:100%">কোনো বেস্ট সেলার পণ্য নেই</div>'; return; }
+  document.getElementById('slider-best').innerHTML = best.map(bestCard).join('');
   bestCloned = false;
-
   regSlider('best', best.length, window.innerWidth <= 900 ? 2 : 4);
   startBestAutoSlide();
 }
-
-
 let activeCatRow = '';
-
 function renderCatTabs() {
-  const el = document.getElementById('catTabs');
-  if (!el) return; // ❗ fix
-
-  el.innerHTML = cats.map(c => `
-    <button onclick="switchCat('${c.id}')"
-      style="
-        padding:6px 14px;
-        border:none;
-        cursor:pointer;
-        font-family:inherit;
-        font-size:.83rem;
-        font-weight:600;
-        background:${c.id === activeCatRow ? 'var(--gd)' : '#fff'};
-        color:${c.id === activeCatRow ? '#fff' : '#555'};
-        border-right:1px solid var(--border);
-        transition:all .2s;
-        white-space:nowrap;
-      ">
-      ${c.em || ''} ${c.lbl || ''}
-    </button>
-  `).join('');
-}function switchCat(catId) {
+  document.getElementById('catTabs').innerHTML = cats.map(c => `
+    <button onclick="switchCat('${c.id}')" style="
+      padding:6px 14px;border:none;cursor:pointer;font-family:inherit;font-size:.83rem;font-weight:600;
+      background:${c.id===activeCatRow?'var(--gd)':'#fff'};
+      color:${c.id===activeCatRow?'#fff':'#555'};
+      border-right:1px solid var(--border);transition:all .2s;white-space:nowrap;
+    ">${c.em} ${c.lbl}</button>`).join('');
+}
+function switchCat(catId) {
   activeCatRow = catId;
   renderCatTabs();
   const items = prods.filter(p => p.cat === catId && p.active !== false);
@@ -2089,59 +2027,36 @@ function checkAdvanceDelivery(items) {
   });
   return found;
 }
-// *********************************************
-// FIXED: openOrderModal function with robust error handling
-// *********************************************
 function openOrderModal() {
   const items = Object.values(cart);
   if (!items.length) { showToast('❌ কার্টে কোনো পণ্য নেই'); return; }
   selectedDelivery = null;
   selectedDeliveryType = '';
-  // Safely clear form fields
-  const nameEl = document.getElementById('omName');
-  if (nameEl) nameEl.value = '';
-  const phoneEl = document.getElementById('omPhone');
-  if (phoneEl) phoneEl.value = '';
-  const addrEl = document.getElementById('omAddress');
-  if (addrEl) addrEl.value = '';
-  const noteEl = document.getElementById('omNote');
-  if (noteEl) noteEl.value = '';
+  document.getElementById('omName').value = '';
+  document.getElementById('omPhone').value = '';
+  document.getElementById('omAddress').value = '';
+  document.getElementById('omNote').value = '';
   const trxEl = document.getElementById('omTrxId');
   if (trxEl) trxEl.value = '';
-  const delOpts = document.querySelectorAll('.om-del-opt');
-  delOpts.forEach(o => o.classList.remove('selected'));
-  const mainContent = document.getElementById('omMainContent');
-  if (mainContent) mainContent.style.display = 'block';
-  const successDiv = document.getElementById('omSuccess');
-  if (successDiv) successDiv.classList.remove('show');
+  document.querySelectorAll('.om-del-opt').forEach(o => o.classList.remove('selected'));
+  document.getElementById('omMainContent').style.display = 'block';
+  document.getElementById('omSuccess').classList.remove('show');
   const subtotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
-  const omItemsDiv = document.getElementById('omItems');
-  if (omItemsDiv) {
-    omItemsDiv.innerHTML = items.map(i => `
-      <div class="om-item">
-        <div class="om-item-em">${i.img ? `<img src="${i.img}" alt="${i.nm}" onerror="this.style='font-size:1.4rem';this.parentElement.textContent='${i.em||'📦'}'">` : (i.em || '📦')}</div>
-        <div class="om-item-info"><div class="om-item-nm">${i.nm}</div><div class="om-item-var">${i.varLabel} × ${i.qty}</div></div>
-        <div class="om-item-price">৳${(i.cartPrice * i.qty).toLocaleString('en')}</div>
-      </div>`).join('');
-  }
-  const omSubtotal = document.getElementById('omSubtotal');
-  if (omSubtotal) omSubtotal.textContent = '৳' + subtotal.toLocaleString('en');
-  const omSubtotal2 = document.getElementById('omSubtotal2');
-  if (omSubtotal2) omSubtotal2.textContent = '৳' + subtotal.toLocaleString('en');
-  const omDeliveryDisplay = document.getElementById('omDeliveryDisplay');
-  if (omDeliveryDisplay) omDeliveryDisplay.textContent = '— নির্বাচন করুন';
-  const omDelivery2 = document.getElementById('omDelivery2');
-  if (omDelivery2) omDelivery2.textContent = '—';
-  const omGrandTotal = document.getElementById('omGrandTotal');
-  if (omGrandTotal) omGrandTotal.textContent = '৳' + subtotal.toLocaleString('en');
-  const omGrand2 = document.getElementById('omGrand2');
-  if (omGrand2) omGrand2.textContent = '৳' + subtotal.toLocaleString('en');
-  const omSubmitTotal = document.getElementById('omSubmitTotal');
-  if (omSubmitTotal) omSubmitTotal.textContent = '৳' + subtotal.toLocaleString('en');
-  const delCharge1 = document.getElementById('delCharge1');
-  if (delCharge1) delCharge1.textContent = '৳' + deliveryCharges.inside;
-  const delCharge2 = document.getElementById('delCharge2');
-  if (delCharge2) delCharge2.textContent = '৳' + deliveryCharges.outside;
+  document.getElementById('omItems').innerHTML = items.map(i => `
+    <div class="om-item">
+      <div class="om-item-em">${i.img ? `<img src="${i.img}" alt="${i.nm}" onerror="this.style='font-size:1.4rem';this.parentElement.textContent='${i.em||'📦'}'">` : (i.em || '📦')}</div>
+      <div class="om-item-info"><div class="om-item-nm">${i.nm}</div><div class="om-item-var">${i.varLabel} × ${i.qty}</div></div>
+      <div class="om-item-price">৳${(i.cartPrice * i.qty).toLocaleString('en')}</div>
+    </div>`).join('');
+  document.getElementById('omSubtotal').textContent = '৳' + subtotal.toLocaleString('en');
+  document.getElementById('omSubtotal2').textContent = '৳' + subtotal.toLocaleString('en');
+  document.getElementById('omDeliveryDisplay').textContent = '— নির্বাচন করুন';
+  document.getElementById('omDelivery2').textContent = '—';
+  document.getElementById('omGrandTotal').textContent = '৳' + subtotal.toLocaleString('en');
+  document.getElementById('omGrand2').textContent = '৳' + subtotal.toLocaleString('en');
+  document.getElementById('omSubmitTotal').textContent = '৳' + subtotal.toLocaleString('en');
+  document.getElementById('delCharge1').textContent = '৳' + deliveryCharges.inside;
+  document.getElementById('delCharge2').textContent = '৳' + deliveryCharges.outside;
   const advItems = items.filter(i => {
     const cat = (i.cat || '').trim();
     return ADVANCE_DELIVERY_CATS.some(ac => cat.includes(ac) || ac.includes(cat));
@@ -2151,25 +2066,21 @@ function openOrderModal() {
   const legalEl = document.getElementById('omLegalText');
   if (requiresAdvanceDelivery) {
     const catNames = [...new Set(advItems.map(i => i.cat))].join(', ');
-    const advCatList = document.getElementById('omAdvanceCatList');
-    if (advCatList) advCatList.textContent = catNames;
-    const bkashNum = document.getElementById('omBkashNum');
-    if (bkashNum) bkashNum.textContent = ADVANCE_PAYMENT_INFO.bkash;
-    const nagadNum = document.getElementById('omNagadNum');
-    if (nagadNum) nagadNum.textContent = ADVANCE_PAYMENT_INFO.nagad;
-    if (advBox) advBox.style.display = 'block';
+    document.getElementById('omAdvanceCatList').textContent = catNames;
+    document.getElementById('omBkashNum').textContent = ADVANCE_PAYMENT_INFO.bkash;
+    document.getElementById('omNagadNum').textContent = ADVANCE_PAYMENT_INFO.nagad;
+    advBox.style.display = 'block';
     if (legalEl) legalEl.innerHTML = '⚠️ এই অর্ডারে <strong>ডেলিভারি চার্জ অগ্রিম</strong> পরিশোধ করতে হবে। বাকি পণ্যমূল্য ডেলিভারিতে দিন।';
   } else {
-    if (advBox) advBox.style.display = 'none';
+    advBox.style.display = 'none';
     if (legalEl) legalEl.textContent = 'ক্যাশ অন ডেলিভারি — পণ্য পেলে টাকা দিন। কোনো অগ্রিম পেমেন্ট নেই।';
   }
   const cartSb = document.getElementById('cartSb');
   const cartOv = document.getElementById('cartOv');
   const orderOv = document.getElementById('orderOv');
-  if (!orderOv) { showToast('মডাল এলিমেন্ট পাওয়া যায়নি'); return; }
-  if (cartSb && cartSb.classList.contains('open')) {
+  if (cartSb.classList.contains('open')) {
     cartSb.classList.remove('open');
-    if (cartOv) cartOv.classList.remove('open');
+    cartOv.classList.remove('open');
     setTimeout(() => {
       orderOv.classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -2180,41 +2091,34 @@ function openOrderModal() {
   }
 }
 function closeOrderModal() {
-  const orderOv = document.getElementById('orderOv');
-  if (orderOv) orderOv.classList.remove('open');
+  document.getElementById('orderOv').classList.remove('open');
   document.body.style.overflow = '';
 }
 function selectDelivery(charge, optId, type) {
   selectedDelivery = charge;
   selectedDeliveryType = type;
   document.querySelectorAll('.om-del-opt').forEach(o => o.classList.remove('selected'));
-  const opt = document.getElementById(optId);
-  if (opt) opt.classList.add('selected');
+  document.getElementById(optId).classList.add('selected');
   const subtotal = Object.values(cart).reduce((s, i) => s + i.cartPrice * i.qty, 0);
   const grand = subtotal + charge;
-  const omDeliveryDisplay = document.getElementById('omDeliveryDisplay');
-  if (omDeliveryDisplay) omDeliveryDisplay.textContent = '৳' + charge;
-  const omDelivery2 = document.getElementById('omDelivery2');
-  if (omDelivery2) omDelivery2.textContent = '৳' + charge;
-  const omGrandTotal = document.getElementById('omGrandTotal');
-  if (omGrandTotal) omGrandTotal.textContent = '৳' + grand.toLocaleString('en');
-  const omGrand2 = document.getElementById('omGrand2');
-  if (omGrand2) omGrand2.textContent = '৳' + grand.toLocaleString('en');
-  const omSubmitTotal = document.getElementById('omSubmitTotal');
-  if (omSubmitTotal) omSubmitTotal.textContent = '৳' + grand.toLocaleString('en');
+  document.getElementById('omDeliveryDisplay').textContent = '৳' + charge;
+  document.getElementById('omDelivery2').textContent = '৳' + charge;
+  document.getElementById('omGrandTotal').textContent = '৳' + grand.toLocaleString('en');
+  document.getElementById('omGrand2').textContent = '৳' + grand.toLocaleString('en');
+  document.getElementById('omSubmitTotal').textContent = '৳' + grand.toLocaleString('en');
   const advAmt = document.getElementById('omAdvanceAmtText');
   if (advAmt && requiresAdvanceDelivery) {
     advAmt.innerHTML = `📌 অগ্রিম পাঠাতে হবে: <strong>৳${charge.toLocaleString('en')}</strong> (ডেলিভারি চার্জ মাত্র)`;
   }
 }
 async function submitOrder() {
-  const name = document.getElementById('omName')?.value.trim() || '';
-  const phone = document.getElementById('omPhone')?.value.trim() || '';
-  const address = document.getElementById('omAddress')?.value.trim() || '';
-  const note = document.getElementById('omNote')?.value.trim() || '';
-  if (!name) { showToast('❌ নাম লিখুন'); document.getElementById('omName')?.focus(); return; }
-  if (!phone || phone.length < 11) { showToast('❌ সঠিক মোবাইল নম্বর দিন'); document.getElementById('omPhone')?.focus(); return; }
-  if (!address) { showToast('❌ ঠিকানা লিখুন'); document.getElementById('omAddress')?.focus(); return; }
+  const name = document.getElementById('omName').value.trim();
+  const phone = document.getElementById('omPhone').value.trim();
+  const address = document.getElementById('omAddress').value.trim();
+  const note = document.getElementById('omNote').value.trim();
+  if (!name) { showToast('❌ নাম লিখুন'); document.getElementById('omName').focus(); return; }
+  if (!phone || phone.length < 11) { showToast('❌ সঠিক মোবাইল নম্বর দিন'); document.getElementById('omPhone').focus(); return; }
+  if (!address) { showToast('❌ ঠিকানা লিখুন'); document.getElementById('omAddress').focus(); return; }
   if (selectedDelivery === null) { showToast('❌ ডেলিভারি পদ্ধতি নির্বাচন করুন'); return; }
   let trxId = '';
   if (requiresAdvanceDelivery) {
@@ -2235,10 +2139,8 @@ async function submitOrder() {
   const subtotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
   const total = subtotal + selectedDelivery;
   const btn = document.getElementById('omSubmitBtn');
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> অর্ডার হচ্ছে...';
-  }
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> অর্ডার হচ্ছে...';
   const orderData = {
     items: items.map(i => ({ productId: i._id || i.id, nm: i.nm, varLabel: i.varLabel, qty: i.qty, cartPrice: i.cartPrice, em: i.em, img: i.img || '' })),
     customer: { name, phone, address, note },
@@ -2254,22 +2156,17 @@ async function submitOrder() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Order failed');
-    const orderNumSpan = document.getElementById('omOrderNum');
-    if (orderNumSpan) orderNumSpan.textContent = 'অর্ডার নম্বর: ' + data.orderNum;
+    document.getElementById('omOrderNum').textContent = 'অর্ডার নম্বর: ' + data.orderNum;
     const advNote = document.getElementById('omSuccessAdvanceNote');
     if (advNote) advNote.style.display = requiresAdvanceDelivery ? 'block' : 'none';
-    const mainContent = document.getElementById('omMainContent');
-    if (mainContent) mainContent.style.display = 'none';
-    const successDiv = document.getElementById('omSuccess');
-    if (successDiv) successDiv.classList.add('show');
+    document.getElementById('omMainContent').style.display = 'none';
+    document.getElementById('omSuccess').classList.add('show');
     cart = {};
     updateCart();
   } catch (err) {
     showToast('❌ অর্ডার ব্যর্থ হয়েছে: ' + (err.message || 'সার্ভার সমস্যা'));
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> অর্ডার কনফার্ম করুন';
-    }
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> অর্ডার কনফার্ম করুন';
   }
 }
 async function loadProductsPage(page) {
@@ -2460,6 +2357,15 @@ if (!heroTimer) {
       cur = next;
     }
   }, 4500);
+}
+
+
+console.log("openOrderModal called", items.length);
+try {
+  // ... বাকি সব কোড (যা আগে ছিল)
+} catch(e) {
+  console.error("Order modal error:", e);
+  showToast("টেকনিক্যাল সমস্যা, পরে আবার চেষ্টা করুন");
 }
 </script>
 </body>
