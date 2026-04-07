@@ -2376,6 +2376,12 @@ async function saveOneStock(pid) {
       allStockData[idx].stockOut = stockQuantity <= 0;
       allStockData[idx].isLow = stockQuantity > 0 && stockQuantity <= 10;
     }
+    // slProducts (লেনদেন পেজের ক্যাশ) আপডেট করো — প্রিভিউ সঠিক থাকবে
+    const slIdx = slProducts.findIndex(p => p._id === pid);
+    if (slIdx !== -1) { slProducts[slIdx].stockQuantity = stockQuantity; }
+    // বর্তমানে ঐ পণ্য সিলেক্ট থাকলে slCurrentStock আপডেট করো
+    const selPid = document.getElementById('slProductId')?.value;
+    if (selPid === pid) { slCurrentStock = stockQuantity; previewStockCalc(); }
     toast('স্টক আপডেট সফল ✅', 'success');
   } catch(err) {
     toast('স্টক সেভ ব্যর্থ: ' + err.message, 'error');
@@ -2404,6 +2410,14 @@ async function saveBulkStock() {
   try {
     const res = await api('PATCH', '/api/stock/bulk', { updates });
     toast(`✅ ${res.updated}টি পণ্যের স্টক আপডেট হয়েছে`, 'success');
+    // slProducts (লেনদেন পেজের ক্যাশ) আপডেট করো
+    updates.forEach(upd => {
+      const slIdx = slProducts.findIndex(p => p._id === upd.productId);
+      if (slIdx !== -1) { slProducts[slIdx].stockQuantity = upd.stockQuantity; }
+    });
+    // বর্তমান সিলেক্টেড পণ্য আপডেট হলে প্রিভিউ রিফ্রেশ করো
+    const selPid = document.getElementById('slProductId')?.value;
+    if (selPid) { const updMatch = updates.find(u => u.productId === selPid); if (updMatch) { slCurrentStock = updMatch.stockQuantity; previewStockCalc(); } }
     loadStockPage();
   } catch(err) {
     toast('Bulk সেভ ব্যর্থ: ' + err.message, 'error');
@@ -2476,9 +2490,16 @@ async function submitStockLog() {
     const res = await api('POST', '/api/stock/log', { productId, type, qty, note });
     const typeLabel = type === 'purchase' ? '📥 কেনা' : type === 'sale' ? '📤 বিক্রি' : '🔧 সমন্বয়';
     toast(`✅ ${typeLabel} রেকর্ড হয়েছে। বর্তমান স্টক: ${res.stockAfter} পিস`, 'success');
-    // স্টক আপডেট করো ক্যাশে
+    // slProducts ক্যাশে আপডেট করো
     const prod = slProducts.find(p => p._id === productId);
     if (prod) { prod.stockQuantity = res.stockAfter; slCurrentStock = res.stockAfter; }
+    // allStockData (স্টক পেজের ক্যাশ) আপডেট করো — যাতে স্টক পেজ রিফ্রেশ না করেও ঠিক থাকে
+    const stockIdx = allStockData.findIndex(p => p._id === productId);
+    if (stockIdx !== -1) {
+      allStockData[stockIdx].stockQuantity = res.stockAfter;
+      allStockData[stockIdx].stockOut = res.stockAfter <= 0;
+      allStockData[stockIdx].isLow = res.stockAfter > 0 && res.stockAfter <= 10;
+    }
     resetStockLogForm();
     loadStockLogs();
   } catch(err) {
