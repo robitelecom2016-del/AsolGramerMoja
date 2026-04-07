@@ -1836,7 +1836,7 @@ function renderPdp(p) {
           <button class="pdp-btn-cart" id="pdpCartBtn" onclick="pdpAddCart('${p._id||p.id}')" ${isStockOut(p)?'disabled':''}>
             <i class="fa-solid fa-cart-plus"></i> ${isStockOut(p)?'স্টক নেই':'কার্টে যোগ করুন'}
           </button>
-          <button class="pdp-btn-order" onclick="pdpAddCart('${p._id||p.id}');toggleCart()" ${isStockOut(p)?'disabled':''}>
+          <button class="pdp-btn-order" onclick="pdpOrderNow('${p._id||p.id}')" ${isStockOut(p)?'disabled':''}>
             <i class="fa-solid fa-bag-shopping"></i> ${isStockOut(p)?'স্টক নেই':'এখনই অর্ডার করুন'}
           </button>
           <button class="pdp-btn-phone">
@@ -2023,6 +2023,27 @@ function checkAdvanceDelivery(items) {
     return ADVANCE_DELIVERY_CATS.some(ac => cat.includes(ac) || ac.includes(cat));
   });
   return found;
+}
+function pdpOrderNow(id) {
+  const p = prods.find(x => (x._id || x.id) === id);
+  if (!p) return;
+  if (isStockOut(p)) { showToast('❌ এই পণ্যটি স্টক আউট'); return; }
+  // কার্টে যোগ করুন (যদি আগে না থাকে)
+  const v = p.variants?.[pdpState.varIdx] || { p: getBasePrice(p), lbl: 'Default' };
+  const cartKey = `${id}_${pdpState.varIdx}`;
+  if (!cart[cartKey]) cart[cartKey] = { ...p, qty: 0, cartPrice: v.p, varLabel: v.lbl || '', cartKey };
+  cart[cartKey].qty += pdpState.qty;
+  updateCart();
+  // Cart sidebar যদি খোলা থাকে বন্ধ করে তারপর order modal খুলুন
+  const cartSb = document.getElementById('cartSb');
+  const cartOv = document.getElementById('cartOv');
+  if (cartSb && cartSb.classList.contains('open')) {
+    cartSb.classList.remove('open');
+    cartOv.classList.remove('open');
+    setTimeout(openOrderModal, 320);
+  } else {
+    openOrderModal();
+  }
 }
 function openOrderModal() {
   const items = Object.values(cart);
