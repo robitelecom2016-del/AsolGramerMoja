@@ -1409,7 +1409,7 @@ const api = async (path, opts = {}) => {
   if (!res.ok) throw new Error('API error: ' + res.status);
   return res.json();
 };
-let prods = [];
+let prods = []; 
 let cats = [];
 let heroSlides = [];
 let settings = {};

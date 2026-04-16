@@ -1477,7 +1477,7 @@ app.get('/sitemap.xml', async (req, res) => {
 });
 
 app.get('/robots.txt', (req, res) => {
-  res.type('text/plain');
+  res.type('text/plain'); 
   res.send(`User-agent: *
 Allow: /
 Sitemap: ${process.env.FRONTEND_URL || 'https://asolgramermoja.netlify.app'}/sitemap.xml
