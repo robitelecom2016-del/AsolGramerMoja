@@ -83,7 +83,11 @@ body{
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:#f0ede6;}
 ::-webkit-scrollbar-thumb{background:#c8c0b0;border-radius:3px;}
-.navbar{background:var(--gd);position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.navbar{
+  background:linear-gradient(135deg,#2d3a5e 0%,#3b4d78 60%,#2a3457 100%);
+  position:sticky;top:0;z-index:1000;
+  box-shadow:0 4px 24px rgba(30,40,80,.35);
+}
 .nb{max-width:var(--mw);margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:14px;height:62px;}
 .nb-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0;cursor:pointer;}
@@ -121,23 +125,56 @@ body{
   text-overflow:ellipsis;max-width:100%;
   margin:0;padding:0;
 }
-.nav-links{display:flex;align-items:center;list-style:none;flex-shrink:0;}
-.nav-links a{color:#d4f0b0;text-decoration:none;font-size:.88rem;padding:0 13px;border-right:1px solid rgba(255,255,255,.15);cursor:pointer;}
-.nav-links li:last-child a{border-right:none;}
-.nav-links a:hover,.nav-links a.active{color:#fff;font-weight:600;}
+.nav-links{display:flex;align-items:center;list-style:none;flex-shrink:0;gap:28px;}
+.nav-links a{
+  position:relative;
+  color:#c5cde8;text-decoration:none;
+  font-size:.72rem;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;
+  padding:4px 0;cursor:pointer;
+  transition:color .2s;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-2px;left:0;
+  width:0;height:2px;background:#7b96f5;
+  border-radius:2px;transition:width .25s cubic-bezier(.4,0,.2,1);
+}
+.nav-links a:hover{color:#fff;}
+.nav-links a:hover::after{width:100%;}
+.nav-links a.active{color:#fff;}
+.nav-links a.active::after{width:100%;}
 .search-wrap{flex:1;position:relative;max-width:360px;}
-.search-input{width:100%;padding:8px 38px 8px 14px;border-radius:20px;border:none;background:rgba(255,255,255,.15);color:#fff;font-family:inherit;font-size:.87rem;outline:none;transition:background .2s;}
-.search-input::placeholder{color:rgba(255,255,255,.6);}
-.search-input:focus{background:rgba(255,255,255,.25);}
-.search-icon-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.75);font-size:.9rem;cursor:pointer;background:none;border:none;padding:4px;}
-.cart-btn{background:var(--or);color:#fff;border:none;padding:8px 15px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:.87rem;display:flex;align-items:center;gap:6px;transition:background .2s;flex-shrink:0;white-space:nowrap;}
-.cart-btn:hover{background:var(--orl);}
-.cart-count{background:#fff;color:var(--or);border-radius:50%;width:17px;height:17px;font-size:.65rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.search-input{
+  width:100%;padding:7px 38px 7px 14px;
+  border-radius:999px;border:1px solid rgba(255,255,255,.13);
+  background:rgba(255,255,255,.1);
+  color:#fff;font-family:inherit;font-size:.72rem;
+  outline:none;transition:background .2s,width .3s,border-color .2s;
+  letter-spacing:.08em;
+}
+.search-input::placeholder{color:rgba(200,210,240,.6);}
+.search-input:focus{background:rgba(255,255,255,.18);border-color:rgba(123,150,245,.5);}
+.search-icon-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:rgba(180,195,240,.8);font-size:.9rem;cursor:pointer;background:none;border:none;padding:4px;}
+.cart-btn{
+  background:var(--or);color:#fff;border:none;
+  padding:8px 15px;border-radius:999px;cursor:pointer;
+  font-family:inherit;font-size:.87rem;
+  display:flex;align-items:center;gap:6px;
+  transition:background .2s,transform .15s;flex-shrink:0;white-space:nowrap;
+}
+.cart-btn:hover{background:var(--orl);transform:translateY(-1px);}
+.cart-count{
+  background:#fff;color:var(--or);border-radius:50%;
+  width:18px;height:18px;font-size:.65rem;
+  display:flex;align-items:center;justify-content:center;font-weight:700;
+  transition:transform .2s;
+}
+.cart-btn:hover .cart-count{transform:scale(1.15);}
 .mob-header{
   display:none;
   position:sticky;top:0;z-index:1000;
-  background:var(--gd);
-  box-shadow:0 2px 8px rgba(0,0,0,.28);
+  background:linear-gradient(135deg,#2d3a5e 0%,#3b4d78 60%,#2a3457 100%);
+  box-shadow:0 4px 24px rgba(30,40,80,.35);
 }
 .mob-header-inner{
   display:flex;align-items:center;
@@ -560,19 +597,19 @@ body{
 .why-ic{font-size:2rem;margin-bottom:7px;display:block;}
 .why-card h3{font-size:.92rem;font-weight:700;color:var(--gd);margin-bottom:5px;}
 .why-card p{font-size:.78rem;color:var(--txt2);line-height:1.6;}
-footer{background:var(--gd);color:#c8e6b0;padding:32px 16px 16px; flex-shrink:0; }
+footer.site-footer{background:#3d4a6b;color:#a8b4cc;padding:0;flex-shrink:0;}
 .fin{max-width:var(--mw);margin:0 auto;}
 .fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:24px;margin-bottom:20px;}
-footer h4{color:#fff;font-size:.88rem;margin-bottom:10px;font-weight:700;}
-footer p{font-size:.79rem;line-height:1.7;}
+footer.site-footer h4{color:#fff;font-size:.88rem;margin-bottom:10px;font-weight:700;}
+footer.site-footer p{font-size:.79rem;line-height:1.7;}
 .flinks{list-style:none;}
 .flinks li{margin-bottom:5px;}
-.flinks a{color:#c8e6b0;text-decoration:none;font-size:.79rem;transition:color .2s;cursor:pointer;}
+.flinks a{color:#a8b4cc;text-decoration:none;font-size:.79rem;transition:color .2s;cursor:pointer;}
 .flinks a:hover{color:#fff;}
 .soc{display:flex;gap:9px;margin-top:9px;}
-.sb{background:rgba(255,255,255,.1);color:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:.88rem;display:flex;align-items:center;justify-content:center;transition:background .2s;text-decoration:none;}
-.sb:hover{background:var(--or);}
-.fbot{border-top:1px solid rgba(255,255,255,.12);padding-top:12px;text-align:center;font-size:.74rem;color:rgba(255,255,255,.4);}
+.sb{background:rgba(255,255,255,.08);color:#a8b4cc;border:2px solid #a8b4cc;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:.88rem;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s,color .2s;text-decoration:none;}
+.sb:hover{background:transparent;border-color:#fff;color:#fff;}
+.fbot{border-top:1px solid rgba(255,255,255,.08);padding-top:0;text-align:center;font-size:.74rem;color:rgba(255,255,255,.4);}
 .cart-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;opacity:0;pointer-events:none;transition:opacity .3s;}
 .cart-ov.open{opacity:1;pointer-events:all;}
 .cart-sb{position:fixed;right:-420px;top:0;width:400px;height:100%;background:#fff;z-index:2001;transition:right .3s ease;display:flex;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,.18);}
@@ -885,23 +922,117 @@ footer p{font-size:.79rem;line-height:1.7;}
   .prod-card .c-img{height:calc(50vw - 26px);}
   #catTabs button{font-size:.76rem;padding:5px 11px;}
 }
+
+/* ===== NEW FOOTER STYLES ===== */
+.site-footer{
+  background:#3d4a6b;
+  color:#fff;
+  font-family:'Hind Siliguri',sans-serif;
+}
+.footer-main{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:36px;
+  max-width:var(--mw);
+  margin:0 auto;
+  padding:40px 24px;
+}
+.footer-logo{
+  margin-bottom:14px;cursor:pointer;
+  display:flex;align-items:center;
+}
+.footer-logo .lt-main{color:#fff;}
+.footer-logo .lt-sub{color:#b8e67a;}
+.footer-desc{
+  color:#a8b4cc;font-size:.84rem;
+  line-height:1.75;margin-bottom:18px;
+}
+.footer-phone{
+  margin-top:12px;font-size:.79rem;color:#c8e6b0;
+}
+.footer-heading{
+  color:#fff;font-size:.72rem;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
+  margin-bottom:16px;
+}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:0;}
+.footer-links li a{
+  display:flex;align-items:baseline;gap:7px;
+  color:#a8b4cc;font-size:.84rem;
+  padding:7px 0;cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  text-decoration:none;
+  transition:color .2s;
+}
+.footer-links li:last-child a{border-bottom:none;}
+.footer-links li a:hover{color:#fff;}
+.footer-link-arrow{color:#6a7da0;font-size:.8rem;}
+.footer-links li a:hover .footer-link-arrow{color:#7b96f5;}
+.footer-socials{display:flex;gap:10px;margin-top:4px;}
+.footer-social-btn{
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid #a8b4cc;
+  display:flex;align-items:center;justify-content:center;
+  color:#a8b4cc;
+  transition:border-color .2s,color .2s;
+  text-decoration:none;
+}
+.footer-social-btn:hover{border-color:#fff;color:#fff;}
+.footer-social-icon{
+  width:16px;height:16px;
+  fill:currentColor;
+}
+/* Bottom bar */
+.footer-bottom{
+  background:#2f3a56;
+  display:flex;flex-wrap:wrap;
+  align-items:center;justify-content:space-between;
+  gap:10px;
+  max-width:100%;
+  padding:14px 24px;
+  font-size:.76rem;
+  color:#6a7da0;
+}
+.footer-bottom-nav{display:flex;gap:24px;}
+.footer-bot-link{
+  color:#a8b4cc;text-decoration:none;
+  font-size:.72rem;font-weight:700;
+  letter-spacing:.15em;text-transform:uppercase;
+  cursor:pointer;transition:color .2s;
+}
+.footer-bot-link:hover{color:#fff;}
+@media(max-width:900px){
+  .footer-main{grid-template-columns:1fr 1fr;gap:24px;}
+}
+@media(max-width:600px){
+  .footer-main{grid-template-columns:1fr;gap:20px;padding:28px 16px;}
+  .footer-bottom{flex-direction:column;align-items:flex-start;gap:8px;padding:14px 16px;}
+  .footer-bottom-nav{gap:14px;flex-wrap:wrap;}
+}
+/* ===== END FOOTER STYLES ===== */
 </style>
 </head>
 <body>
 <nav class="navbar">
   <div class="nb">
+    <!-- Brand / Logo -->
     <div class="logo" onclick="goHome()">
       <div class="logo-icon">
         <img src="images/logo-g.png" alt="Logo">
       </div>
-      <div class="logo-txt"><span class="lt-main">আসল গ্রামের মজা</span><span class="lt-sub">বিশুদ্ধ পণ্য · সরাসরি কৃষক থেকে</span></div>
+      <div class="logo-txt">
+        <span class="lt-main">আসল গ্রামের মজা</span>
+        <span class="lt-sub">বিশুদ্ধ পণ্য · সরাসরি কৃষক থেকে</span>
+      </div>
     </div>
+    <!-- Desktop Nav Links -->
     <ul class="nav-links">
       <li><a onclick="goHome()" id="navHome" class="active">হোম</a></li>
       <li><a onclick="goProductsPage()" id="navProducts">পণ্য</a></li>
       <li><a onclick="goAboutPage()" id="navAbout">আমাদের সম্পর্কে</a></li>
       <li><a onclick="goContactPage()" id="navContact">যোগাযোগ</a></li>
     </ul>
+    <!-- Search + Cart -->
     <div class="nb-right">
       <div class="search-wrap" id="deskSearchWrap">
         <input type="text" class="search-input" id="deskSearch" placeholder="পণ্য খুঁজুন..." autocomplete="off" oninput="doSearch(this.value,'deskDrop')">
@@ -909,7 +1040,8 @@ footer p{font-size:.79rem;line-height:1.7;}
         <div class="search-dropdown" id="deskDrop"></div>
       </div>
       <button class="cart-btn" onclick="toggleCart()">
-        <i class="fa-solid fa-cart-shopping"></i> Cart
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span style="font-size:.87rem;font-weight:600;letter-spacing:.05em;">কার্ট</span>
         <span class="cart-count" id="cartCountDesk">0</span>
       </button>
     </div>
@@ -1071,36 +1203,66 @@ footer p{font-size:.79rem;line-height:1.7;}
 <div class="page" id="page-product">
   <div id="pdpContent"></div>
 </div>
-<footer>
-  <div class="fin">
-    <div class="fgrid">
-      <div>
-        <div class="logo" onclick="goHome()" style="margin-bottom:12px;display:flex;">
-          <div class="logo-icon">
-            <img src="images/logo-g.png" alt="Logo">
-          </div>
-          <div class="logo-txt"><span class="lt-main">আসল গ্রামের মজা</span><span class="lt-sub">বিশুদ্ধ পণ্য · সরাসরি কৃষক থেকে</span></div>
+<footer class="site-footer">
+  <!-- Main Footer Grid -->
+  <div class="footer-main">
+    <!-- About Column -->
+    <div class="footer-col">
+      <div class="logo footer-logo" onclick="goHome()">
+        <div class="logo-icon">
+          <img src="images/logo-g.png" alt="Logo">
         </div>
-        <p id="footerDesc">বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়। সরাসরি কৃষক থেকে আপনার কাছে।</p>
-        <div class="soc">
-          <a href="#" id="fbLink" class="sb"><i class="fa-brands fa-facebook-f"></i></a>
-          <a href="#" id="igLink" class="sb"><i class="fa-brands fa-instagram"></i></a>
+        <div class="logo-txt">
+          <span class="lt-main">আসল গ্রামের মজা</span>
+          <span class="lt-sub">বিশুদ্ধ পণ্য · সরাসরি কৃষক থেকে</span>
         </div>
       </div>
-      <div><h4>নেভিগেশন</h4><ul class="flinks"><li><a onclick="goHome()">হোম</a></li><li><a onclick="goProductsPage()">পণ্য</a></li><li><a onclick="goAboutPage()">আমাদের সম্পর্কে</a></li><li><a onclick="goContactPage()">যোগাযোগ</a></li></ul></div>
-      <div><h4>পণ্য বিভাগ</h4><ul class="flinks" id="footerCatLinks"></ul></div>
-      <div>
-        <h4>সাহায্য</h4>
-        <ul class="flinks">
-          <li><a>ডেলিভারি তথ্য</a></li>
-          <li><a>রিটার্ন পলিসি</a></li>
-          <li><a>গোপনীয়তা নীতি</a></li>
-          <li><a onclick="goContactPage()">যোগাযোগ করুন</a></li>
-        </ul>
-        <div style="margin-top:10px;font-size:.79rem;color:#c8e6b0;" id="footerPhone"></div>
+      <p class="footer-desc" id="footerDesc">বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়। সরাসরি কৃষক থেকে আপনার কাছে।</p>
+      <div class="footer-socials soc">
+        <a href="#" id="fbLink" class="sb footer-social-btn" title="Facebook">
+          <svg class="footer-social-icon" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="#" id="igLink" class="sb footer-social-btn" title="Instagram">
+          <svg class="footer-social-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></svg>
+        </a>
       </div>
     </div>
-    <div class="fbot" id="footerCopyright">&copy; 2024 আসল গ্রামের মজা | সর্বস্বত্ব সংরক্ষিত</div>
+    <!-- Navigation Column -->
+    <div class="footer-col">
+      <h4 class="footer-heading">নেভিগেশন</h4>
+      <ul class="flinks footer-links">
+        <li><a onclick="goHome()"><span class="footer-link-arrow">»</span> হোম</a></li>
+        <li><a onclick="goProductsPage()"><span class="footer-link-arrow">»</span> পণ্য</a></li>
+        <li><a onclick="goAboutPage()"><span class="footer-link-arrow">»</span> আমাদের সম্পর্কে</a></li>
+        <li><a onclick="goContactPage()"><span class="footer-link-arrow">»</span> যোগাযোগ</a></li>
+      </ul>
+    </div>
+    <!-- Categories Column -->
+    <div class="footer-col">
+      <h4 class="footer-heading">পণ্য বিভাগ</h4>
+      <ul class="flinks footer-links" id="footerCatLinks"></ul>
+    </div>
+    <!-- Help Column -->
+    <div class="footer-col">
+      <h4 class="footer-heading">সাহায্য</h4>
+      <ul class="flinks footer-links">
+        <li><a><span class="footer-link-arrow">»</span> ডেলিভারি তথ্য</a></li>
+        <li><a><span class="footer-link-arrow">»</span> রিটার্ন পলিসি</a></li>
+        <li><a><span class="footer-link-arrow">»</span> গোপনীয়তা নীতি</a></li>
+        <li><a onclick="goContactPage()"><span class="footer-link-arrow">»</span> যোগাযোগ করুন</a></li>
+      </ul>
+      <div class="footer-phone" id="footerPhone"></div>
+    </div>
+  </div>
+  <!-- Bottom Bar -->
+  <div class="fbot footer-bottom">
+    <span id="footerCopyright">&copy; 2024 আসল গ্রামের মজা | সর্বস্বত্ব সংরক্ষিত</span>
+    <nav class="footer-bottom-nav">
+      <a onclick="goHome()" class="footer-bot-link">হোম</a>
+      <a onclick="goProductsPage()" class="footer-bot-link">পণ্য</a>
+      <a onclick="goAboutPage()" class="footer-bot-link">আমাদের সম্পর্কে</a>
+      <a onclick="goContactPage()" class="footer-bot-link">যোগাযোগ</a>
+    </nav>
   </div>
 </footer>
 <nav class="bottom-nav" id="bottomNav" style="display:none !important;">
@@ -1241,7 +1403,7 @@ footer p{font-size:.79rem;line-height:1.7;}
 </div>
 <div class="toast" id="toast"><div class="toast-inner"><div class="toast-icon" id="toastIcon"><i class="fa-solid fa-check"></i></div><span class="toast-msg" id="toastMsg"></span></div><div class="toast-bar" id="toastBar"></div></div>
 <script>
-const API_BASE = 'https://asolgramermoja-jysj.onrender.com';
+const API_BASE = 'https://asolgramermoja-lkxv.onrender.com';
 const api = async (path, opts = {}) => {
   const res = await fetch(API_BASE + path, { ...opts, headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) } });
   if (!res.ok) throw new Error('API error: ' + res.status);
