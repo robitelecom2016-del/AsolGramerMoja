@@ -74,7 +74,7 @@ src="https://www.facebook.com/tr?id=1396042442297865&ev=PageView&noscript=1"
 *{margin:0;padding:0;box-sizing:border-box;}
 body{
   font-family:'Hind Siliguri',sans-serif;
-  background:#f0ede6;
+  background:#f5f5f5;
   color:var(--txt);
   display:flex;
   flex-direction:column;
@@ -84,32 +84,33 @@ body{
 ::-webkit-scrollbar-track{background:#f0ede6;}
 ::-webkit-scrollbar-thumb{background:#c8c0b0;border-radius:3px;}
 .navbar{
-  background:linear-gradient(135deg,#2d3a5e 0%,#3b4d78 60%,#2a3457 100%);
+  background:#fff;
   position:sticky;top:0;z-index:1000;
-  box-shadow:0 4px 24px rgba(30,40,80,.35);
+  box-shadow:0 2px 12px rgba(0,0,0,.10);
+  border-bottom:1px solid #eee;
 }
-.nb{max-width:var(--mw);margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:14px;height:62px;}
-.nb-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
+.nb{max-width:var(--mw);margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:0;height:56px;}
+.nb-right{display:flex;align-items:center;gap:16px;margin-left:auto;}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0;cursor:pointer;}
 .logo-icon{width:38px;height:38px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:18px;}
 .logo-txt{
   display:inline-table;
-  color:#fff;
+  color:#222;
 }
 .logo-txt .lt-main{
   display:block;
-  font-size:1.22rem;
+  font-size:1.1rem;
   font-weight:700;
   white-space:nowrap;
   line-height:1.15;
-  color:#fff;
+  color:#222;
   margin:0;padding:0;
 }
 .logo-txt .lt-sub{
   display:block;
   font-size:.59rem;
   font-weight:400;
-  color:#b8e67a;
+  color:#888;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -121,44 +122,62 @@ body{
 }
 .logo-txt span{
   display:block;font-size:.59rem;font-weight:400;
-  color:#b8e67a;white-space:nowrap;overflow:hidden;
+  color:#888;white-space:nowrap;overflow:hidden;
   text-overflow:ellipsis;max-width:100%;
   margin:0;padding:0;
 }
-.nav-links{display:flex;align-items:center;list-style:none;flex-shrink:0;gap:28px;}
+/* Shop by category button - like the image */
+.nb-shop-cat-btn{
+  display:flex;align-items:center;gap:8px;
+  background:#f5a623;color:#fff;
+  border:none;border-radius:4px;
+  padding:0 18px;height:38px;
+  font-family:inherit;font-size:.78rem;font-weight:700;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;
+  margin-right:20px;
+  transition:background .2s;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+}
+.nb-shop-cat-btn:hover{background:#e09510;}
+.nb-shop-cat-btn i{font-size:.9rem;}
+.nav-links{display:flex;align-items:center;list-style:none;flex-shrink:0;gap:6px;}
 .nav-links a{
   position:relative;
-  color:#c5cde8;text-decoration:none;
-  font-size:.72rem;font-weight:600;
-  letter-spacing:.18em;text-transform:uppercase;
-  padding:4px 0;cursor:pointer;
-  transition:color .2s;
+  color:#444;text-decoration:none;
+  font-size:.76rem;font-weight:500;
+  padding:6px 10px;cursor:pointer;
+  border-radius:4px;
+  transition:color .2s,background .2s;
+  display:flex;align-items:center;gap:4px;
 }
-.nav-links a::after{
-  content:'';position:absolute;bottom:-2px;left:0;
-  width:0;height:2px;background:#7b96f5;
-  border-radius:2px;transition:width .25s cubic-bezier(.4,0,.2,1);
-}
-.nav-links a:hover{color:#fff;}
-.nav-links a:hover::after{width:100%;}
-.nav-links a.active{color:#fff;}
-.nav-links a.active::after{width:100%;}
-.search-wrap{flex:1;position:relative;max-width:360px;}
+.nav-links a i{font-size:.65rem;color:#aaa;}
+.nav-links a:hover{color:#f5a623;background:#fff8ee;}
+.nav-links a.active{color:#f5a623;}
+.search-wrap{flex:1;position:relative;max-width:280px;margin-left:16px;}
 .search-input{
   width:100%;padding:7px 38px 7px 14px;
-  border-radius:999px;border:1px solid rgba(255,255,255,.13);
-  background:rgba(255,255,255,.1);
-  color:#fff;font-family:inherit;font-size:.72rem;
-  outline:none;transition:background .2s,width .3s,border-color .2s;
-  letter-spacing:.08em;
+  border-radius:4px;border:1.5px solid #e0e0e0;
+  background:#f8f8f8;
+  color:#333;font-family:inherit;font-size:.78rem;
+  outline:none;transition:border-color .2s,background .2s;
 }
-.search-input::placeholder{color:rgba(200,210,240,.6);}
-.search-input:focus{background:rgba(255,255,255,.18);border-color:rgba(123,150,245,.5);}
-.search-icon-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:rgba(180,195,240,.8);font-size:.9rem;cursor:pointer;background:none;border:none;padding:4px;}
+.search-input::placeholder{color:#aaa;}
+.search-input:focus{background:#fff;border-color:#f5a623;}
+.search-icon-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#aaa;font-size:.9rem;cursor:pointer;background:none;border:none;padding:4px;}
+/* Recently viewed link */
+.nb-recently{
+  display:flex;align-items:center;gap:5px;
+  color:#555;font-size:.76rem;cursor:pointer;
+  white-space:nowrap;
+  transition:color .2s;
+}
+.nb-recently:hover{color:#f5a623;}
+.nb-recently i{font-size:.85rem;}
 .cart-btn{
   background:var(--or);color:#fff;border:none;
-  padding:8px 15px;border-radius:999px;cursor:pointer;
-  font-family:inherit;font-size:.87rem;
+  padding:7px 14px;border-radius:4px;cursor:pointer;
+  font-family:inherit;font-size:.82rem;
   display:flex;align-items:center;gap:6px;
   transition:background .2s,transform .15s;flex-shrink:0;white-space:nowrap;
 }
@@ -173,8 +192,9 @@ body{
 .mob-header{
   display:none;
   position:sticky;top:0;z-index:1000;
-  background:linear-gradient(135deg,#2d3a5e 0%,#3b4d78 60%,#2a3457 100%);
-  box-shadow:0 4px 24px rgba(30,40,80,.35);
+  background:#fff;
+  box-shadow:0 2px 10px rgba(0,0,0,.1);
+  border-bottom:1px solid #eee;
 }
 .mob-header-inner{
   display:flex;align-items:center;
@@ -193,12 +213,12 @@ body{
 .mob-logo-icon img{width:26px;height:26px;object-fit:contain;}
 .mob-logo-text{display:inline-table;}
 .mob-logo-name{
-  display:block;color:#fff;font-size:1.22rem;font-weight:700;
+  display:block;color:#222;font-size:1.1rem;font-weight:700;
   white-space:nowrap;line-height:1.15;
   margin:0;padding:0;
 }
 .mob-logo-sub{
-  display:block;color:#b8e67a;font-size:.6rem;font-weight:400;
+  display:block;color:#888;font-size:.6rem;font-weight:400;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   max-width:100%;margin:0;padding:0;opacity:.88;
   line-height:1.2;
@@ -206,8 +226,8 @@ body{
 .mob-header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .mob-search-pill{
   width:36px;height:36px;border-radius:50%;
-  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);
-  color:#fff;font-size:.88rem;
+  background:#f5f5f5;border:1.5px solid #eee;
+  color:#444;font-size:.88rem;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;-webkit-tap-highlight-color:transparent;
   transition:background .15s;
@@ -420,16 +440,33 @@ body{
 .sk-line{height:12px;margin:10px;border-radius:4px;}
 .sk-line.short{width:60%;}
 .sk-line.shorter{width:40%;}
-.cat-bar-outer{background:#e3f0dc;border-bottom:2px solid #bcd8b4;}
-.cat-bar-inner{max-width:var(--mw);margin:0 auto;overflow:hidden;}
-.cat-track{display:flex;width:max-content;animation:catScroll 28s linear infinite;}
-.cat-track:hover{animation-play-state:paused;}
+.cat-bar-outer{background:#fff;border-bottom:1px solid #eee;border-top:1px solid #eee;padding:16px 0;}
+.cat-bar-inner{max-width:var(--mw);margin:0 auto;overflow:hidden;padding:0 16px;}
+.cat-bar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cat-bar-title{font-size:1.1rem;font-weight:700;color:#222;}
+.cat-bar-title span{font-size:.8rem;font-weight:400;color:#888;margin-left:8px;}
+.cat-bar-arrows{display:flex;gap:6px;}
+.cat-bar-arr{width:28px;height:28px;border-radius:50%;border:1.5px solid #eee;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:#555;transition:all .15s;}
+.cat-bar-arr:hover,.cat-bar-arr.active{background:var(--or);color:#fff;border-color:var(--or);}
+.cat-track{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:4px 0;}
+.cat-track::-webkit-scrollbar{display:none;}
 @keyframes catScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
-.cat-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px 22px;cursor:pointer;transition:background .2s;border-right:1px solid #cde0c5;min-width:90px;user-select:none;text-decoration:none;}
-.cat-item:hover,.cat-item.active{background:#bcd8b4;}
-.cat-item.active .cat-lbl{color:var(--gd);font-weight:700;}
-.cat-emoji{font-size:1.4rem;line-height:1;}
-.cat-lbl{font-size:.72rem;font-weight:500;color:#3a5a34;margin-top:3px;white-space:nowrap;}
+.cat-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:14px 10px 10px;cursor:pointer;
+  background:#f8f8f8;border:1.5px solid #f0f0f0;
+  border-radius:8px;min-width:90px;max-width:90px;
+  user-select:none;text-decoration:none;
+  transition:border-color .2s,background .2s,transform .2s;
+  flex-shrink:0;
+}
+.cat-item:hover,.cat-item.active{
+  border-color:var(--or);background:#fff8ee;
+  transform:translateY(-2px);
+}
+.cat-item.active .cat-lbl{color:var(--or);font-weight:700;}
+.cat-emoji{font-size:1.8rem;line-height:1;margin-bottom:6px;}
+.cat-lbl{font-size:.68rem;font-weight:500;color:#444;text-align:center;white-space:nowrap;line-height:1.3;}
 .page{display:none; flex:1; }
 .page.active{display:block;}
 .main{max-width:var(--mw);margin:0 auto;padding:24px 16px 40px;}
@@ -439,37 +476,83 @@ body{
 .sec-arrows{display:flex;gap:6px;}
 .arr-btn{width:30px;height:30px;border-radius:4px;border:1px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.78rem;color:#555;transition:all .15s;}
 .arr-btn:hover{background:var(--gd);color:#fff;border-color:var(--gd);}
+/* ===== HERO/SLIDER - Image-style 2-column layout ===== */
 .hero{
   position:relative;
   width:100%;
-  aspect-ratio:8/3;
-  min-height:160px;
-  max-height:480px;
   overflow:hidden;
-  background:#1a4010;
+  background:#f5f5f5;
   flex-shrink:0;
 }
+.hero-layout{
+  max-width:var(--mw);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 340px;
+  gap:0;
+  min-height:320px;
+  max-height:400px;
+}
+.hero-main-slider{
+  position:relative;
+  overflow:hidden;
+  background:#dce8f5;
+  min-height:320px;
+}
+.hero-side-banner{
+  background:#f5a623;
+  position:relative;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  justify-content:center;
+  padding:30px 28px;
+  min-height:320px;
+}
+.hero-side-banner .side-badge{
+  font-size:2.2rem;font-weight:800;color:#222;
+  line-height:1.1;margin-bottom:6px;
+}
+.hero-side-banner .side-sub{
+  font-size:.85rem;color:#444;margin-bottom:4px;
+}
+.hero-side-banner .side-weight{
+  font-size:.78rem;color:#555;margin-bottom:22px;
+}
+.hero-side-banner .side-img{
+  position:absolute;right:-10px;top:10px;
+  width:200px;height:180px;object-fit:contain;
+  opacity:.9;
+}
+.side-shop-btn{
+  background:#fff;color:#222;border:none;
+  padding:9px 22px;border-radius:4px;
+  font-family:inherit;font-size:.84rem;font-weight:700;
+  cursor:pointer;display:inline-flex;align-items:center;
+  gap:6px;transition:all .2s;width:fit-content;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);
+}
+.side-shop-btn:hover{background:#222;color:#fff;}
 .slide{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .75s ease;}
 .slide.active{opacity:1;}
 .hero-slide-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;z-index:1;display:block;}
 .hero-slide-overlay{position:absolute;inset:0;background:linear-gradient(95deg,rgba(0,0,0,.50) 0%,rgba(0,0,0,.18) 40%,rgba(0,0,0,.0) 100%);z-index:2;pointer-events:none;}
-.s1{background:linear-gradient(135deg,#1a4a10 0%,#3d7a2e 40%,#6aab5e 70%,#a8d56e 100%);}
-.s2{background:linear-gradient(135deg,#3d2b1f 0%,#8b5e3c 40%,#c49a6c 70%,#e8c99a 100%);}
-.s3{background:linear-gradient(135deg,#1a3a5c 0%,#2e6da4 40%,#5ba0d4 70%,#90c4e8 100%);}
+.s1{background:linear-gradient(135deg,#c8d8e8 0%,#dce8f5 50%,#eef4fa 100%);}
+.s2{background:linear-gradient(135deg,#e8dfd0 0%,#f0e8d8 50%,#faf5ee 100%);}
+.s3{background:linear-gradient(135deg,#d0dce8 0%,#e0ecf8 50%,#f0f6fc 100%);}
 .hero-svg{position:absolute;inset:0;width:100%;height:100%;}
 .hero-cw{position:absolute;inset:0;display:flex;align-items:center;z-index:10;}
-.hero-ci{max-width:var(--mw);width:100%;margin:0 auto;padding:0 48px;}
-.hero-ci h1{font-size:2.4rem;font-weight:700;color:#fff;line-height:1.28;text-shadow:0 2px 10px rgba(0,0,0,.55);margin-bottom:10px;max-width:560px;}
-.hero-ci p{color:rgba(255,255,255,.9);font-size:1rem;margin-bottom:22px;text-shadow:0 1px 4px rgba(0,0,0,.4);max-width:420px;}
-.btn-hero{background:#fff;color:var(--gd);border:none;padding:11px 28px;border-radius:6px;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:7px;box-shadow:0 4px 16px rgba(0,0,0,.22);}
-.btn-hero:hover{background:var(--cream);transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.26);}
-.slide-dots{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:20;}
-.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.38);cursor:pointer;transition:all .3s ease;border:1.5px solid rgba(255,255,255,.55);}
-.dot.active{background:#fff;width:22px;border-radius:4px;border-color:#fff;}
-.hero-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:20;background:rgba(255,255,255,.16);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1.5px solid rgba(255,255,255,.28);color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;transition:background .2s, transform .2s;}
-.hero-arrow:hover{background:rgba(255,255,255,.3);transform:translateY(-50%) scale(1.1);}
-.hero-arrow.prev{left:16px;}
-.hero-arrow.next{right:16px;}
+.hero-ci{max-width:100%;width:100%;padding:0 48px;}
+.hero-ci h1{font-size:2rem;font-weight:700;color:#222;line-height:1.28;margin-bottom:10px;max-width:400px;}
+.hero-ci p{color:#555;font-size:.92rem;margin-bottom:22px;max-width:340px;}
+.btn-hero{background:var(--or);color:#fff;border:none;padding:11px 24px;border-radius:4px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(245,166,35,.35);}
+.btn-hero:hover{background:#e09510;transform:translateY(-2px);box-shadow:0 8px 20px rgba(245,166,35,.4);}
+.slide-dots{position:absolute;bottom:14px;right:16px;display:flex;gap:6px;z-index:20;}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.2);cursor:pointer;transition:all .3s ease;border:1.5px solid rgba(0,0,0,.15);}
+.dot.active{background:var(--or);width:22px;border-radius:4px;border-color:var(--or);}
+.hero-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:20;background:rgba(255,255,255,.75);backdrop-filter:blur(4px);border:1px solid rgba(0,0,0,.1);color:#333;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.78rem;transition:background .2s, transform .2s;}
+.hero-arrow:hover{background:#fff;transform:translateY(-50%) scale(1.08);}
+.hero-arrow.prev{left:12px;}
+.hero-arrow.next{right:12px;}
 .c-img{display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
 .c-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease;}
 .c-acts{display:flex;align-items:stretch;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
@@ -875,9 +958,11 @@ footer.site-footer p{font-size:.79rem;line-height:1.7;}
 @media(max-width:900px){
   .navbar{ display:none; }
   .mob-header{ display:block; }
-  .hero{aspect-ratio:unset;height:220px;min-height:220px;}
+  .hero-layout{grid-template-columns:1fr;min-height:220px;max-height:280px;}
+  .hero-side-banner{display:none;}
+  .hero-main-slider{min-height:220px;}
   .hero-ci{padding:0 18px;}
-  .hero-ci h1{font-size:1.5rem;max-width:100%;}
+  .hero-ci h1{font-size:1.5rem;max-width:100%;color:#222;}
   .hero-ci p{font-size:.85rem;max-width:100%;margin-bottom:14px;}
   .btn-hero{padding:9px 20px;font-size:.85rem;}
   .hero-arrow{width:34px;height:34px;font-size:.78rem;}
@@ -900,7 +985,8 @@ footer.site-footer p{font-size:.79rem;line-height:1.7;}
   .order-modal{max-height:95vh;}
 }
 @media(max-width:600px){
-  .hero{aspect-ratio:unset;height:200px;min-height:200px;}
+  .hero-layout{min-height:200px;max-height:240px;}
+  .hero-main-slider{min-height:200px;}
   .hero-ci{padding:0 14px;}
   .hero-ci h1{font-size:1.1rem;margin-bottom:5px;}
   .hero-ci p{font-size:.76rem;margin-bottom:12px;}
@@ -1015,33 +1101,32 @@ footer.site-footer p{font-size:.79rem;line-height:1.7;}
 <body>
 <nav class="navbar">
   <div class="nb">
-    <!-- Brand / Logo -->
-    <div class="logo" onclick="goHome()">
-      <div class="logo-icon">
-        <img src="images/logo-g.png" alt="Logo">
-      </div>
-      <div class="logo-txt">
-        <span class="lt-main">আসল গ্রামের মজা</span>
-        <span class="lt-sub">বিশুদ্ধ পণ্য · সরাসরি কৃষক থেকে</span>
-      </div>
-    </div>
+    <!-- Shop by Category Button -->
+    <button class="nb-shop-cat-btn" onclick="document.getElementById('catTrack').scrollIntoView({behavior:'smooth',block:'center'})">
+      <i class="fa-solid fa-bars"></i> ক্যাটাগরি দেখুন
+    </button>
     <!-- Desktop Nav Links -->
     <ul class="nav-links">
-      <li><a onclick="goHome()" id="navHome" class="active">হোম</a></li>
-      <li><a onclick="goProductsPage()" id="navProducts">পণ্য</a></li>
-      <li><a onclick="goAboutPage()" id="navAbout">আমাদের সম্পর্কে</a></li>
-      <li><a onclick="goContactPage()" id="navContact">যোগাযোগ</a></li>
+      <li><a onclick="goHome()" id="navHome" class="active"><i class="fa-solid fa-bolt"></i> আজকের ডিল</a></li>
+      <li><a onclick="goProductsPage()" id="navProducts"><i class="fa-solid fa-tag"></i> বিশেষ মূল্য</a></li>
+      <li><a onclick="goHome()" ><i class="fa-solid fa-chevron-down"></i> তাজা পণ্য</a></li>
+      <li><a onclick="goProductsPage()" id="navShop"><i class="fa-solid fa-chevron-down"></i> সকল পণ্য</a></li>
+      <li><a onclick="goAboutPage()" id="navAbout"><i class="fa-solid fa-chevron-down"></i> আমাদের সম্পর্কে</a></li>
+      <li><a onclick="goContactPage()" id="navContact"><i class="fa-solid fa-chevron-down"></i> যোগাযোগ</a></li>
     </ul>
-    <!-- Search + Cart -->
+    <!-- Search + Recently Viewed + Cart -->
     <div class="nb-right">
       <div class="search-wrap" id="deskSearchWrap">
         <input type="text" class="search-input" id="deskSearch" placeholder="পণ্য খুঁজুন..." autocomplete="off" oninput="doSearch(this.value,'deskDrop')">
         <button class="search-icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
         <div class="search-dropdown" id="deskDrop"></div>
       </div>
+      <span class="nb-recently" onclick="toggleCart()">
+        <i class="fa-regular fa-clock"></i> সম্প্রতি দেখা
+      </span>
       <button class="cart-btn" onclick="toggleCart()">
         <i class="fa-solid fa-cart-shopping"></i>
-        <span style="font-size:.87rem;font-weight:600;letter-spacing:.05em;">কার্ট</span>
+        <span style="font-size:.82rem;font-weight:600;">কার্ট</span>
         <span class="cart-count" id="cartCountDesk">0</span>
       </button>
     </div>
@@ -1079,47 +1164,73 @@ footer.site-footer p{font-size:.79rem;line-height:1.7;}
 </div>
 <div class="page active" id="page-home">
   <div class="hero" id="heroSection">
-    <div class="slide active s1">
-      <svg class="hero-svg" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        <rect width="700" height="360" fill="url(#hg1)"/>
-        <ellipse cx="1050" cy="360" rx="580" ry="220" fill="#2d5a22" opacity=".62"/>
-        <circle cx="1220" cy="60" r="54" fill="#FFD700" opacity=".4"/>
-        <rect x="720" y="228" width="400" height="76" fill="#F4C430" opacity=".48" rx="4"/>
-        <defs><linearGradient id="hg1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1a4010" stop-opacity=".86"/><stop offset="100%" stop-color="#1a4010" stop-opacity="0"/></linearGradient></defs>
-      </svg>
-    </div>
-    <div class="slide s2">
-      <svg class="hero-svg" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        <rect width="700" height="360" fill="url(#hg2)"/>
-        <circle cx="1050" cy="180" r="150" fill="#f5a623" opacity=".15"/>
-        <ellipse cx="1020" cy="260" rx="90" ry="110" fill="#f5a623" opacity=".5"/>
-        <defs><linearGradient id="hg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#3d2b1f" stop-opacity=".86"/><stop offset="100%" stop-color="#3d2b1f" stop-opacity="0"/></linearGradient></defs>
-      </svg>
-    </div>
-    <div class="slide s3">
-      <svg class="hero-svg" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        <rect width="700" height="360" fill="url(#hg3)"/>
-        <circle cx="1100" cy="180" r="130" fill="#4a9e6f" opacity=".2"/>
-        <defs><linearGradient id="hg3" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1a3a5c" stop-opacity=".86"/><stop offset="100%" stop-color="#1a3a5c" stop-opacity="0"/></linearGradient></defs>
-      </svg>
-    </div>
-    <div class="hero-cw">
-      <div class="hero-ci">
-        <h1 id="hTitle">গ্রামীণ সতেজতা ও স্বাদের আসল স্বাদ</h1>
-        <p id="hSub">বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়</p>
-        <a onclick="document.getElementById('sec-products').scrollIntoView({behavior:'smooth'})" class="btn-hero" style="cursor:pointer"><i class="fa-solid fa-bag-shopping"></i> পণ্য কিনুন</a>
+    <div class="hero-layout">
+      <!-- Main Slider (Left) -->
+      <div class="hero-main-slider">
+        <div class="slide active s1">
+          <svg class="hero-svg" viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="900" height="400" fill="#dce8f5"/>
+            <circle cx="680" cy="200" r="180" fill="#b8d4ee" opacity=".6"/>
+            <circle cx="750" cy="120" r="80" fill="#90bde0" opacity=".45"/>
+            <ellipse cx="680" cy="380" rx="220" ry="100" fill="#a8ccE4" opacity=".4"/>
+            <rect x="580" y="160" width="260" height="200" rx="8" fill="#c8dff0" opacity=".5"/>
+          </svg>
+        </div>
+        <div class="slide s2">
+          <svg class="hero-svg" viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="900" height="400" fill="#f0ece4"/>
+            <circle cx="680" cy="200" r="160" fill="#e8d8c0" opacity=".7"/>
+            <ellipse cx="700" cy="350" rx="200" ry="90" fill="#d4c0a0" opacity=".4"/>
+          </svg>
+        </div>
+        <div class="slide s3">
+          <svg class="hero-svg" viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="900" height="400" fill="#e4eef4"/>
+            <circle cx="700" cy="200" r="170" fill="#c0d8ec" opacity=".6"/>
+            <ellipse cx="680" cy="370" rx="210" ry="100" fill="#aac8e0" opacity=".4"/>
+          </svg>
+        </div>
+        <div class="hero-cw">
+          <div class="hero-ci">
+            <h1 id="hTitle">গ্রামীণ সতেজতা ও স্বাদের আসল স্বাদ</h1>
+            <p id="hSub">বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়</p>
+            <a onclick="document.getElementById('sec-products').scrollIntoView({behavior:'smooth'})" class="btn-hero" style="cursor:pointer"><i class="fa-solid fa-bag-shopping"></i> পণ্য কিনুন</a>
+          </div>
+        </div>
+        <button class="hero-arrow prev" onclick="goSlide((cur-1+heroSlides.length)%heroSlides.length||0)"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="hero-arrow next" onclick="goSlide((cur+1)%heroSlides.length||0)"><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="slide-dots" id="slideDots">
+          <div class="dot active" onclick="goSlide(0)"></div>
+          <div class="dot" onclick="goSlide(1)"></div>
+          <div class="dot" onclick="goSlide(2)"></div>
+        </div>
       </div>
-    </div>
-    <button class="hero-arrow prev" onclick="goSlide((cur-1+heroSlides.length)%heroSlides.length||0)"><i class="fa-solid fa-chevron-left"></i></button>
-    <button class="hero-arrow next" onclick="goSlide((cur+1)%heroSlides.length||0)"><i class="fa-solid fa-chevron-right"></i></button>
-    <div class="slide-dots" id="slideDots">
-      <div class="dot active" onclick="goSlide(0)"></div>
-      <div class="dot" onclick="goSlide(1)"></div>
-      <div class="dot" onclick="goSlide(2)"></div>
+      <!-- Side Promo Banner (Right) -->
+      <div class="hero-side-banner">
+        <div class="side-badge">২০% ছাড়!</div>
+        <div style="font-size:1.3rem;font-weight:700;color:#222;margin-bottom:8px;">বিশেষ অফার</div>
+        <div class="side-sub">খাঁটি গ্রামীণ পণ্য</div>
+        <div class="side-weight">সরাসরি কৃষক থেকে</div>
+        <button class="side-shop-btn" onclick="goProductsPage()">
+          <i class="fa-solid fa-bag-shopping"></i> কিনুন এখনই
+        </button>
+        <svg style="position:absolute;right:10px;top:20px;width:160px;height:160px;opacity:.3" viewBox="0 0 100 100">
+          <rect x="20" y="20" width="60" height="75" rx="6" fill="#fff" stroke="#fff" stroke-width="2"/>
+          <rect x="30" y="10" width="40" height="25" rx="4" fill="#fff" opacity=".7"/>
+          <circle cx="50" cy="50" r="15" fill="#fff" opacity=".5"/>
+        </svg>
+      </div>
     </div>
   </div>
   <div class="cat-bar-outer">
     <div class="cat-bar-inner">
+      <div class="cat-bar-header">
+        <div class="cat-bar-title">ক্যাটাগরি অনুযায়ী দেখুন <span>সকল ক্যাটাগরি ›</span></div>
+        <div class="cat-bar-arrows">
+          <button class="cat-bar-arr" onclick="document.getElementById('catTrack').scrollLeft -= 300">‹</button>
+          <button class="cat-bar-arr active" onclick="document.getElementById('catTrack').scrollLeft += 300">›</button>
+        </div>
+      </div>
       <div class="cat-track" id="catTrack"></div>
     </div>
   </div>
@@ -1533,8 +1644,9 @@ function buildHero() {
       return `<div class="slide ${i===0?'active':''} ${gradClass}" data-idx="${i}">${svgBg}</div>`;
     }
   }).join('');
-  [...section.querySelectorAll('.slide')].forEach(s => s.remove());
-  section.insertAdjacentHTML('afterbegin', slidesHtml);
+  const sliderContainer = section.querySelector('.hero-main-slider') || section;
+  [...sliderContainer.querySelectorAll('.slide')].forEach(s => s.remove());
+  sliderContainer.insertAdjacentHTML('afterbegin', slidesHtml);
   dots.innerHTML = heroSlides.map((_, i) => `<div class="dot ${i===0?'active':''}" onclick="goSlide(${i})"></div>`).join('');
   goSlide(0);
   if (heroTimer) clearInterval(heroTimer);
@@ -1543,7 +1655,7 @@ function buildHero() {
 function goSlide(n) {
   if (!heroSlides.length) return;
   n = ((n % heroSlides.length) + heroSlides.length) % heroSlides.length;
-  const slides = document.querySelectorAll('#heroSection .slide');
+  const slides = document.querySelectorAll('#heroSection .hero-main-slider .slide, #heroSection > .slide');
   const dots = document.querySelectorAll('.dot');
   slides.forEach((s, i) => s.classList.toggle('active', i === n));
   dots.forEach((d, i) => d.classList.toggle('active', i === n));

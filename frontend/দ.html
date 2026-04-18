@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Markhor – Best Beauty Items</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cream: #f5f2ed;
+      --warm-white: #faf8f5;
+      --brown-dark: #3b2a1a;
+      --brown-mid: #7a5c42;
+      --brown-light: #c4a882;
+      --green-muted: #6b7c5e;
+      --sand: #e8ddd0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: 'Jost', sans-serif;
+      background-color: var(--warm-white);
+      color: var(--brown-dark);
+    }
+
+    h1, h2, h3 {
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    /* Navbar */
+    nav {
+      background: rgba(250, 248, 245, 0.95);
+      backdrop-filter: blur(12px);
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(196, 168, 130, 0.2);
+    }
+
+    .nav-link {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--brown-dark);
+      transition: color 0.3s;
+    }
+    .nav-link:hover { color: var(--brown-mid); }
+
+    /* ====== HERO + CATEGORIES = 100vh total ====== */
+    .hero-wrapper {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: 65px; /* navbar height */
+    }
+
+    /* Hero */
+    .hero {
+      flex: 1;
+      background: linear-gradient(135deg, #f5f2ed 0%, #ede8df 40%, #e4ddd3 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Organic blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .blob-1 { width: 500px; height: 500px; background: radial-gradient(circle, #d4c5b0, transparent); top: -100px; left: -150px; }
+    .blob-2 { width: 400px; height: 400px; background: radial-gradient(circle, #b8cba8, transparent); bottom: -80px; left: 200px; opacity: 0.25; }
+    .blob-3 { width: 300px; height: 300px; background: radial-gradient(circle, #c4a882, transparent); top: 50px; right: 100px; opacity: 0.2; }
+
+    /* Leaf decorations */
+    .leaf-svg { position: absolute; pointer-events: none; }
+
+    /* Product float animation */
+    @keyframes floatUp {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-18px) rotate(1deg); }
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) rotate(-1deg); }
+      50% { transform: translateY(-10px) rotate(0.5deg); }
+    }
+
+    .float-main { animation: floatUp 5s ease-in-out infinite; }
+    .float-secondary { animation: floatSlow 6.5s ease-in-out infinite; animation-delay: 1.2s; }
+
+    /* CTA Button */
+    .btn-primary {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border: 1.5px solid var(--brown-dark);
+      padding: 14px 32px;
+      background: transparent;
+      color: var(--brown-dark);
+      cursor: pointer;
+      transition: all 0.35s ease;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: var(--brown-dark); color: var(--warm-white); }
+
+    .text-link {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--brown-mid);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .text-link:hover { color: var(--brown-dark); }
+
+    /* Slide indicators */
+    .slide-dots span {
+      display: block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--brown-light);
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .slide-dots span.active {
+      background: var(--brown-dark);
+      transform: scale(1.4);
+    }
+
+    /* Fade-in on load */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-1 { animation: fadeInUp 0.8s ease forwards; opacity: 0; }
+    .fade-in-2 { animation: fadeInUp 0.8s ease 0.2s forwards; opacity: 0; }
+    .fade-in-3 { animation: fadeInUp 0.8s ease 0.4s forwards; opacity: 0; }
+    .fade-in-4 { animation: fadeInUp 0.8s ease 0.6s forwards; opacity: 0; }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-60px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .slide-in-left { animation: slideInLeft 1s ease 0.3s forwards; opacity: 0; }
+
+    /* Mobile menu */
+    #mobile-menu { display: none; }
+    #mobile-menu.open { display: flex; }
+
+    /* Divider line */
+    .divider { width: 40px; height: 1.5px; background: var(--brown-light); }
+
+    /* Product label tag */
+    .tag {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--brown-mid);
+    }
+
+    /* Scroll arrow animation */
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+    .scroll-arrow { animation: scrollBounce 1.8s ease-in-out infinite; }
+
+    /* ====== HERO SLIDE CONTENT TRANSITIONS ====== */
+    .hero-slide-content {
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .hero-slide-content.fade-out {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    .hero-slide-content.fade-in-slide {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ====== BOTTLE IMAGE UPLOAD ZONE ====== */
+    .bottle-upload-zone {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-130px);
+      bottom: 40px;
+      z-index: 3;
+      width: 110px;
+      height: 260px;
+      cursor: pointer;
+    }
+    .bottle-upload-zone .upload-overlay {
+      position: absolute;
+      inset: 0;
+      border: 2px dashed rgba(196,168,130,0.5);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(245,242,237,0.15);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--brown-mid);
+      gap: 4px;
+    }
+    .bottle-upload-zone:hover .upload-overlay { opacity: 1; }
+    .bottle-upload-zone img.bottle-img {
+      width: 110px;
+      height: 260px;
+      object-fit: contain;
+      display: none;
+    }
+    .bottle-upload-zone.has-image img.bottle-img { display: block; }
+    .bottle-upload-zone.has-image svg.default-bottle { display: none; }
+
+    /* ====== FEATURED CATEGORIES STRIP (card carousel) ====== */
+    .categories-strip {
+      background: var(--brown-dark);
+      padding: 16px 0;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .cat-track-wrapper {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .cat-track {
+      display: flex;
+      gap: 14px;
+      padding: 4px 20px;
+      transition: transform 0.5s cubic-bezier(0.25,0.8,0.25,1);
+    }
+
+    .cat-card {
+      flex-shrink: 0;
+      width: 140px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(196,168,130,0.2);
+      border-radius: 10px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.3s, border-color 0.3s, transform 0.3s;
+      user-select: none;
+    }
+    .cat-card:hover {
+      background: rgba(255,255,255,0.13);
+      border-color: rgba(196,168,130,0.5);
+      transform: translateY(-2px);
+    }
+    .cat-card .cat-emoji {
+      font-size: 1.6rem;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .cat-card .cat-name {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--brown-light);
+    }
+
+    .cat-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      background: rgba(59,42,26,0.8);
+      border: 1px solid rgba(196,168,130,0.3);
+      border-radius: 50%;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--brown-light);
+      transition: background 0.2s;
+    }
+    .cat-nav-btn:hover { background: rgba(59,42,26,1); }
+    .cat-nav-btn.prev { left: 8px; }
+    .cat-nav-btn.next { right: 8px; }
+
+    /* ====== PRODUCT CARDS ====== */
+    .product-card { transition: transform 0.3s, box-shadow 0.3s; }
+
+    /* Ticker (below products) */
+    @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    /* Product hover */
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(59,42,26,0.12);
+    }
+
+    /* ===== REAL LEAVES SVG ===== */
+    .real-leaf { position: absolute; pointer-events: none; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C8 2 4 6 4 10c0 5 8 12 8 12s8-7 8-12c0-4-4-8-8-8z" fill="#3b2a1a"/>
+          <path d="M12 8l1.5 3h3l-2.5 2 1 3L12 14l-3 2 1-3-2.5-2h3z" fill="#f5f2ed"/>
+        </svg>
+        <span style="font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:600; letter-spacing:0.08em; color:var(--brown-dark);">MARKHOR</span>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#" class="nav-link">Home</a>
+        <a href="#" class="nav-link">Products</a>
+        <a href="#" class="nav-link">About Us</a>
+        <a href="#" class="nav-link">Contact</a>
+      </div>
+
+      <!-- Icons -->
+      <div class="flex items-center gap-5">
+        <button class="text-[var(--brown-dark)] hover:text-[var(--brown-mid)] transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+        </button>
+        <button id="cart-btn" class="relative text-[var(--brown-dark)] hover:text-[var(--brown-mid)] transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <span id="cart-count" class="absolute -top-2 -right-2 w-4 h-4 rounded-full text-[9px] flex items-center justify-center font-semibold" style="background:var(--brown-dark); color:var(--warm-white);">0</span>
+        </button>
+        <!-- Hamburger -->
+        <button id="hamburger" class="md:hidden text-[var(--brown-dark)]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="flex-col gap-3 px-6 pb-5 md:hidden">
+      <a href="#" class="nav-link block py-1">Home</a>
+      <a href="#" class="nav-link block py-1">Products</a>
+      <a href="#" class="nav-link block py-1">About Us</a>
+      <a href="#" class="nav-link block py-1">Contact</a>
+    </div>
+  </nav>
+
+  <!-- ====== HERO + CATEGORIES WRAPPER (fits exactly in viewport) ====== -->
+  <div class="hero-wrapper">
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+      <!-- Background blobs -->
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+
+      <!-- ===== REALISTIC LEAVES LEFT ===== -->
+      <svg class="real-leaf" style="bottom:0;left:-30px;width:260px;opacity:0.85;" viewBox="0 0 300 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Large main leaf -->
+        <path d="M55 400 C55 400 110 280 200 170 C240 120 260 80 240 40 C210 100 160 200 55 400Z" fill="#6b8c5a"/>
+        <path d="M55 400 C55 400 120 290 210 180" stroke="#4a6640" stroke-width="1.2" opacity="0.6" fill="none"/>
+        <!-- Veins -->
+        <path d="M120 310 C145 280 175 250 215 200" stroke="#4a6640" stroke-width="0.7" opacity="0.4" fill="none"/>
+        <path d="M90 355 C115 330 145 295 185 240" stroke="#4a6640" stroke-width="0.7" opacity="0.4" fill="none"/>
+        <path d="M150 265 C170 240 195 215 225 185" stroke="#4a6640" stroke-width="0.6" opacity="0.35" fill="none"/>
+        <!-- Second leaf -->
+        <path d="M20 380 C20 380 90 270 170 180 C130 240 70 330 20 380Z" fill="#7a9a68" opacity="0.7"/>
+        <path d="M20 380 C20 380 85 275 165 185" stroke="#5a7a50" stroke-width="1" opacity="0.5" fill="none"/>
+        <!-- Third leaf -->
+        <path d="M90 410 C90 410 150 310 230 230 C195 280 140 355 90 410Z" fill="#5a7a50" opacity="0.55"/>
+        <!-- Small accent leaf -->
+        <path d="M120 180 C120 180 75 240 85 330 C100 260 130 210 120 180Z" fill="#8aaa76" opacity="0.6"/>
+        <path d="M120 180 C120 180 90 250 88 320" stroke="#5a7a50" stroke-width="0.8" opacity="0.4" fill="none"/>
+      </svg>
+
+      <!-- ===== REALISTIC LEAVES RIGHT-BOTTOM ===== -->
+      <svg class="real-leaf" style="bottom:0;right:-20px;width:210px;opacity:0.82;" viewBox="0 0 300 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M280 300 C280 300 190 210 110 140 C75 110 55 75 80 40 C100 100 155 190 280 300Z" fill="#6b8c5a"/>
+        <path d="M280 300 C280 300 195 215 115 145" stroke="#4a6640" stroke-width="1.2" opacity="0.6" fill="none"/>
+        <path d="M220 255 C195 228 165 198 130 165" stroke="#4a6640" stroke-width="0.7" opacity="0.4" fill="none"/>
+        <path d="M250 278 C225 252 195 225 160 192" stroke="#4a6640" stroke-width="0.7" opacity="0.4" fill="none"/>
+        <path d="M300 285 C270 258 225 218 180 180 C215 210 265 255 300 285Z" fill="#7a9a68" opacity="0.6"/>
+      </svg>
+
+      <!-- ===== SCATTERED LEAVES top (realistic) ===== -->
+      <svg class="real-leaf" style="left:28px;top:55px;width:72px;z-index:6;" viewBox="0 0 80 100">
+        <path d="M12 88 C12 88 55 55 72 8 C56 42 36 65 12 88Z" fill="#6b8c5a"/>
+        <path d="M12 88 C12 88 50 52 70 9" stroke="#4a6640" stroke-width="0.9" opacity="0.55" fill="none"/>
+        <path d="M30 70 C40 57 55 40 68 20" stroke="#4a6640" stroke-width="0.6" opacity="0.35" fill="none"/>
+        <path d="M20 79 C30 68 45 52 60 34" stroke="#4a6640" stroke-width="0.6" opacity="0.35" fill="none"/>
+      </svg>
+      <svg class="real-leaf" style="right:38px;top:35px;width:65px;z-index:6;" viewBox="0 0 70 90">
+        <path d="M58 82 C58 82 18 56 5 10 C20 43 42 65 58 82Z" fill="#7a9a68"/>
+        <path d="M58 82 C58 82 20 57 6 12" stroke="#4a6640" stroke-width="0.9" opacity="0.5" fill="none"/>
+        <path d="M42 68 C32 55 20 42 9 25" stroke="#4a6640" stroke-width="0.6" opacity="0.35" fill="none"/>
+      </svg>
+      <svg class="real-leaf" style="left:78px;bottom:110px;width:50px;z-index:1;" viewBox="0 0 55 70">
+        <path d="M6 65 C6 65 36 42 50 5 C38 30 23 52 6 65Z" fill="#5a7a50" opacity="0.75"/>
+        <path d="M6 65 C6 65 34 40 49 6" stroke="#3d5c38" stroke-width="0.8" opacity="0.45" fill="none"/>
+        <path d="M18 54 C25 44 35 32 46 18" stroke="#3d5c38" stroke-width="0.5" opacity="0.3" fill="none"/>
+      </svg>
+
+      <div class="max-w-7xl mx-auto px-6 w-full flex flex-col md:flex-row items-center gap-10 md:gap-0 relative z-10 h-full">
+
+        <!-- Left: Product Image Area -->
+        <div class="w-full md:w-1/2 flex items-end justify-center relative slide-in-left" style="min-height:340px;">
+
+          <!-- Shadow base -->
+          <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-64 h-8 rounded-full" style="background: radial-gradient(ellipse, rgba(59,42,26,0.15), transparent); filter:blur(8px);"></div>
+
+          <!-- ===== MAIN TALL BROWN BOTTLE (with image upload) ===== -->
+          <div class="float-main bottle-upload-zone" id="bottleUploadZone" title="ছবি আপলোড করতে ক্লিক করুন">
+            <input type="file" id="bottleFileInput" accept="image/*" style="display:none;"/>
+            <!-- Default SVG bottle -->
+            <svg class="default-bottle" width="110" height="260" viewBox="0 0 110 260" xmlns="http://www.w3.org/2000/svg">
+              <rect x="38" y="0" width="34" height="18" rx="4" fill="#5a3e2b"/>
+              <rect x="48" y="18" width="14" height="22" rx="3" fill="#6b4c35"/>
+              <path d="M18 60 Q18 40 30 38 L42 38 L42 40 L68 40 L68 38 L80 38 Q92 40 92 60 L92 220 Q92 240 55 242 Q18 240 18 220 Z" fill="#5c3a1e"/>
+              <path d="M18 60 Q18 40 30 38 L42 38 L42 40 L68 40 L68 38 L80 38 Q92 40 92 60 L88 80 Q70 72 55 72 Q40 72 22 80 Z" fill="#6b4533"/>
+              <path d="M22 90 Q22 80 28 78 L28 200 Q22 195 22 180 Z" fill="rgba(255,255,255,0.1)" rx="4"/>
+              <rect x="28" y="130" width="54" height="70" rx="6" fill="rgba(250,245,235,0.12)"/>
+              <path d="M55 152 C55 152 48 146 48 141 C48 137 55 136 55 141 C55 136 62 137 62 141 C62 146 55 152 55 152Z" fill="#e8b4b8" opacity="0.7"/>
+              <text x="55" y="168" text-anchor="middle" font-family="Jost,sans-serif" font-size="9" fill="#f5ece0" opacity="0.9" letter-spacing="1">Ladies</text>
+              <text x="55" y="180" text-anchor="middle" font-family="Jost,sans-serif" font-size="6" fill="#d4c0a8" opacity="0.7">Botanical • Luminance</text>
+            </svg>
+            <!-- Uploaded image shown here -->
+            <img class="bottle-img" id="bottleImg" src="" alt="Product" />
+            <!-- Upload overlay hint -->
+            <div class="upload-overlay">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>ছবি যোগ করুন</span>
+            </div>
+          </div>
+
+          <!-- Secondary beige bottle -->
+          <div class="float-secondary absolute" style="left:50%; transform:translateX(10px); bottom:40px; z-index:4;">
+            <svg width="80" height="220" viewBox="0 0 80 220" xmlns="http://www.w3.org/2000/svg">
+              <rect x="26" y="0" width="28" height="12" rx="3" fill="#8a6e56"/>
+              <rect x="36" y="12" width="8" height="18" rx="2" fill="#9a7e65"/>
+              <path d="M8 50 Q8 34 18 32 L32 32 L32 34 L48 34 L48 32 L62 32 Q72 34 72 50 L72 180 Q72 196 40 198 Q8 196 8 180 Z" fill="#e8ddd0"/>
+              <path d="M8 50 Q8 34 18 32 L32 32 L48 32 L62 32 Q72 34 72 50 L68 65 Q52 58 40 58 Q28 58 12 65 Z" fill="#d4c4b0"/>
+              <path d="M12 70 Q12 62 16 60 L16 175 Q12 170 12 160 Z" fill="rgba(255,255,255,0.25)" rx="3"/>
+              <rect x="16" y="100" width="48" height="68" rx="5" fill="rgba(59,42,26,0.06)"/>
+              <path d="M40 120 C40 120 34 115 34 111 C34 108 40 107 40 111 C40 107 46 108 46 111 C46 115 40 120 40 120Z" fill="#c9a0a5" opacity="0.8"/>
+              <text x="40" y="135" text-anchor="middle" font-family="Jost,sans-serif" font-size="8" fill="#5c3a1e" letter-spacing="1">Ladies</text>
+              <text x="40" y="147" text-anchor="middle" font-family="Jost,sans-serif" font-size="5.5" fill="#8a6e56">Botanical • Luminance</text>
+            </svg>
+          </div>
+
+          <!-- Small cream jar -->
+          <div class="float-main absolute" style="left:50%; transform:translateX(-180px); bottom:38px; z-index:5;">
+            <svg width="90" height="70" viewBox="0 0 90 70" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="45" cy="12" rx="40" ry="10" fill="#e8ddd0"/>
+              <rect x="5" y="6" width="80" height="18" rx="4" fill="#e8ddd0"/>
+              <rect x="8" y="20" width="74" height="40" rx="8" fill="#f0ebe2"/>
+              <ellipse cx="45" cy="60" rx="37" ry="8" fill="#e0d8cc"/>
+              <path d="M45 34 C45 34 40 30 40 27 C40 25 45 24 45 27 C45 24 50 25 50 27 C50 30 45 34 45 34Z" fill="#c9a0a5" opacity="0.7"/>
+              <text x="45" y="46" text-anchor="middle" font-family="Jost,sans-serif" font-size="7" fill="#5c3a1e" letter-spacing="0.5">Ladies</text>
+            </svg>
+          </div>
+
+          <!-- Ribbon/twine roll -->
+          <div class="float-secondary absolute" style="left:50%; transform:translateX(55px); bottom:36px; z-index:2;">
+            <svg width="70" height="55" viewBox="0 0 70 55" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="35" cy="28" rx="32" ry="18" fill="#c9b49a"/>
+              <ellipse cx="35" cy="20" rx="32" ry="18" fill="#d4c4a8"/>
+              <ellipse cx="35" cy="20" rx="22" ry="12" fill="#bba98a"/>
+              <ellipse cx="35" cy="20" rx="10" ry="6" fill="#a8927a"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Right: Text Content (slides) -->
+        <div class="w-full md:w-1/2 flex flex-col justify-center md:pl-12 text-center md:text-left pb-6 md:pb-0">
+          <div class="hero-slide-content fade-in-slide" id="heroTextContent">
+            <div class="tag mb-3 flex items-center gap-2 justify-center md:justify-start">
+              <div class="divider hidden md:block"></div>
+              <span id="slide-tag">winter offers running</span>
+            </div>
+
+            <h1 class="mb-4 leading-none" style="font-size: clamp(2.2rem, 4.5vw, 3.6rem); font-weight:700; color:var(--brown-dark); letter-spacing:-0.01em;">
+              <span id="slide-heading">BEST BEAUTY<br/>ITEMS</span>
+            </h1>
+
+            <p class="mb-6 leading-relaxed" style="font-family:'Jost',sans-serif; font-size:0.88rem; color:#7a6655; max-width:380px; margin-left:auto; margin-right:auto; line-height:1.75;" id="slide-desc">
+              প্রকৃতির সেরা উপাদান থেকে তৈরি আমাদের বিউটি কালেকশন। আপনার ত্বককে দিন প্রাকৃতিক উজ্জ্বলতা এবং যত্নের ছোঁয়া।
+            </p>
+
+            <div class="flex items-center gap-6 justify-center md:justify-start flex-wrap">
+              <button class="btn-primary" onclick="addToCart()">START SHOPPING</button>
+              <a href="#" class="text-link">see our offers</a>
+            </div>
+
+            <!-- Trust badges -->
+            <div class="flex items-center gap-6 mt-8 justify-center md:justify-start">
+              <div class="flex flex-col items-center md:items-start">
+                <span style="font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:600; color:var(--brown-dark);">120+</span>
+                <span class="tag" style="font-size:0.6rem;">Products</span>
+              </div>
+              <div class="w-px h-8" style="background:var(--brown-light);"></div>
+              <div class="flex flex-col items-center md:items-start">
+                <span style="font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:600; color:var(--brown-dark);">98%</span>
+                <span class="tag" style="font-size:0.6rem;">Natural</span>
+              </div>
+              <div class="w-px h-8" style="background:var(--brown-light);"></div>
+              <div class="flex flex-col items-center md:items-start">
+                <span style="font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:600; color:var(--brown-dark);">50k+</span>
+                <span class="tag" style="font-size:0.6rem;">Customers</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide dots - right side (functional) -->
+      <div class="slide-dots absolute right-5 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20 hidden md:flex">
+        <span class="active" data-index="0" onclick="goToSlide(0)"></span>
+        <span data-index="1" onclick="goToSlide(1)"></span>
+        <span data-index="2" onclick="goToSlide(2)"></span>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="absolute bottom-5 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20 opacity-50">
+        <span class="tag" style="font-size:0.6rem;">scroll</span>
+        <svg class="scroll-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5c3a1e" stroke-width="2">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- FEATURED CATEGORIES STRIP -->
+    <div class="categories-strip">
+      <div style="position:relative;">
+        <!-- Prev button -->
+        <button class="cat-nav-btn prev" id="catPrev" onclick="shiftCat(-1)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+
+        <div class="cat-track-wrapper" style="margin:0 44px;">
+          <div class="cat-track" id="catTrack">
+            <div class="cat-card" onclick="filterCat('মিষ্টি')">
+              <span class="cat-emoji">🍮</span>
+              <span class="cat-name">মিষ্টি</span>
+            </div>
+            <div class="cat-card" onclick="filterCat('মধু')">
+              <span class="cat-emoji">🍯</span>
+              <span class="cat-name">মধু</span>
+            </div>
+            <div class="cat-card" onclick="filterCat('দই')">
+              <span class="cat-emoji">🥛</span>
+              <span class="cat-name">বিভিন্ন দই</span>
+            </div>
+            <div class="cat-card" onclick="filterCat('তেল')">
+              <span class="cat-emoji">🫙</span>
+              <span class="cat-name">প্রাকৃতিক তেল</span>
+            </div>
+            <div class="cat-card" onclick="filterCat('পানীয়')">
+              <span class="cat-emoji">🥤</span>
+              <span class="cat-name">গ্রীষ্মকালীন পানীয়</span>
+            </div>
+            <div class="cat-card" onclick="filterCat('রশমালাই')">
+              <span class="cat-emoji">🍨</span>
+              <span class="cat-name">রশমালাই</span>
+            </div>
+            <div class="cat-card" onclick="filterCat('গুড়')">
+              <span class="cat-emoji">🟫</span>
+              <span class="cat-name">গুড়</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next button -->
+        <button class="cat-nav-btn next" id="catNext" onclick="shiftCat(1)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- end hero-wrapper -->
+
+  <!-- PRODUCT CARDS SECTION -->
+  <section class="py-20 px-6" style="background:var(--cream);">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-14">
+        <div class="tag mb-3 flex items-center justify-center gap-3">
+          <div class="divider"></div>
+          Our Collection
+          <div class="divider"></div>
+        </div>
+        <h2 style="font-size:clamp(1.8rem,4vw,2.8rem); font-weight:600;">Bestselling Products</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Card 1 -->
+        <div class="product-card group cursor-pointer" onclick="addToCart()" style="background:var(--warm-white); border:1px solid rgba(196,168,130,0.25);">
+          <div class="overflow-hidden relative" style="height:260px; background:linear-gradient(135deg,#ede8df,#e4ddd3);">
+            <svg class="absolute inset-0 m-auto group-hover:scale-105 transition-transform duration-500" width="140" height="200" viewBox="0 0 140 240" xmlns="http://www.w3.org/2000/svg" style="top:50%;left:50%;transform:translate(-50%,-50%)">
+              <rect x="35" y="0" width="28" height="14" rx="3" fill="#5a3e2b"/>
+              <rect x="44" y="14" width="12" height="16" rx="2" fill="#6b4c35"/>
+              <path d="M15 55 Q15 38 26 36 L40 36 L40 38 L100 38 L100 36 L114 36 Q125 38 125 55 L125 200 Q125 218 70 220 Q15 218 15 200 Z" fill="#5c3a1e"/>
+              <path d="M15 55 Q15 38 26 36 L114 36 Q125 38 125 55 L120 72 Q90 62 70 62 Q50 62 20 72 Z" fill="#6b4533"/>
+              <path d="M19 80 L19 195 Q15 185 15 170 Z" fill="rgba(255,255,255,0.08)"/>
+              <rect x="30" y="115" width="80" height="75" rx="7" fill="rgba(255,245,230,0.1)"/>
+              <path d="M70 138 C70 138 63 132 63 127 C63 123 70 122 70 127 C70 122 77 123 77 127 C77 132 70 138 70 138Z" fill="#e8b4b8" opacity="0.75"/>
+              <text x="70" y="154" text-anchor="middle" font-family="Jost,sans-serif" font-size="10" fill="#f5ece0" letter-spacing="1.5">Ladies</text>
+              <text x="70" y="168" text-anchor="middle" font-family="Jost,sans-serif" font-size="6" fill="#c9b09a" opacity="0.8">Botanical Serum</text>
+            </svg>
+            <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span style="background:var(--brown-dark); color:var(--warm-white); font-size:0.65rem; letter-spacing:0.1em; padding:6px 12px;">NEW</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="tag mb-1">Serum</div>
+            <h3 style="font-size:1.1rem; font-weight:600; margin-bottom:8px;">Botanical Night Serum</h3>
+            <div class="flex items-center justify-between">
+              <span style="font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600; color:var(--brown-dark);">$34.99</span>
+              <button onclick="event.stopPropagation(); addToCart()" class="btn-primary py-2 px-4 text-xs">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="product-card group cursor-pointer" style="background:var(--warm-white); border:1px solid rgba(196,168,130,0.25);">
+          <div class="overflow-hidden relative" style="height:260px; background:linear-gradient(135deg,#e8e2d8,#ddd5c8);">
+            <svg class="absolute group-hover:scale-105 transition-transform duration-500" width="160" height="180" viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" style="top:50%;left:50%;transform:translate(-50%,-50%)">
+              <ellipse cx="80" cy="28" rx="68" ry="18" fill="#e0d5c5"/>
+              <rect x="12" y="16" width="136" height="28" rx="6" fill="#e8ddd0"/>
+              <rect x="15" y="40" width="130" height="65" rx="10" fill="#f0ebe2"/>
+              <ellipse cx="80" cy="105" rx="65" ry="14" fill="#ddd3c2"/>
+              <rect x="35" y="52" width="90" height="42" rx="6" fill="rgba(59,42,26,0.05)"/>
+              <path d="M80 68 C80 68 74 63 74 59 C74 56 80 55 80 59 C80 55 86 56 86 59 C86 63 80 68 80 68Z" fill="#c9a0a5" opacity="0.7"/>
+              <text x="80" y="80" text-anchor="middle" font-family="Jost,sans-serif" font-size="9" fill="#5c3a1e" letter-spacing="1.5">Ladies</text>
+              <text x="80" y="91" text-anchor="middle" font-family="Jost,sans-serif" font-size="6.5" fill="#8a6e56">Day Cream</text>
+            </svg>
+          </div>
+          <div class="p-6">
+            <div class="tag mb-1">Moisturizer</div>
+            <h3 style="font-size:1.1rem; font-weight:600; margin-bottom:8px;">Rose Hip Day Cream</h3>
+            <div class="flex items-center justify-between">
+              <span style="font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600; color:var(--brown-dark);">$28.50</span>
+              <button onclick="event.stopPropagation(); addToCart()" class="btn-primary py-2 px-4 text-xs">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="product-card group cursor-pointer" style="background:var(--warm-white); border:1px solid rgba(196,168,130,0.25);">
+          <div class="overflow-hidden relative" style="height:260px; background:linear-gradient(135deg,#ede8df,#e8e0d5);">
+            <svg class="absolute group-hover:scale-105 transition-transform duration-500" width="100" height="210" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg" style="top:50%;left:50%;transform:translate(-50%,-50%)">
+              <rect x="30" y="0" width="40" height="14" rx="3" fill="#8a6e56"/>
+              <rect x="40" y="14" width="20" height="18" rx="2" fill="#9a7e65"/>
+              <path d="M10 48 Q10 35 20 33 L38 33 L38 35 L62 35 L62 33 L80 33 Q90 35 90 48 L90 165 Q90 178 50 180 Q10 178 10 165 Z" fill="#e8ddd0"/>
+              <path d="M10 48 Q10 35 20 33 L80 33 Q90 35 90 48 L86 60 Q65 54 50 54 Q35 54 14 60 Z" fill="#d8cbb8"/>
+              <rect x="22" y="95" width="56" height="60" rx="5" fill="rgba(59,42,26,0.06)"/>
+              <path d="M50 110 C50 110 44 105 44 101 C44 98 50 97 50 101 C50 97 56 98 56 101 C56 105 50 110 50 110Z" fill="#c9a0a5" opacity="0.75"/>
+              <text x="50" y="124" text-anchor="middle" font-family="Jost,sans-serif" font-size="8" fill="#5c3a1e" letter-spacing="1.5">Ladies</text>
+              <text x="50" y="136" text-anchor="middle" font-family="Jost,sans-serif" font-size="6" fill="#8a6e56">Mist & Glow</text>
+            </svg>
+          </div>
+          <div class="p-6">
+            <div class="tag mb-1">Mist</div>
+            <h3 style="font-size:1.1rem; font-weight:600; margin-bottom:8px;">Dewy Glow Face Mist</h3>
+            <div class="flex items-center justify-between">
+              <span style="font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600; color:var(--brown-dark);">$22.00</span>
+              <button onclick="event.stopPropagation(); addToCart()" class="btn-primary py-2 px-4 text-xs">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CART TOAST -->
+  <div id="cart-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 opacity-0 pointer-events-none transition-all duration-300" style="transform:translateX(-50%) translateY(20px);">
+    <div style="background:var(--brown-dark); color:var(--warm-white); padding:12px 28px; font-family:'Jost',sans-serif; font-size:0.8rem; letter-spacing:0.1em;">
+      ✓ Added to cart
+    </div>
+  </div>
+
+  <script>
+    // ===== NAVBAR HEIGHT ADJUSTMENT =====
+    function adjustHeroWrapper() {
+      const nav = document.querySelector('nav');
+      const wrapper = document.querySelector('.hero-wrapper');
+      if (nav && wrapper) {
+        const navH = nav.offsetHeight;
+        wrapper.style.paddingTop = navH + 'px';
+        wrapper.style.height = '100vh';
+      }
+    }
+    adjustHeroWrapper();
+    window.addEventListener('resize', adjustHeroWrapper);
+
+    // ===== HAMBURGER =====
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+      adjustHeroWrapper();
+    });
+
+    // ===== CART =====
+    let cartCount = 0;
+    const cartCountEl = document.getElementById('cart-count');
+    const toast = document.getElementById('cart-toast');
+
+    function addToCart() {
+      cartCount++;
+      cartCountEl.textContent = cartCount;
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      toast.style.pointerEvents = 'auto';
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(20px)';
+        toast.style.pointerEvents = 'none';
+      }, 2200);
+    }
+
+    // ===== BOTTLE IMAGE UPLOAD =====
+    const bottleZone = document.getElementById('bottleUploadZone');
+    const bottleInput = document.getElementById('bottleFileInput');
+    const bottleImg = document.getElementById('bottleImg');
+
+    bottleZone.addEventListener('click', () => bottleInput.click());
+    bottleInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        bottleImg.src = ev.target.result;
+        bottleZone.classList.add('has-image');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // ===== HERO SLIDES DATA =====
+    const slides = [
+      {
+        tag: 'winter offers running',
+        heading: 'BEST BEAUTY<br/>ITEMS',
+        desc: 'প্রকৃতির সেরা উপাদান থেকে তৈরি আমাদের বিউটি কালেকশন। আপনার ত্বককে দিন প্রাকৃতিক উজ্জ্বলতা এবং যত্নের ছোঁয়া।'
+      },
+      {
+        tag: 'new arrivals',
+        heading: 'NATURAL<br/>SKINCARE',
+        desc: '১০০% প্রাকৃতিক উপাদানে তৈরি আমাদের স্কিনকেয়ার রেঞ্জ। রাসায়নিক মুক্ত, ত্বকের জন্য নিরাপদ এবং কার্যকর।'
+      },
+      {
+        tag: 'exclusive collection',
+        heading: 'PURE &<br/>ORGANIC',
+        desc: 'বাংলাদেশের সেরা প্রাকৃতিক উৎস থেকে সংগ্রহ করা উপাদান দিয়ে তৈরি। আপনার সৌন্দর্যচর্চাকে করুন আরও সহজ ও স্বাস্থ্যকর।'
+      }
+    ];
+
+    let currentSlide = 0;
+    const tagEl = document.getElementById('slide-tag');
+    const headingEl = document.getElementById('slide-heading');
+    const descEl = document.getElementById('slide-desc');
+    const contentEl = document.getElementById('heroTextContent');
+
+    function goToSlide(index) {
+      if (index === currentSlide) return;
+
+      // Fade out
+      contentEl.classList.add('fade-out');
+      contentEl.classList.remove('fade-in-slide');
+
+      setTimeout(() => {
+        currentSlide = index;
+        const s = slides[currentSlide];
+        tagEl.textContent = s.tag;
+        headingEl.innerHTML = s.heading;
+        descEl.textContent = s.desc;
+
+        // Update dots
+        document.querySelectorAll('.slide-dots span').forEach((el, i) => {
+          el.classList.toggle('active', i === currentSlide);
+        });
+
+        // Fade in
+        contentEl.classList.remove('fade-out');
+        contentEl.classList.add('fade-in-slide');
+      }, 450);
+    }
+
+    // Auto-rotate slides
+    setInterval(() => {
+      const next = (currentSlide + 1) % slides.length;
+      goToSlide(next);
+    }, 4000);
+
+    // ===== CATEGORY STRIP SLIDER =====
+    const catTrack = document.getElementById('catTrack');
+    const catCardWidth = 154; // card width + gap
+    let catOffset = 0;
+    const catMaxOffset = () => {
+      const cards = catTrack.querySelectorAll('.cat-card');
+      const trackW = catTrack.parentElement.offsetWidth;
+      const totalW = cards.length * catCardWidth;
+      return Math.max(0, totalW - trackW);
+    };
+
+    function shiftCat(dir) {
+      const step = catCardWidth * 2;
+      catOffset += dir * step;
+      catOffset = Math.max(0, Math.min(catOffset, catMaxOffset()));
+      catTrack.style.transform = `translateX(-${catOffset}px)`;
+
+      document.getElementById('catPrev').style.opacity = catOffset <= 0 ? '0.4' : '1';
+      document.getElementById('catNext').style.opacity = catOffset >= catMaxOffset() ? '0.4' : '1';
+    }
+
+    // Init nav button states
+    document.getElementById('catPrev').style.opacity = '0.4';
+
+    function filterCat(name) {
+      // Highlight selected card
+      document.querySelectorAll('.cat-card').forEach(c => {
+        c.style.background = '';
+        c.style.borderColor = '';
+      });
+      event.currentTarget.style.background = 'rgba(196,168,130,0.25)';
+      event.currentTarget.style.borderColor = 'rgba(196,168,130,0.7)';
+    }
+  </script>
+</body>
+</html>
