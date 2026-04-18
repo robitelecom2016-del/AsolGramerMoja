@@ -671,28 +671,23 @@ body{
 .contact-social-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;flex-shrink:0;}
 .contact-social-ico.fb{background:#1877f2;}
 .contact-social-ico.ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);}
-.why-sec{background:#e3f0dc;border-top:2px solid #bcd8b4;border-bottom:2px solid #bcd8b4;padding:36px 16px;}
+.why-sec{background:#fff;border-top:1px solid #eee;border-bottom:1px solid #eee;padding:36px 16px;}
 .why-in{max-width:var(--mw);margin:0 auto;}
-.why-ttl{text-align:center;font-size:1.3rem;font-weight:700;color:var(--gd);margin-bottom:20px;}
+.why-ttl{text-align:center;font-size:1.3rem;font-weight:700;color:#222;margin-bottom:20px;}
 .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
 .why-card{background:#fff;border-radius:10px;padding:20px 14px;text-align:center;box-shadow:0 1px 8px rgba(0,0,0,.06);transition:transform .2s;}
 .why-card:hover{transform:translateY(-3px);}
 .why-ic{font-size:2rem;margin-bottom:7px;display:block;}
-.why-card h3{font-size:.92rem;font-weight:700;color:var(--gd);margin-bottom:5px;}
+.why-card h3{font-size:.92rem;font-weight:700;color:#222;margin-bottom:5px;}
 .why-card p{font-size:.78rem;color:var(--txt2);line-height:1.6;}
-footer.site-footer{background:#3d4a6b;color:#a8b4cc;padding:0;flex-shrink:0;}
-.fin{max-width:var(--mw);margin:0 auto;}
-.fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:24px;margin-bottom:20px;}
-footer.site-footer h4{color:#fff;font-size:.88rem;margin-bottom:10px;font-weight:700;}
-footer.site-footer p{font-size:.79rem;line-height:1.7;}
+footer.site-footer{background:#fff;color:#555;padding:0;flex-shrink:0;}
+footer.site-footer h4{color:#222;font-size:.88rem;margin-bottom:10px;font-weight:700;}
+footer.site-footer p{font-size:.82rem;line-height:1.75;color:#777;}
 .flinks{list-style:none;}
 .flinks li{margin-bottom:5px;}
-.flinks a{color:#a8b4cc;text-decoration:none;font-size:.79rem;transition:color .2s;cursor:pointer;}
-.flinks a:hover{color:#fff;}
-.soc{display:flex;gap:9px;margin-top:9px;}
-.sb{background:rgba(255,255,255,.08);color:#a8b4cc;border:2px solid #a8b4cc;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:.88rem;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s,color .2s;text-decoration:none;}
-.sb:hover{background:transparent;border-color:#fff;color:#fff;}
-.fbot{border-top:1px solid rgba(255,255,255,.08);padding-top:0;text-align:center;font-size:.74rem;color:rgba(255,255,255,.4);}
+.flinks a{color:#666;text-decoration:none;font-size:.82rem;transition:color .2s;cursor:pointer;}
+.flinks a:hover{color:#f5a623;}
+.fbot{border-top:1px solid #eee;padding-top:0;font-size:.76rem;color:#999;}
 .cart-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;opacity:0;pointer-events:none;transition:opacity .3s;}
 .cart-ov.open{opacity:1;pointer-events:all;}
 .cart-sb{position:fixed;right:-420px;top:0;width:400px;height:100%;background:#fff;z-index:2001;transition:right .3s ease;display:flex;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,.18);}
@@ -978,7 +973,6 @@ footer.site-footer p{font-size:.79rem;line-height:1.7;}
   .about-stats{gap:12px;}
   .about-stat-item{padding:16px 20px;min-width:100px;}
   .contact-grid{grid-template-columns:1fr;}
-  .fgrid{grid-template-columns:1fr 1fr;}
   .why-grid{grid-template-columns:1fr 1fr;}
   .pdp-main{grid-template-columns:1fr;}
   .pdp-related-grid{grid-template-columns:repeat(2,1fr);}
@@ -997,7 +991,6 @@ footer.site-footer p{font-size:.79rem;line-height:1.7;}
   .dot.active{width:14px;}
   .all-cat-tabs{display:none;}
   .why-grid{grid-template-columns:1fr;}
-  .fgrid{grid-template-columns:1fr;}
   .main{padding:16px 12px 32px;}
   .sec-head h2{font-size:1rem;}
 }
@@ -1010,90 +1003,193 @@ footer.site-footer p{font-size:.79rem;line-height:1.7;}
 }
 
 /* ===== NEW FOOTER STYLES ===== */
+/* ===== FOOTER — matches navbar/slider/category white+amber theme ===== */
+
+/* Top newsletter/promo strip */
+.footer-promo-strip{
+  background:#f5a623;
+  padding:18px 24px;
+}
+.footer-promo-inner{
+  max-width:var(--mw);margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;
+}
+.footer-promo-text{
+  display:flex;align-items:center;gap:10px;
+  color:#fff;font-size:.95rem;font-weight:700;
+}
+.footer-promo-text i{font-size:1.2rem;}
+.footer-promo-text span{font-size:.82rem;font-weight:400;opacity:.9;margin-left:4px;}
+.footer-promo-actions{display:flex;gap:10px;align-items:center;}
+.footer-promo-input{
+  padding:8px 16px;border:none;border-radius:4px;
+  font-family:inherit;font-size:.82rem;
+  outline:none;width:220px;
+  background:#fff;color:#333;
+}
+.footer-promo-input::placeholder{color:#aaa;}
+.footer-promo-btn{
+  background:#222;color:#fff;border:none;
+  padding:8px 18px;border-radius:4px;
+  font-family:inherit;font-size:.82rem;font-weight:700;
+  cursor:pointer;white-space:nowrap;
+  transition:background .2s;
+}
+.footer-promo-btn:hover{background:#444;}
+
+/* Main footer */
 .site-footer{
-  background:#3d4a6b;
-  color:#fff;
+  background:#fff;
+  color:#555;
   font-family:'Hind Siliguri',sans-serif;
+  border-top:2px solid #eee;
 }
 .footer-main{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:36px;
+  grid-template-columns:2fr 1fr 1fr 1fr;
+  gap:40px;
   max-width:var(--mw);
   margin:0 auto;
-  padding:40px 24px;
+  padding:44px 24px 36px;
 }
 .footer-logo{
-  margin-bottom:14px;cursor:pointer;
-  display:flex;align-items:center;
+  margin-bottom:16px;cursor:pointer;
+  display:flex;align-items:center;gap:10px;
 }
-.footer-logo .lt-main{color:#fff;}
-.footer-logo .lt-sub{color:#b8e67a;}
+.footer-logo .logo-icon{
+  background:#fff8ee;border:1.5px solid #f5d08a;
+  width:42px;height:42px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+}
+.footer-logo .logo-icon img{width:32px;height:32px;object-fit:contain;}
+.footer-logo .lt-main{color:#222;font-size:1.1rem;}
+.footer-logo .lt-sub{color:#888;}
 .footer-desc{
-  color:#a8b4cc;font-size:.84rem;
-  line-height:1.75;margin-bottom:18px;
+  color:#777;font-size:.84rem;
+  line-height:1.8;margin-bottom:20px;
+  max-width:280px;
 }
 .footer-phone{
-  margin-top:12px;font-size:.79rem;color:#c8e6b0;
+  margin-top:0;font-size:.82rem;color:#444;
+  display:flex;align-items:center;gap:7px;
 }
+.footer-phone i{color:#f5a623;}
+
+/* Category/nav chips row */
+.footer-cat-chips{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;
+}
+.footer-cat-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 12px;border-radius:20px;
+  background:#f8f8f8;border:1px solid #eee;
+  font-size:.74rem;font-weight:500;color:#555;
+  cursor:pointer;transition:all .2s;text-decoration:none;
+}
+.footer-cat-chip:hover{background:#fff8ee;border-color:#f5a623;color:#f5a623;}
+
+/* Divider */
+.footer-divider{
+  width:36px;height:3px;
+  background:#f5a623;border-radius:2px;
+  margin-bottom:18px;
+}
+
 .footer-heading{
-  color:#fff;font-size:.72rem;font-weight:700;
-  letter-spacing:.18em;text-transform:uppercase;
-  margin-bottom:16px;
+  color:#222;font-size:.78rem;font-weight:800;
+  letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:6px;
 }
 .footer-links{list-style:none;display:flex;flex-direction:column;gap:0;}
 .footer-links li a{
-  display:flex;align-items:baseline;gap:7px;
-  color:#a8b4cc;font-size:.84rem;
-  padding:7px 0;cursor:pointer;
-  border-bottom:1px solid rgba(255,255,255,.05);
+  display:flex;align-items:center;gap:8px;
+  color:#666;font-size:.84rem;
+  padding:8px 0;cursor:pointer;
+  border-bottom:1px solid #f5f5f5;
   text-decoration:none;
-  transition:color .2s;
+  transition:color .2s,padding-left .2s;
 }
 .footer-links li:last-child a{border-bottom:none;}
-.footer-links li a:hover{color:#fff;}
-.footer-link-arrow{color:#6a7da0;font-size:.8rem;}
-.footer-links li a:hover .footer-link-arrow{color:#7b96f5;}
-.footer-socials{display:flex;gap:10px;margin-top:4px;}
+.footer-links li a:hover{color:#f5a623;padding-left:4px;}
+.footer-link-arrow{
+  color:#e0e0e0;font-size:.72rem;
+  transition:color .2s;
+}
+.footer-links li a:hover .footer-link-arrow{color:#f5a623;}
+
+.footer-socials{display:flex;gap:8px;margin-top:8px;}
 .footer-social-btn{
-  width:36px;height:36px;border-radius:50%;
-  border:2px solid #a8b4cc;
+  width:36px;height:36px;border-radius:8px;
+  border:1.5px solid #eee;
+  background:#f8f8f8;
   display:flex;align-items:center;justify-content:center;
-  color:#a8b4cc;
-  transition:border-color .2s,color .2s;
+  color:#777;
+  transition:all .2s;
   text-decoration:none;
 }
-.footer-social-btn:hover{border-color:#fff;color:#fff;}
+.footer-social-btn:hover{
+  border-color:#f5a623;
+  background:#fff8ee;
+  color:#f5a623;
+  transform:translateY(-2px);
+}
 .footer-social-icon{
   width:16px;height:16px;
   fill:currentColor;
 }
+
+/* Payment badges row */
+.footer-pay-row{
+  display:flex;flex-wrap:wrap;gap:8px;
+  margin-top:8px;
+}
+.footer-pay-badge{
+  padding:5px 12px;border-radius:4px;
+  background:#f5f5f5;border:1px solid #eee;
+  font-size:.7rem;font-weight:700;color:#555;
+  display:flex;align-items:center;gap:4px;
+}
+.footer-pay-badge i{color:#f5a623;}
+
 /* Bottom bar */
 .footer-bottom{
-  background:#2f3a56;
+  background:#f8f8f8;
+  border-top:1px solid #eee;
   display:flex;flex-wrap:wrap;
   align-items:center;justify-content:space-between;
   gap:10px;
   max-width:100%;
   padding:14px 24px;
   font-size:.76rem;
-  color:#6a7da0;
+  color:#999;
 }
-.footer-bottom-nav{display:flex;gap:24px;}
+.footer-bottom-nav{display:flex;gap:20px;}
 .footer-bot-link{
-  color:#a8b4cc;text-decoration:none;
-  font-size:.72rem;font-weight:700;
-  letter-spacing:.15em;text-transform:uppercase;
+  color:#777;text-decoration:none;
+  font-size:.76rem;font-weight:600;
   cursor:pointer;transition:color .2s;
 }
-.footer-bot-link:hover{color:#fff;}
+.footer-bot-link:hover{color:#f5a623;}
+.footer-bottom-right{
+  display:flex;align-items:center;gap:6px;
+  font-size:.74rem;color:#bbb;
+}
+.footer-bottom-right a{color:#f5a623;text-decoration:none;}
+
 @media(max-width:900px){
-  .footer-main{grid-template-columns:1fr 1fr;gap:24px;}
+  .footer-main{grid-template-columns:1fr 1fr;gap:28px;}
+  .footer-promo-input{width:160px;}
 }
 @media(max-width:600px){
-  .footer-main{grid-template-columns:1fr;gap:20px;padding:28px 16px;}
-  .footer-bottom{flex-direction:column;align-items:flex-start;gap:8px;padding:14px 16px;}
-  .footer-bottom-nav{gap:14px;flex-wrap:wrap;}
+  .footer-promo-strip{padding:14px 16px;}
+  .footer-promo-input{display:none;}
+  .footer-main{grid-template-columns:1fr 1fr;gap:20px;padding:28px 16px;}
+  .footer-bottom{flex-direction:column;align-items:flex-start;gap:8px;padding:12px 16px;}
+  .footer-bottom-nav{gap:12px;flex-wrap:wrap;}
+}
+@media(max-width:480px){
+  .footer-main{grid-template-columns:1fr;gap:24px;}
 }
 /* ===== END FOOTER STYLES ===== */
 </style>
@@ -1315,6 +1411,23 @@ footer.site-footer p{font-size:.79rem;line-height:1.7;}
   <div id="pdpContent"></div>
 </div>
 <footer class="site-footer">
+  <!-- Promo/Newsletter Strip -->
+  <div class="footer-promo-strip">
+    <div class="footer-promo-inner">
+      <div class="footer-promo-text">
+        <i class="fa-solid fa-truck-fast"></i>
+        সারাদেশে দ্রুত ডেলিভারি
+        <span>· ক্যাশ অন ডেলিভারি · অর্ডার করুন এখনই</span>
+      </div>
+      <div class="footer-promo-actions">
+        <input class="footer-promo-input" type="text" placeholder="আপনার মোবাইল নম্বর দিন...">
+        <button class="footer-promo-btn" onclick="toggleCart()">
+          <i class="fa-solid fa-bell"></i> অর্ডার করুন
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Main Footer Grid -->
   <div class="footer-main">
     <!-- About Column -->
@@ -1328,52 +1441,79 @@ footer.site-footer p{font-size:.79rem;line-height:1.7;}
           <span class="lt-sub">বিশুদ্ধ পণ্য · সরাসরি কৃষক থেকে</span>
         </div>
       </div>
-      <p class="footer-desc" id="footerDesc">বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়। সরাসরি কৃষক থেকে আপনার কাছে।</p>
-      <div class="footer-socials soc">
-        <a href="#" id="fbLink" class="sb footer-social-btn" title="Facebook">
+      <p class="footer-desc" id="footerDesc">বিশুদ্ধ গ্রামীণ পণ্য এখন আপনার দরজায়। সরাসরি কৃষক থেকে আপনার কাছে পৌঁছে দিচ্ছি আমরা।</p>
+      <div class="footer-pay-row">
+        <span class="footer-pay-badge"><i class="fa-solid fa-money-bill-wave"></i> ক্যাশ অন ডেলিভারি</span>
+        <span class="footer-pay-badge"><i class="fa-solid fa-shield-halved"></i> নিরাপদ</span>
+        <span class="footer-pay-badge"><i class="fa-solid fa-rotate-left"></i> রিটার্ন গ্যারান্টি</span>
+      </div>
+      <div class="footer-socials" style="margin-top:16px;">
+        <a href="#" id="fbLink" class="footer-social-btn" title="Facebook">
           <svg class="footer-social-icon" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
         </a>
-        <a href="#" id="igLink" class="sb footer-social-btn" title="Instagram">
+        <a href="#" id="igLink" class="footer-social-btn" title="Instagram">
           <svg class="footer-social-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></svg>
         </a>
+        <a href="tel:" id="waLink" class="footer-social-btn" title="WhatsApp">
+          <svg class="footer-social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+        </a>
       </div>
+      <div class="footer-phone" id="footerPhone"></div>
     </div>
+
     <!-- Navigation Column -->
     <div class="footer-col">
       <h4 class="footer-heading">নেভিগেশন</h4>
+      <div class="footer-divider"></div>
       <ul class="flinks footer-links">
-        <li><a onclick="goHome()"><span class="footer-link-arrow">»</span> হোম</a></li>
-        <li><a onclick="goProductsPage()"><span class="footer-link-arrow">»</span> পণ্য</a></li>
-        <li><a onclick="goAboutPage()"><span class="footer-link-arrow">»</span> আমাদের সম্পর্কে</a></li>
-        <li><a onclick="goContactPage()"><span class="footer-link-arrow">»</span> যোগাযোগ</a></li>
+        <li><a onclick="goHome()"><span class="footer-link-arrow">›</span> হোম</a></li>
+        <li><a onclick="goProductsPage()"><span class="footer-link-arrow">›</span> সকল পণ্য</a></li>
+        <li><a onclick="goHome()"><span class="footer-link-arrow">›</span> আজকের ডিল</a></li>
+        <li><a onclick="goHome()"><span class="footer-link-arrow">›</span> বেস্ট সেলার</a></li>
+        <li><a onclick="goAboutPage()"><span class="footer-link-arrow">›</span> আমাদের সম্পর্কে</a></li>
+        <li><a onclick="goContactPage()"><span class="footer-link-arrow">›</span> যোগাযোগ</a></li>
       </ul>
     </div>
+
     <!-- Categories Column -->
     <div class="footer-col">
       <h4 class="footer-heading">পণ্য বিভাগ</h4>
+      <div class="footer-divider"></div>
       <ul class="flinks footer-links" id="footerCatLinks"></ul>
     </div>
-    <!-- Help Column -->
+
+    <!-- Help & Info Column -->
     <div class="footer-col">
-      <h4 class="footer-heading">সাহায্য</h4>
+      <h4 class="footer-heading">গ্রাহক সেবা</h4>
+      <div class="footer-divider"></div>
       <ul class="flinks footer-links">
-        <li><a><span class="footer-link-arrow">»</span> ডেলিভারি তথ্য</a></li>
-        <li><a><span class="footer-link-arrow">»</span> রিটার্ন পলিসি</a></li>
-        <li><a><span class="footer-link-arrow">»</span> গোপনীয়তা নীতি</a></li>
-        <li><a onclick="goContactPage()"><span class="footer-link-arrow">»</span> যোগাযোগ করুন</a></li>
+        <li><a><span class="footer-link-arrow">›</span> ডেলিভারি তথ্য</a></li>
+        <li><a><span class="footer-link-arrow">›</span> রিটার্ন পলিসি</a></li>
+        <li><a><span class="footer-link-arrow">›</span> গোপনীয়তা নীতি</a></li>
+        <li><a onclick="goContactPage()"><span class="footer-link-arrow">›</span> যোগাযোগ করুন</a></li>
       </ul>
-      <div class="footer-phone" id="footerPhone"></div>
+      <div style="margin-top:20px;padding:14px;background:#fff8ee;border:1.5px solid #f5d08a;border-radius:8px;">
+        <div style="font-size:.72rem;font-weight:800;color:#f5a623;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">
+          <i class="fa-solid fa-headset"></i> সাপোর্ট হেল্পলাইন
+        </div>
+        <div style="font-size:.9rem;font-weight:700;color:#222;" id="footerHelpPhone">01XXXXXXXXX</div>
+        <div style="font-size:.72rem;color:#999;margin-top:3px;">শনি–বৃহস্পতি, সকাল ৯টা–রাত ৯টা</div>
+      </div>
     </div>
   </div>
+
   <!-- Bottom Bar -->
   <div class="fbot footer-bottom">
-    <span id="footerCopyright">&copy; 2024 আসল গ্রামের মজা | সর্বস্বত্ব সংরক্ষিত</span>
+    <span id="footerCopyright" style="color:#999;">&copy; 2024 আসল গ্রামের মজা &mdash; সর্বস্বত্ব সংরক্ষিত</span>
     <nav class="footer-bottom-nav">
       <a onclick="goHome()" class="footer-bot-link">হোম</a>
       <a onclick="goProductsPage()" class="footer-bot-link">পণ্য</a>
       <a onclick="goAboutPage()" class="footer-bot-link">আমাদের সম্পর্কে</a>
       <a onclick="goContactPage()" class="footer-bot-link">যোগাযোগ</a>
     </nav>
+    <div class="footer-bottom-right">
+      <i class="fa-solid fa-lock" style="color:#f5a623;font-size:.7rem;"></i> নিরাপদ শপিং
+    </div>
   </div>
 </footer>
 <nav class="bottom-nav" id="bottomNav" style="display:none !important;">
