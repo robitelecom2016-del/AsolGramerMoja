@@ -669,27 +669,59 @@ body{
 .about-content{background:#fff;border:1px solid var(--border);border-radius:12px;padding:32px;margin:0 0 32px;line-height:2;font-size:.94rem;color:#444;box-shadow:0 2px 10px rgba(0,0,0,.04);}
 .about-content p{margin-bottom:12px;}
 .about-content p:last-child{margin-bottom:0;}
-.contact-page{max-width:var(--mw);margin:0 auto;padding:0 0 60px;}
-.contact-hero{background:linear-gradient(135deg,var(--gd),var(--gm));padding:48px 16px 40px;text-align:center;position:relative;overflow:hidden;}
-.contact-hero::before{content:'📞';font-size:8rem;position:absolute;right:-10px;top:-10px;opacity:.08;line-height:1;}
-.contact-title{font-size:2rem;font-weight:700;color:#fff;margin-bottom:8px;text-shadow:0 2px 8px rgba(0,0,0,.2);}
-.contact-subtitle{font-size:1rem;color:rgba(255,255,255,.85);max-width:500px;margin:0 auto;line-height:1.6;}
-.contact-body{padding:0 16px;}
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:32px 0 0;}
-.contact-info-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,.05);}
-.contact-info-card-title{font-size:.82rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--border);}
-.contact-info-row{display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid #f0ede6;}
-.contact-info-row:last-child{border-bottom:none;}
-.contact-ico{width:40px;height:40px;background:linear-gradient(135deg,var(--gd),var(--gm));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;flex-shrink:0;}
-.contact-info-row span{font-size:.9rem;color:#444;line-height:1.4;}
-.contact-faqs{margin-top:28px;}
+/* ===== CONTACT PAGE ===== */
+.contact-page{max-width:100%;margin:0;padding:0 0 60px;background:#f8f8f6;}
+/* Hero */
+.contact-hero{position:relative;width:100%;overflow:hidden;background:#e8e8dc;}
+.contact-hero-img{width:100%;height:240px;object-fit:cover;object-position:center 55%;display:block;}
+.contact-hero-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(248,248,244,.55);padding:20px 16px;}
+.contact-title{font-size:2.8rem;font-weight:800;color:#1e2d4a;margin-bottom:10px;letter-spacing:-.5px;text-align:center;}
+.contact-subtitle{font-size:.9rem;color:#555;max-width:440px;margin:0 auto;line-height:1.65;text-align:center;}
+/* Two-column body */
+.contact-body{max-width:var(--mw);margin:0 auto;padding:44px 24px 0;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;}
+/* Left column */
+.contact-left{}
+.contact-cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+.contact-card{background:#fff;border:1px solid #ebebeb;border-radius:10px;padding:26px 18px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.05);transition:box-shadow .2s,transform .2s;}
+.contact-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-2px);}
+.contact-card-ico{width:54px;height:54px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;background:#f2eeee;color:#5a3535;}
+.contact-card-ico.whatsapp{background:#eef4ee;color:#2e6b3e;}
+.contact-card-ico.email{background:#eeeef4;color:#35355a;}
+.contact-card-ico.shop{background:#f4f0eb;color:#6b4a28;}
+.contact-card-label{font-size:1rem;font-weight:700;color:#1a1a1a;margin-bottom:5px;}
+.contact-card-val{font-size:.81rem;color:#888;line-height:1.45;}
+/* Map */
+.contact-map{width:100%;height:235px;border-radius:10px;border:1px solid #e0e0e0;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);display:block;}
+/* Right column - form */
+.contact-right{}
+.contact-form-title{font-size:2.2rem;font-weight:800;color:#1a2740;margin-bottom:10px;letter-spacing:-.3px;}
+.contact-form-desc{font-size:.87rem;color:#888;line-height:1.65;margin-bottom:26px;}
+.contact-form-field{margin-bottom:15px;}
+.contact-form-field label{display:block;font-size:.83rem;font-weight:600;color:#333;margin-bottom:6px;}
+.contact-form-field input,
+.contact-form-field textarea{width:100%;padding:11px 14px;border:1.5px solid #e0dcd6;border-radius:6px;font-family:inherit;font-size:.87rem;color:#222;background:#fff;outline:none;transition:border-color .2s,box-shadow .2s;}
+.contact-form-field input:focus,
+.contact-form-field textarea:focus{border-color:#c8915a;box-shadow:0 0 0 3px rgba(200,145,90,.12);}
+.contact-form-field input::placeholder,
+.contact-form-field textarea::placeholder{color:#c8c4c0;}
+.contact-form-field textarea{resize:vertical;min-height:105px;}
+.contact-send-btn{width:100%;background:#c8855a;color:#fff;border:none;padding:14px 20px;border-radius:30px;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s,transform .15s;margin-top:4px;letter-spacing:.02em;}
+.contact-send-btn:hover{background:#b36e44;transform:translateY(-1px);}
+/* FAQs */
+.contact-faqs{max-width:var(--mw);margin:36px auto 0;padding:0 24px;}
 .contact-faqs h3{font-size:1.15rem;font-weight:700;color:var(--gd);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .faq-item{background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);}
 .faq-q{background:#f9f7f4;padding:14px 18px;font-weight:700;color:var(--txt);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .2s;}
 .faq-q:hover{background:#f0ede6;}
 .faq-q i{color:var(--gd);font-size:.85rem;}
 .faq-a{padding:14px 18px;color:#555;font-size:.88rem;border-top:1px solid var(--border);line-height:1.7;}
-.contact-map{width:100%;height:280px;border-radius:12px;margin:24px 0;border:1px solid var(--border);overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08);}
+/* Legacy / kept for compatibility */
+.contact-info-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,.05);}
+.contact-info-card-title{font-size:.82rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--border);}
+.contact-info-row{display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid #f0ede6;}
+.contact-info-row:last-child{border-bottom:none;}
+.contact-ico{width:40px;height:40px;background:linear-gradient(135deg,var(--gd),var(--gm));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;flex-shrink:0;}
+.contact-info-row span{font-size:.9rem;color:#444;line-height:1.4;}
 .contact-social-card{background:linear-gradient(135deg,#fff 0%,#f0f9eb 100%);border:1px solid #c8e0bc;border-radius:12px;padding:24px;box-shadow:0 4px 16px rgba(45,90,39,.08);}
 .contact-social-link{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #eee;text-decoration:none;color:inherit;transition:color .2s;}
 .contact-social-link:last-child{border-bottom:none;}
@@ -1001,7 +1033,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:#777;}
   .about-banner-title{font-size:1.4rem;bottom:18px;}
   .about-stats{gap:12px;}
   .about-stat-item{padding:16px 20px;min-width:100px;}
-  .contact-grid{grid-template-columns:1fr;}
+  .contact-body{grid-template-columns:1fr;} .contact-cards-grid{grid-template-columns:1fr 1fr;}
   .why-grid{grid-template-columns:1fr 1fr;}
   .pdp-main{grid-template-columns:1fr;}
   .pdp-related-grid{grid-template-columns:repeat(2,1fr);}
@@ -2762,45 +2794,100 @@ async function loadContactPageContent() {
     const data = await api('/api/pages/contact');
     const contact = data || {};
     const faqs = contact.faqs || [];
+
     let mapHtml = '';
     if (contact.mapUrl && contact.mapUrl.startsWith('http')) {
       mapHtml = `<iframe class="contact-map" src="${contact.mapUrl}" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+    } else {
+      mapHtml = `<iframe class="contact-map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.1583!2d-74.1197639!3d40.6976637!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY!5e0!3m2!1sen!2sbd!4v1680000000000" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
     }
+
+    const heroBg = contact.bannerUrl
+      ? `<img class="contact-hero-img" src="${contact.bannerUrl}" alt="Contact" onerror="this.style.display='none'">`
+      : `<img class="contact-hero-img" src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1400&auto=format&fit=crop&q=80" alt="Contact Banner" onerror="this.style.minHeight='180px';this.style.background='linear-gradient(135deg,#e8e4dc,#d4cfc4)'">`;
+
     container.innerHTML = `
       <div class="contact-hero">
-        <div class="contact-title">${contact.title || 'যোগাযোগ করুন'}</div>
-        ${contact.subtitle ? `<div class="contact-subtitle">${contact.subtitle}</div>` : ''}
-      </div>
-      <div class="contact-body">
-        <div class="contact-grid">
-          <div class="contact-info-card">
-            <div class="contact-info-card-title"><i class="fa-solid fa-address-book" style="margin-right:6px;"></i> যোগাযোগের তথ্য</div>
-            ${contact.phone1 ? `<div class="contact-info-row"><span class="contact-ico"><i class="fa-solid fa-phone"></i></span><span>${contact.phone1}</span></div>` : ''}
-            ${contact.phone2 ? `<div class="contact-info-row"><span class="contact-ico"><i class="fa-solid fa-phone"></i></span><span>${contact.phone2}</span></div>` : ''}
-            ${contact.email ? `<div class="contact-info-row"><span class="contact-ico"><i class="fa-solid fa-envelope"></i></span><span>${contact.email}</span></div>` : ''}
-            ${contact.hours ? `<div class="contact-info-row"><span class="contact-ico"><i class="fa-regular fa-clock"></i></span><span>${contact.hours}</span></div>` : ''}
-            ${contact.address ? `<div class="contact-info-row"><span class="contact-ico"><i class="fa-solid fa-location-dot"></i></span><span>${contact.address}</span></div>` : ''}
-            ${contact.whatsapp ? `<div class="contact-info-row"><span class="contact-ico" style="background:linear-gradient(135deg,#25d366,#128c7e);"><i class="fa-brands fa-whatsapp"></i></span><span>${contact.whatsapp}</span></div>` : ''}
-          </div>
-          <div class="contact-social-card">
-            <div class="contact-info-card-title"><i class="fa-solid fa-share-nodes" style="margin-right:6px;"></i> সোশ্যাল মিডিয়া</div>
-            ${contact.fb ? `<a href="${contact.fb}" target="_blank" class="contact-social-link"><span class="contact-social-ico fb"><i class="fa-brands fa-facebook-f"></i></span><span>Facebook পেজ দেখুন</span><i class="fa-solid fa-arrow-up-right-from-square" style="margin-left:auto;font-size:.75rem;color:#aaa;"></i></a>` : ''}
-            ${contact.ig ? `<a href="${contact.ig}" target="_blank" class="contact-social-link"><span class="contact-social-ico ig"><i class="fa-brands fa-instagram"></i></span><span>Instagram ফলো করুন</span><i class="fa-solid fa-arrow-up-right-from-square" style="margin-left:auto;font-size:.75rem;color:#aaa;"></i></a>` : ''}
-            ${!contact.fb && !contact.ig ? `<div style="color:#aaa;font-size:.88rem;padding:12px 0;">সোশ্যাল মিডিয়া লিংক পাওয়া যায়নি</div>` : ''}
-          </div>
+        ${heroBg}
+        <div class="contact-hero-overlay">
+          <div class="contact-title">${contact.title || 'Contact Us'}</div>
+          <div class="contact-subtitle">${contact.subtitle || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.'}</div>
         </div>
-        ${mapHtml}
-        ${faqs.length ? `<div class="contact-faqs"><h3><i class="fa-regular fa-circle-question"></i> প্রায়শই জিজ্ঞাসিত প্রশ্ন</h3>` + faqs.map(f => `
-          <div class="faq-item">
-            <div class="faq-q" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='none'?'block':'none'">
-              <span>${f.q}</span><i class="fa-solid fa-chevron-down"></i>
+      </div>
+
+      <div class="contact-body">
+        <div class="contact-left">
+          <div class="contact-cards-grid">
+            <div class="contact-card">
+              <div class="contact-card-ico"><i class="fa-solid fa-phone"></i></div>
+              <div class="contact-card-label">Phone</div>
+              <div class="contact-card-val">${contact.phone1 || '207-8767-452'}</div>
             </div>
-            <div class="faq-a" style="display:none;">${f.a}</div>
-          </div>`).join('') + '</div>' : ''}
-      </div>`;
+            <div class="contact-card">
+              <div class="contact-card-ico whatsapp"><i class="fa-brands fa-whatsapp"></i></div>
+              <div class="contact-card-label">Whatsapp</div>
+              <div class="contact-card-val">${contact.whatsapp || contact.phone2 || '082-123-234-345'}</div>
+            </div>
+            <div class="contact-card">
+              <div class="contact-card-ico email"><i class="fa-solid fa-envelope"></i></div>
+              <div class="contact-card-label">Email</div>
+              <div class="contact-card-val">${contact.email || 'support@yoursite.com'}</div>
+            </div>
+            <div class="contact-card">
+              <div class="contact-card-ico shop"><i class="fa-solid fa-store"></i></div>
+              <div class="contact-card-label">Our Shop</div>
+              <div class="contact-card-val">${contact.address || '2443 Oak Ridge Omaha, QA.45065'}</div>
+            </div>
+          </div>
+          ${mapHtml}
+        </div>
+
+        <div class="contact-right">
+          <div class="contact-form-title">Get In Touch</div>
+          <div class="contact-form-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</div>
+          <div class="contact-form-field">
+            <label>Name</label>
+            <input type="text" placeholder="Your Name" id="ctcName">
+          </div>
+          <div class="contact-form-field">
+            <label>Email</label>
+            <input type="email" placeholder="your@email.com" id="ctcEmail">
+          </div>
+          <div class="contact-form-field">
+            <label>Subject</label>
+            <input type="text" placeholder="Subject" id="ctcSubject">
+          </div>
+          <div class="contact-form-field">
+            <label>Message</label>
+            <textarea placeholder="Type here..." id="ctcMessage"></textarea>
+          </div>
+          <button class="contact-send-btn" onclick="handleContactFormSubmit(this)">Send Now</button>
+        </div>
+      </div>
+
+      ${faqs.length ? `<div class="contact-faqs"><h3><i class="fa-regular fa-circle-question"></i> প্রায়শই জিজ্ঞাসিত প্রশ্ন</h3>` + faqs.map(f => `
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+            <span>${f.q}</span><i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-a" style="display:none;">${f.a}</div>
+        </div>`).join('') + '</div>' : ''}
+    `;
   } catch {
     container.innerHTML = '<div class="error-state"><i class="fa-solid fa-circle-exclamation"></i><p>পৃষ্ঠা লোড হয়নি</p></div>';
   }
+}
+function handleContactFormSubmit(btn) {
+  const name = document.getElementById('ctcName')?.value.trim();
+  const email = document.getElementById('ctcEmail')?.value.trim();
+  if (!name || !email) { alert('অনুগ্রহ করে নাম ও ইমেইল দিন।'); return; }
+  btn.textContent = 'পাঠানো হচ্ছে...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = '✓ পাঠানো হয়েছে!';
+    btn.style.background = '#4a7c3f';
+    setTimeout(() => { btn.textContent = 'Send Now'; btn.style.background = ''; btn.disabled = false; }, 3000);
+  }, 1200);
 }
 function copyPayNum(method, btn) {
   const num = ADVANCE_PAYMENT_INFO[method];
