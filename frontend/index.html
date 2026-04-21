@@ -832,75 +832,76 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:#777;}
 .pdp-breadcrumb a:hover{color:var(--gd);}
 .pdp-breadcrumb .bc-sep{color:#ccc;}
 .pdp-breadcrumb .bc-cur{color:var(--txt2);font-weight:600;}
-.pdp-main{display:grid;grid-template-columns:420px 1fr;gap:24px;margin-bottom:36px;}
-.pdp-gallery{display:flex;flex-direction:column;gap:10px;}
-.pdp-main-img{border-radius:10px;height:380px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1);}
-.pdp-main-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease;}
+.pdp-main{display:grid;grid-template-columns:420px 1fr;gap:24px;margin-bottom:36px;align-items:start;}
+/* Gallery — no fixed height, image defines its own size */
+.pdp-gallery{display:flex;flex-direction:column;gap:8px;}
+.pdp-main-img{border-radius:10px;width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1);}
+.pdp-main-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease;display:block;}
 .pdp-main-img:hover img{transform:scale(1.04);}
-.pdp-thumbs{display:flex;gap:8px;flex-wrap:wrap;}
-.pdp-thumb{width:68px;height:68px;border-radius:7px;border:2px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:#f5f1eb;transition:border-color .2s,transform .15s,box-shadow .2s;overflow:hidden;}
+.pdp-thumbs{display:flex;gap:7px;flex-wrap:wrap;}
+.pdp-thumb{width:64px;height:64px;border-radius:7px;border:2px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:#f5f1eb;transition:border-color .2s,transform .15s,box-shadow .2s;overflow:hidden;flex-shrink:0;}
 .pdp-thumb img{width:100%;height:100%;object-fit:cover;border-radius:5px;}
 .pdp-thumb:hover{transform:scale(1.05);box-shadow:0 2px 8px rgba(0,0,0,.1);}
 .pdp-thumb.active{border-color:var(--gd);box-shadow:0 0 0 3px rgba(45,90,39,.15);}
 
-/* Info panel — white card */
-.pdp-info{background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.07);display:flex;flex-direction:column;gap:0;}
+/* Info panel — white card, tight spacing */
+.pdp-info{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.07);display:flex;flex-direction:column;gap:0;}
 
 /* Item code */
-.pdp-item-code{font-size:.72rem;font-weight:600;color:#999;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.pdp-item-code{font-size:.7rem;font-weight:600;color:#999;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
 
 /* Product name */
-.pdp-name{font-size:1.55rem;font-weight:800;color:#1a1a1a;line-height:1.3;margin-bottom:10px;}
+.pdp-name{font-size:1.45rem;font-weight:800;color:#1a1a1a;line-height:1.3;margin-bottom:6px;}
 
 /* Star rating row */
-.pdp-rating-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.pdp-rating-row{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
 .pdp-stars{display:flex;align-items:center;gap:2px;}
-.pdp-stars i{color:#f5a623;font-size:.88rem;}
+.pdp-stars i{color:#f5a623;font-size:.86rem;}
 .pdp-stars i.half{position:relative;color:#e0e0e0;}
 .pdp-stars i.half::before{content:'\f089';position:absolute;left:0;color:#f5a623;font-family:"Font Awesome 6 Free";font-weight:900;}
-.pdp-rating-val{font-size:.84rem;font-weight:700;color:#333;}
-.pdp-rating-count{font-size:.8rem;color:#888;}
+.pdp-rating-val{font-size:.82rem;font-weight:700;color:#333;}
+.pdp-rating-count{font-size:.78rem;color:#888;}
 
 /* Short description */
-.pdp-short-desc{font-size:.88rem;color:#555;line-height:1.7;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #f0ede6;}
+.pdp-short-desc{font-size:.86rem;color:#555;line-height:1.6;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f0ede6;}
 
 /* Feature badges */
-.pdp-features-label{font-size:.78rem;font-weight:700;color:#444;margin-bottom:8px;}
-.pdp-features{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #f0ede6;}
-.pdp-feature-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:#f0f8ff;border:1.5px solid #c8dff0;border-radius:5px;font-size:.78rem;font-weight:600;color:#2c5f8a;}
-.pdp-feature-badge i{color:#4a90d9;font-size:.7rem;}
+.pdp-features-label{font-size:.76rem;font-weight:700;color:#444;margin-bottom:6px;}
+.pdp-features{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f0ede6;}
+.pdp-feature-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#f0f8ff;border:1.5px solid #c8dff0;border-radius:5px;font-size:.76rem;font-weight:600;color:#2c5f8a;}
+.pdp-feature-badge i{color:#4a90d9;font-size:.68rem;}
 
 /* Pricing section */
-.pdp-prices{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
-.pdp-price{font-size:2rem;font-weight:800;color:#1a1a1a;}
-.pdp-oldp{font-size:1.05rem;color:#bbb;text-decoration:line-through;font-weight:500;}
-.pdp-badge{background:#22c55e;color:#fff;font-size:.75rem;font-weight:700;padding:4px 12px;border-radius:5px;}
+.pdp-prices{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.pdp-price{font-size:1.9rem;font-weight:800;color:#1a1a1a;}
+.pdp-oldp{font-size:1rem;color:#bbb;text-decoration:line-through;font-weight:500;}
+.pdp-badge{background:#22c55e;color:#fff;font-size:.73rem;font-weight:700;padding:3px 10px;border-radius:5px;}
 
 /* Stock indicator */
-.pdp-stock-row{display:flex;align-items:center;gap:7px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #f0ede6;}
-.pdp-stock-dot{width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;box-shadow:0 0 0 3px rgba(34,197,94,.2);}
+.pdp-stock-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f0ede6;}
+.pdp-stock-dot{width:9px;height:9px;border-radius:50%;background:#22c55e;flex-shrink:0;box-shadow:0 0 0 3px rgba(34,197,94,.2);}
 .pdp-stock-dot.out{background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.2);}
-.pdp-stock-text{font-size:.84rem;color:#22c55e;font-weight:600;}
+.pdp-stock-text{font-size:.82rem;color:#22c55e;font-weight:600;}
 .pdp-stock-text.out{color:#ef4444;}
-.pdp-stock-qty{font-size:.78rem;color:#888;margin-left:2px;}
+.pdp-stock-qty{font-size:.76rem;color:#888;margin-left:2px;}
 
 /* Quantity section */
-.pdp-qty-row{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
-.pdp-section-label{font-size:.84rem;font-weight:700;color:#444;}
-.pdp-qty-box{display:flex;align-items:center;border:2px solid var(--border);border-radius:8px;overflow:hidden;}
-.pdp-qbtn{width:42px;height:44px;border:none;background:#f5f1eb;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;font-weight:700;transition:background .15s,color .15s;color:#555;}
+.pdp-qty-row{display:flex;align-items:center;gap:14px;margin-bottom:10px;}
+.pdp-section-label{font-size:.82rem;font-weight:700;color:#444;}
+.pdp-qty-box{display:flex;align-items:center;border:2px solid var(--border);border-radius:7px;overflow:hidden;}
+.pdp-qbtn{width:38px;height:40px;border:none;background:#f5f1eb;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;font-weight:700;transition:background .15s,color .15s;color:#555;}
 .pdp-qbtn:hover{background:var(--gd);color:#fff;}
-.pdp-qval{width:56px;height:44px;border:none;border-left:2px solid var(--border);border-right:2px solid var(--border);text-align:center;font-family:inherit;font-size:1.05rem;font-weight:700;color:var(--txt);background:#fff;}
+.pdp-qval{width:50px;height:40px;border:none;border-left:2px solid var(--border);border-right:2px solid var(--border);text-align:center;font-family:inherit;font-size:1rem;font-weight:700;color:var(--txt);background:#fff;}
 
 /* Variants */
-.pdp-variants{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
-.pdp-variant{padding:7px 18px;border:2px solid var(--border);border-radius:6px;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;background:#fff;transition:all .2s;color:#555;position:relative;}
+.pdp-variants{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px;}
+.pdp-variant{padding:5px 15px;border:2px solid var(--border);border-radius:6px;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer;background:#fff;transition:all .2s;color:#555;position:relative;}
 .pdp-variant:hover{border-color:var(--gm);color:var(--gd);}
 .pdp-variant.active{border-color:var(--gd);background:var(--gd);color:#fff;}
 .pdp-variant .v-disc{position:absolute;top:-8px;right:-8px;background:#ff4444;color:#fff;font-size:.55rem;padding:2px 5px;border-radius:3px;font-weight:700;}
 
 /* Action buttons — 2x2 grid like image */
-.pdp-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.pdp-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .pdp-btn-cart{background:var(--or);color:#fff;border:none;padding:14px 10px;border-radius:8px;font-family:inherit;font-size:.92rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s,transform .15s;box-shadow:0 3px 10px rgba(232,102,10,.3);}
 .pdp-btn-cart:hover{background:var(--orl);transform:translateY(-1px);}
 .pdp-btn-cart.added{background:#4caf50;}
@@ -2484,7 +2485,7 @@ function renderPdp(p) {
           <span class="pdp-price" id="pdpPrice">৳${price.toLocaleString('en')}</span>${oldHtml}
         </div>
         ${stockHtml}
-        ${p.variants?.length ? `<div style="margin-bottom:14px;"><div class="pdp-section-label" style="margin-bottom:8px;">পরিমাণ নির্বাচন:</div><div class="pdp-variants" id="pdpVars">${variants}</div></div>` : ''}
+        ${p.variants?.length ? `<div style="margin-bottom:8px;"><div class="pdp-section-label" style="margin-bottom:6px;">পরিমাণ নির্বাচন:</div><div class="pdp-variants" id="pdpVars">${variants}</div></div>` : ''}
         <div class="pdp-qty-row">
           <span class="pdp-section-label">পরিমাণ:</span>
           <div class="pdp-qty-box">
