@@ -299,8 +299,10 @@ body{
   transform:translateY(-20px);
   opacity:0;
   transition:all .28s ease .1s;
+  display:none;
 }
-.mob-search-overlay.open .mob-search-results{transform:translateY(0);opacity:1;}
+.mob-search-results.has-results{display:block;}
+.mob-search-overlay.open .mob-search-results.has-results{transform:translateY(0);opacity:1;}
 .bottom-nav{
   display:none;
   position:fixed;bottom:0;left:0;right:0;
@@ -1128,6 +1130,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:#777;}
   .about-stats{border-radius:10px;flex-direction:row;flex-wrap:wrap;}
   .about-stat-item{min-width:120px;padding:18px 16px;}
   .pdp-btns{grid-template-columns:1fr 1fr;}
+  .pdp-btn-cart,.pdp-btn-order,.pdp-btn-whatsapp,.pdp-btn-phone{padding:10px 6px;font-size:.78rem;gap:5px;border-radius:6px;}
   .contact-body{grid-template-columns:1fr;} .contact-cards-grid{grid-template-columns:1fr 1fr;}
   .why-grid{grid-template-columns:1fr 1fr;}
   .pdp-main{grid-template-columns:1fr;}
@@ -1164,8 +1167,13 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:#777;}
   #catTabs button{font-size:.76rem;padding:5px 11px;}
 }
 
-/* ===== FOOTER — IMAGE STYLE ===== */
-.site-footer{background:#fff;font-family:'Hind Siliguri',sans-serif;border-top:2px solid #eee;}
+/* ===== FOOTER — DARK NAVY STYLE ===== */
+.site-footer{
+  background:#0d1b2a;
+  font-family:'Hind Siliguri',sans-serif;
+  border-top:none;
+  color:#cdd5de;
+}
 
 /* 4-col main grid */
 .footer-main{
@@ -1174,61 +1182,85 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:#777;}
   gap:36px;
   max-width:var(--mw);
   margin:0 auto;
-  padding:36px 24px 28px;
-  border-bottom:1px solid #eee;
+  padding:40px 24px 32px;
+  border-bottom:1px solid rgba(255,255,255,.08);
 }
 .footer-col{}
 
 /* Logo */
 .footer-logo{margin-bottom:12px;cursor:pointer;display:block;}
 .footer-logo img{height:46px;width:auto;border-radius:5px;display:block;}
-.footer-desc{color:#888;font-size:.82rem;line-height:1.75;margin-bottom:14px;max-width:260px;}
+.footer-desc{color:rgba(255,255,255,.55);font-size:.82rem;line-height:1.75;margin-bottom:14px;max-width:260px;}
+
+/* Phone */
+.footer-phone{font-size:.85rem;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:6px;margin-top:4px;margin-bottom:10px;}
+.footer-phone i{color:#b8e67a;}
 
 /* Column headings */
 .footer-heading{
-  font-size:.7rem;font-weight:800;
-  color:#1a1a1a;letter-spacing:.14em;
+  font-size:.72rem;font-weight:800;
+  color:#fff;letter-spacing:.14em;
   text-transform:uppercase;
-  margin-bottom:14px;
-  padding-bottom:0;
+  margin-bottom:16px;
+  padding-bottom:8px;
+  border-left:3px solid #b8e67a;
+  padding-left:10px;
+  line-height:1;
 }
 .footer-divider{display:none;}
 
 /* Links */
 .footer-links{list-style:none;display:flex;flex-direction:column;gap:0;}
 .footer-links li a{
-  display:block;
-  color:#666;font-size:.82rem;
+  display:flex;align-items:center;gap:7px;
+  color:rgba(255,255,255,.55);font-size:.82rem;
   padding:5px 0;cursor:pointer;
   text-decoration:none;
-  transition:color .18s;
+  transition:color .18s,padding-left .18s;
   border-bottom:none;
 }
-.footer-links li a:hover{color:var(--gd);}
+.footer-links li a::before{
+  content:'›';
+  font-size:1rem;
+  color:#b8e67a;
+  flex-shrink:0;
+  line-height:1;
+  transition:transform .18s;
+}
+.footer-links li a:hover{color:#fff;padding-left:4px;}
 .footer-link-arrow{display:none;}
 
 /* Social icons */
-.footer-socials{display:flex;gap:7px;margin-top:12px;}
+.footer-socials{display:flex;gap:8px;margin-top:14px;}
 .footer-social-btn{
-  width:32px;height:32px;border-radius:5px;
-  border:1.5px solid #eee;background:#f8f8f8;
+  width:36px;height:36px;border-radius:8px;
+  border:1.5px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.07);
   display:flex;align-items:center;justify-content:center;
-  color:#777;transition:all .2s;text-decoration:none;
+  color:rgba(255,255,255,.6);transition:all .2s;text-decoration:none;
 }
-.footer-social-btn:hover{border-color:var(--gd);background:#f0fce8;color:var(--gd);}
-.footer-social-icon{width:15px;height:15px;fill:currentColor;}
+.footer-social-btn:hover{
+  border-color:#b8e67a;
+  background:rgba(184,230,122,.15);
+  color:#b8e67a;
+  transform:translateY(-2px);
+}
+.footer-social-icon{width:16px;height:16px;fill:currentColor;}
 
 /* Payment badges */
-.footer-pay-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.footer-pay-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;}
 .footer-pay-badge{
-  padding:3px 9px;border-radius:5px;
-  background:#f5f5f5;border:1px solid #eee;
-  font-size:.68rem;font-weight:600;color:#666;
-  display:flex;align-items:center;gap:4px;
+  padding:5px 11px;border-radius:6px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  font-size:.7rem;font-weight:600;color:rgba(255,255,255,.7);
+  display:flex;align-items:center;gap:5px;
+  transition:background .2s;
 }
-.footer-pay-badge i{color:var(--gd);}
+.footer-pay-badge:hover{background:rgba(184,230,122,.1);color:#b8e67a;}
+.footer-pay-badge i{color:#b8e67a;}
 
-/* Promo strip — hide it, keep it small */
+/* Promo strip — hide it */
 .footer-promo-strip{display:none;}
 
 /* Bottom bar */
@@ -1237,22 +1269,41 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:#777;}
   display:flex;flex-wrap:wrap;
   align-items:center;justify-content:space-between;
   gap:8px;
-  padding:12px 24px;
-  font-size:.74rem;color:#999;
+  padding:14px 24px;
+  font-size:.74rem;color:rgba(255,255,255,.35);
+  background:#0a1520;
 }
-.footer-bottom-nav{display:flex;gap:18px;}
+.footer-bottom-nav{display:flex;gap:20px;}
 .footer-bot-link{
-  color:#555;text-decoration:none;
+  color:rgba(255,255,255,.45);text-decoration:none;
   font-size:.75rem;font-weight:500;
   cursor:pointer;transition:color .18s;
 }
-.footer-bot-link:hover{color:var(--gd);}
-.footer-bottom-right{display:flex;align-items:center;gap:5px;font-size:.72rem;color:#bbb;}
-.footer-bottom-right a{color:var(--gd);text-decoration:none;}
+.footer-bot-link:hover{color:#b8e67a;}
+.footer-bottom-right{display:flex;align-items:center;gap:5px;font-size:.72rem;color:rgba(255,255,255,.35);}
+.footer-bottom-right a{color:#b8e67a;text-decoration:none;}
 
-/* Phone */
-.footer-phone{font-size:.8rem;color:#444;display:flex;align-items:center;gap:6px;margin-top:6px;}
-.footer-phone i{color:var(--gd);}
+/* Helpline box inside col */
+.footer-helpline-box{
+  margin-top:16px;
+  padding:12px 14px;
+  background:rgba(184,230,122,.07);
+  border:1.5px solid rgba(184,230,122,.2);
+  border-radius:8px;
+}
+.footer-helpline-label{
+  font-size:.68rem;font-weight:800;
+  color:#b8e67a;letter-spacing:.08em;
+  text-transform:uppercase;
+  margin-bottom:5px;
+  display:flex;align-items:center;gap:5px;
+}
+.footer-helpline-num{
+  font-size:.92rem;font-weight:700;color:#fff;
+}
+.footer-helpline-time{
+  font-size:.68rem;color:rgba(255,255,255,.4);margin-top:3px;
+}
 
 @media(max-width:900px){
   .footer-main{grid-template-columns:1fr 1fr;gap:24px;padding:28px 16px;}
@@ -1585,10 +1636,10 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:#777;}
         <li><a>গোপনীয়তা নীতি</a></li>
         <li><a onclick="goContactPage()">যোগাযোগ করুন</a></li>
       </ul>
-      <div style="margin-top:14px;padding:10px 12px;background:#f5faf3;border:1.5px solid #c8e0bc;border-radius:5px;">
-        <div style="font-size:.68rem;font-weight:800;color:var(--gd);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:5px;"><i class="fa-solid fa-headset"></i> হেল্পলাইন</div>
-        <div style="font-size:.88rem;font-weight:700;color:#222;" id="footerHelpPhone">01XXXXXXXXX</div>
-        <div style="font-size:.68rem;color:#aaa;margin-top:2px;">শনি–বৃহস্পতি · সকাল ৯টা–রাত ৯টা</div>
+      <div class="footer-helpline-box">
+        <div class="footer-helpline-label"><i class="fa-solid fa-headset"></i> হেল্পলাইন</div>
+        <div class="footer-helpline-num" id="footerHelpPhone">01XXXXXXXXX</div>
+        <div class="footer-helpline-time">শনি–বৃহস্পতি · সকাল ৯টা–রাত ৯টা</div>
       </div>
     </div>
   </div>
@@ -1920,7 +1971,9 @@ function closeMobSearch() {
   ov.classList.remove('open');
   document.body.style.overflow = '';
   document.getElementById('mobSearchInput').value = '';
-  document.getElementById('mobSearchResults').innerHTML = '';
+  const res = document.getElementById('mobSearchResults');
+  res.innerHTML = '';
+  res.classList.remove('has-results');
 }
 function closeMobSearchOutside(e) {
   if (e.target === document.getElementById('mobSearchOverlay')) closeMobSearch();
@@ -2365,7 +2418,12 @@ function filterScrollCat(catId) {
 function doSearch(q, dropId) {
   const drop = document.getElementById(dropId);
   q = q.trim();
-  if (!q) { drop.classList.remove('open'); drop.innerHTML = ''; return; }
+  if (!q) {
+    drop.classList.remove('open');
+    drop.innerHTML = '';
+    if (dropId === 'mobSearchResults') drop.classList.remove('has-results');
+    return;
+  }
   const res = prods.filter(p => p.nm?.includes(q) || p.sub?.toLowerCase().includes(q.toLowerCase()) || p.cat?.includes(q)).slice(0, 8);
   if (!res.length) drop.innerHTML = '<div class="srch-empty">কোনো পণ্য পাওয়া যায়নি</div>';
   else drop.innerHTML = res.map(p => `
@@ -2375,6 +2433,7 @@ function doSearch(q, dropId) {
       <div class="srch-price">৳${getBasePrice(p).toLocaleString('en')}</div>
     </div>`).join('');
   drop.classList.add('open');
+  if (dropId === 'mobSearchResults') drop.classList.add('has-results');
 }
 function searchGo(id) {
   document.getElementById('deskSearch').value = '';
