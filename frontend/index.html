@@ -426,40 +426,65 @@ body{
 .sk-line{height:12px;margin:10px;border-radius:4px;}
 .sk-line.short{width:60%;}
 .sk-line.shorter{width:40%;}
-.cat-bar-outer{background:#fff;border-bottom:1px solid #eee;border-top:1px solid #eee;padding:20px 0;}
+/* ===== FEATURED CATEGORIES ===== */
+.cat-bar-outer{background:#fff;border-bottom:1px solid #eee;border-top:1px solid #eee;padding:22px 0;}
 .cat-bar-inner{max-width:var(--mw);margin:0 auto;overflow:hidden;padding:0 16px;}
-.cat-bar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.cat-bar-title{font-size:1.15rem;font-weight:700;color:#222;}
-.cat-bar-title span{font-size:.8rem;font-weight:400;color:var(--gd);margin-left:8px;cursor:pointer;}
+.cat-bar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.cat-bar-title{font-size:1.2rem;font-weight:800;color:#1a1a1a;}
+.cat-bar-title-tabs{display:flex;align-items:center;gap:0;margin-left:18px;flex-wrap:wrap;}
+.cat-bar-title-tab{font-size:.78rem;font-weight:500;color:#888;cursor:pointer;padding:4px 10px;border-radius:4px;transition:color .2s,background .2s;white-space:nowrap;}
+.cat-bar-title-tab:hover{color:var(--gd);}
+.cat-bar-title-tab.active{color:var(--gd);font-weight:700;}
 .cat-bar-arrows{display:flex;gap:6px;}
-.cat-bar-arr{width:30px;height:30px;border-radius:5px;border:1.5px solid #ddd;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#555;transition:all .15s;}
-.cat-bar-arr:hover,.cat-bar-arr.active{background:var(--gd);color:#fff;border-color:var(--gd);}
-.cat-track{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding:4px 2px 8px;}
-.cat-track::-webkit-scrollbar{display:none;}
+.cat-bar-arr{width:32px;height:32px;border-radius:50%;border:1.5px solid #ddd;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#555;transition:all .2s;flex-shrink:0;}
+.cat-bar-arr:hover{background:var(--gd);color:#fff;border-color:var(--gd);}
+
+/* Infinite scroll track */
+.cat-track-outer{overflow:hidden;position:relative;}
+.cat-track{display:flex;gap:12px;padding:4px 2px 10px;width:max-content;transition:transform .45s cubic-bezier(.4,0,.2,1);}
+
+/* Card style */
 .cat-item{
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-  padding:0 4px 8px;cursor:pointer;
-  background:transparent;border:none;
-  min-width:90px;max-width:90px;
+  display:flex;flex-direction:column;align-items:center;
+  padding:14px 12px 12px;cursor:pointer;
+  background:#f8fdf5;border:1.5px solid #e8f0e4;
+  border-radius:12px;
+  min-width:110px;max-width:110px;
   user-select:none;text-decoration:none;
-  transition:transform .2s;
+  transition:transform .2s,box-shadow .2s,border-color .2s;
+  flex-shrink:0;position:relative;
+}
+.cat-item:nth-child(5n+1){background:#f0fce8;}
+.cat-item:nth-child(5n+2){background:#fff8f0;}
+.cat-item:nth-child(5n+3){background:#f0f8ff;}
+.cat-item:nth-child(5n+4){background:#fdf5ff;}
+.cat-item:nth-child(5n+5){background:#fffbf0;}
+.cat-item:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.10);border-color:var(--gd);}
+.cat-item.active{border-color:var(--gd);box-shadow:0 4px 16px rgba(45,90,39,.18);}
+.cat-item.active .cat-lbl{color:var(--gd);font-weight:700;}
+
+/* Image area — no background, transparent, object-contain */
+.cat-img-wrap{
+  width:80px;height:72px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:10px;position:relative;
   flex-shrink:0;
 }
-.cat-item:hover{transform:translateY(-3px);}
-.cat-item.active .cat-lbl{color:var(--gd);font-weight:700;}
-.cat-item.active .cat-circle{border-color:var(--gd);box-shadow:0 4px 14px rgba(45,90,39,.22);}
-.cat-circle{
-  width:70px;height:70px;border-radius:50%;
-  background:#f5f5f5;border:2px solid #eee;
-  display:flex;align-items:center;justify-content:center;
-  margin-bottom:8px;overflow:hidden;
-  transition:border-color .2s,box-shadow .2s,transform .2s;
+.cat-img-wrap img{
+  width:80px;height:72px;
+  object-fit:contain;
+  mix-blend-mode:multiply;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.12));
+  transition:transform .25s;
 }
-.cat-item:hover .cat-circle{border-color:var(--gd);box-shadow:0 4px 14px rgba(45,90,39,.18);transform:scale(1.06);}
-.cat-emoji{font-size:2rem;line-height:1;}
-.cat-circle img{width:100%;height:100%;object-fit:cover;}
-.cat-lbl{font-size:.72rem;font-weight:600;color:#333;text-align:center;line-height:1.3;margin-bottom:2px;}
-.cat-count{font-size:.62rem;color:#aaa;text-align:center;}
+.cat-item:hover .cat-img-wrap img{transform:scale(1.08);}
+.cat-emoji-big{font-size:2.8rem;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.08));}
+.cat-lbl{font-size:.78rem;font-weight:700;color:#1a1a1a;text-align:center;line-height:1.3;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.cat-count{font-size:.66rem;color:#999;text-align:center;font-weight:500;}
+
+/* Legacy compat */
+.cat-circle{display:none;}
+.cat-emoji{display:none;}
 .page{display:none; flex:1; }
 .page.active{display:block;}
 .main{max-width:var(--mw);margin:0 auto;padding:24px 16px 40px;}
@@ -906,6 +931,22 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:#777;}
 .toast.err-toast{border-left-color:#e53935;}
 .toast.err-toast .toast-icon{background:#e53935;}
 .toast.err-toast .toast-bar{background:#e53935;}
+
+@media(max-width:900px){
+  .cat-item{min-width:96px;max-width:96px;padding:10px 8px 10px;}
+  .cat-img-wrap{width:68px;height:62px;}
+  .cat-img-wrap img{width:68px;height:62px;}
+  .cat-emoji-big{font-size:2.2rem;}
+  .cat-lbl{font-size:.72rem;}
+  .cat-count{font-size:.6rem;}
+}
+@media(max-width:600px){
+  .cat-item{min-width:88px;max-width:88px;padding:9px 6px 9px;}
+  .cat-img-wrap{width:62px;height:56px;}
+  .cat-img-wrap img{width:62px;height:56px;}
+  .cat-bar-title{font-size:1rem;}
+  .cat-bar-title-tabs{display:none;}
+}
 @media(max-width:900px){
   .toast{bottom:20px;width:calc(100vw - 32px);max-width:290px;}
 }
@@ -1024,7 +1065,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:#777;}
   .pdp-main{grid-template-columns:1fr;}
   .pdp-related-grid{grid-template-columns:repeat(2,1fr);}
   .order-modal{max-height:95vh;}
-  .cat-circle{width:60px;height:60px;}
+  /* cat-circle legacy removed */
 }
 @media(max-width:600px){
   .hero-layout{grid-template-columns:1fr;min-height:auto;max-height:none;padding:0 8px;}
@@ -1266,13 +1307,18 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:#777;}
   <div class="cat-bar-outer">
     <div class="cat-bar-inner">
       <div class="cat-bar-header">
-        <div class="cat-bar-title">ক্যাটাগরি অনুযায়ী দেখুন <span>সকল ক্যাটাগরি ›</span></div>
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">
+          <div class="cat-bar-title">ক্যাটাগরি</div>
+          <div class="cat-bar-title-tabs" id="catBarTabs"></div>
+        </div>
         <div class="cat-bar-arrows">
-          <button class="cat-bar-arr" onclick="document.getElementById('catTrack').scrollLeft -= 300">‹</button>
-          <button class="cat-bar-arr active" onclick="document.getElementById('catTrack').scrollLeft += 300">›</button>
+          <button class="cat-bar-arr" id="catArrPrev" onclick="catSlideStep(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="cat-bar-arr" id="catArrNext" onclick="catSlideStep(1)"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
       </div>
-      <div class="cat-track" id="catTrack"></div>
+      <div class="cat-track-outer">
+        <div class="cat-track" id="catTrack"></div>
+      </div>
     </div>
   </div>
   <div class="main" id="sec-products">
@@ -2074,22 +2120,139 @@ function renderAll() {
   if (!active.length) { document.getElementById('allGrid').innerHTML = '<div style="grid-column:1/-1;padding:30px;text-align:center;color:#aaa">কোনো পণ্য পাওয়া যায়নি</div>'; return; }
   document.getElementById('allGrid').innerHTML = active.map(allCard).join('');
 }
+/* ===== CAT BAR AUTO-SCROLL STATE ===== */
+let catAutoTimer = null;
+let catCurrentOffset = 0;
+let catItemW = 122; /* 110px + 12px gap */
+let catVisibleCount = 0;
+let catTotalItems = 0;
+let catCloned = false;
+
 function buildCatBar() {
-  const scrollCats = [{ id: 'all', lbl: 'সব পণ্য', em: '🛒' }, ...cats];
-  const one = scrollCats.map(c => {
-    const count = c.id === 'all' ? prods.filter(p => p.active !== false).length : prods.filter(p => p.cat === c.id && p.active !== false).length;
+  const scrollCats = [{ id: 'all', lbl: 'সব পণ্য', em: '🛒', img: '' }, ...cats];
+
+  /* build tab pills header */
+  const tabsEl = document.getElementById('catBarTabs');
+  if (tabsEl) {
+    tabsEl.innerHTML = cats.slice(0, 6).map(c =>
+      `<span class="cat-bar-title-tab" data-cat="${c.id}" onclick="filterScrollCat('${c.id}')">${c.lbl}</span>`
+    ).join('');
+  }
+
+  /* build cards — get representative image from products */
+  const track = document.getElementById('catTrack');
+  if (!track) return;
+
+  const cards = scrollCats.map(c => {
+    const count = c.id === 'all'
+      ? prods.filter(p => p.active !== false).length
+      : prods.filter(p => p.cat === c.id && p.active !== false).length;
+    /* pick first product image for this category */
+    const repProd = prods.find(p => p.cat === c.id && p.active !== false && p.img);
+    const imgSrc = (c.id === 'all') ? '' : (repProd ? repProd.img : '');
+    const imgHtml = imgSrc
+      ? `<img src="${imgSrc}" alt="${c.lbl}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`
+      : '';
+    const emojiHtml = `<span class="cat-emoji-big" style="${imgSrc ? 'display:none' : ''}">${c.em}</span>`;
     return `<a class="cat-item" data-cat="${c.id}" onclick="filterScrollCat('${c.id}');return false;" href="#">
-      <div class="cat-circle"><span class="cat-emoji">${c.em}</span></div>
+      <div class="cat-img-wrap">${imgHtml}${emojiHtml}</div>
       <span class="cat-lbl">${c.lbl}</span>
-      <span class="cat-count">${count} পণ্য</span>
+      <span class="cat-count">${count} আইটেম</span>
     </a>`;
-  }).join('');
-  document.getElementById('catTrack').innerHTML = one;
+  });
+
+  track.innerHTML = cards.join('');
+  catTotalItems = scrollCats.length;
+  catCloned = false;
+  catCurrentOffset = 0;
+  track.style.transform = 'translateX(0)';
+
+  /* clone for infinite loop after layout */
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      initCatInfinite();
+    });
+  });
 }
+
+function initCatInfinite() {
+  const track = document.getElementById('catTrack');
+  const outer = track ? track.parentElement : null;
+  if (!track || !outer) return;
+
+  /* measure one item width */
+  const firstItem = track.querySelector('.cat-item');
+  if (!firstItem) return;
+  const style = getComputedStyle(track);
+  const gap = parseFloat(style.gap) || 12;
+  catItemW = firstItem.offsetWidth + gap;
+
+  const outerW = outer.offsetWidth;
+  catVisibleCount = Math.ceil(outerW / catItemW) + 2;
+
+  if (!catCloned) {
+    /* clone enough items to fill 3× width */
+    const origItems = Array.from(track.querySelectorAll('.cat-item'));
+    const cloneCount = Math.ceil((catVisibleCount * 3) / origItems.length) + 1;
+    for (let i = 0; i < cloneCount; i++) {
+      origItems.forEach(item => {
+        const cl = item.cloneNode(true);
+        cl.setAttribute('aria-hidden', 'true');
+        track.appendChild(cl);
+      });
+    }
+    catCloned = true;
+  }
+
+  /* start auto-scroll */
+  startCatAutoScroll();
+}
+
+function startCatAutoScroll() {
+  if (catAutoTimer) clearInterval(catAutoTimer);
+  catAutoTimer = setInterval(() => {
+    catSlideStep(1, true);
+  }, 2800);
+}
+
+function catSlideStep(dir, auto) {
+  const track = document.getElementById('catTrack');
+  if (!track) return;
+
+  /* pause auto on manual */
+  if (!auto && catAutoTimer) {
+    clearInterval(catAutoTimer);
+    catAutoTimer = null;
+    setTimeout(startCatAutoScroll, 5000);
+  }
+
+  catCurrentOffset += dir * catItemW;
+
+  /* infinite reset — when we've scrolled past original set, reset silently */
+  const totalW = catItemW * catTotalItems;
+  track.style.transition = 'transform .45s cubic-bezier(.4,0,.2,1)';
+  track.style.transform = `translateX(${-catCurrentOffset}px)`;
+
+  /* after transition, if far ahead, snap back */
+  track.addEventListener('transitionend', function onEnd() {
+    track.removeEventListener('transitionend', onEnd);
+    if (catCurrentOffset >= totalW) {
+      catCurrentOffset -= totalW;
+      track.style.transition = 'none';
+      track.style.transform = `translateX(${-catCurrentOffset}px)`;
+    } else if (catCurrentOffset < 0) {
+      catCurrentOffset += totalW;
+      track.style.transition = 'none';
+      track.style.transform = `translateX(${-catCurrentOffset}px)`;
+    }
+  }, { once: true });
+}
+
 function filterScrollCat(catId) {
   document.querySelectorAll('.cat-item').forEach(c => c.classList.toggle('active', c.getAttribute('data-cat') === catId));
+  document.querySelectorAll('.cat-bar-title-tab').forEach(t => t.classList.toggle('active', t.getAttribute('data-cat') === catId));
   if (catId === 'all') { if (cats.length) switchCat(activeCatRow || cats[0]?.id); }
-  else { switchCat(catId); setTimeout(() => document.getElementById('sec-catrow').scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }
+  else { switchCat(catId); setTimeout(() => document.getElementById('sec-catrow').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); }
 }
 function doSearch(q, dropId) {
   const drop = document.getElementById(dropId);
