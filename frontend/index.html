@@ -1505,7 +1505,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
         <button class="search-icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
         <div class="search-dropdown" id="deskDrop"></div>
       </div>
-      <span class="nb-recently" onclick="toggleCart()">
+      <span class="nb-recently" onclick="toggleRecent()">
         <i class="fa-regular fa-clock"></i> সম্প্রতি দেখা
       </span>
       <button class="cart-btn" onclick="toggleCart()">
@@ -1594,51 +1594,9 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
           <div class="dot" onclick="goSlide(2)"></div>
         </div>
       </div>
-      <!-- Right Side: 2 columns × 2 rows of promo banners -->
-      <div class="hero-side-col">
-        <!-- Top banner col 2 -->
-        <div class="hero-side-banner sb-green" style="cursor:pointer;background-image:url('https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&auto=format&fit=crop&q=80');background-size:cover;background-position:center;background-blend-mode:multiply;" onclick="goProductsPage()">
-          <div style="position:absolute;inset:0;background:rgba(30,80,20,0.55);border-radius:8px;z-index:0;"></div>
-          <div style="position:relative;z-index:1;">
-          <div class="side-label" style="color:#d4f5a0;">প্রিমিয়াম মানের</div>
-          <div class="side-title" style="color:#fff;">খাঁটি মধু<br>ও দেশি মিষ্টি</div>
-          <div class="side-price" style="color:#ffe066;">৳১৮০</div>
-          <button class="side-shop-btn" onclick="event.stopPropagation();goProductsPage()"><i class="fa-solid fa-cart-plus"></i> কিনুন</button>
-          </div>
-        </div>
-        <!-- Bottom banner col 2 -->
-        <div class="hero-side-banner sb-blue" style="cursor:pointer;background-image:url('https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&auto=format&fit=crop&q=80');background-size:cover;background-position:center;background-blend-mode:multiply;" onclick="goProductsPage()">
-          <div style="position:absolute;inset:0;background:rgba(10,60,100,0.55);border-radius:8px;z-index:0;"></div>
-          <div style="position:relative;z-index:1;">
-          <div class="side-label" style="color:#a8d8f0;">তাজা ও বিশুদ্ধ</div>
-          <div class="side-title" style="color:#fff;">দেশি দই<br>ও রসমালাই</div>
-          <div class="side-price" style="color:#ffe066;">৳৫০</div>
-          <button class="side-shop-btn" style="background:#1a6fa8;" onclick="event.stopPropagation();goProductsPage()"><i class="fa-solid fa-cart-plus"></i> কিনুন</button>
-          </div>
-        </div>
-      </div>
-      <div class="hero-side-col">
-        <!-- Top banner col 3 -->
-        <div class="hero-side-banner" style="cursor:pointer;background-image:url('https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&auto=format&fit=crop&q=80');background-size:cover;background-position:center;background-blend-mode:multiply;" onclick="goProductsPage()">
-          <div style="position:absolute;inset:0;background:rgba(100,60,0,0.5);border-radius:8px;z-index:0;"></div>
-          <div style="position:relative;z-index:1;">
-          <div class="side-label" style="color:#ffd080;">১০০% অর্গানিক</div>
-          <div class="side-title" style="color:#fff;">পরিবারকে দিন<br>সেরা পুষ্টি</div>
-          <div class="side-price" style="color:#ffe066;">৳৩৯০</div>
-          <button class="side-shop-btn dark" onclick="event.stopPropagation();goProductsPage()"><i class="fa-solid fa-cart-plus"></i> কিনুন</button>
-          </div>
-        </div>
-        <!-- Bottom banner col 3 -->
-        <div class="hero-side-banner" style="cursor:pointer;background-image:url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&auto=format&fit=crop&q=80');background-size:cover;background-position:center;background-blend-mode:multiply;" onclick="goProductsPage()">
-          <div style="position:absolute;inset:0;background:rgba(120,20,20,0.5);border-radius:8px;z-index:0;"></div>
-          <div style="position:relative;z-index:1;">
-          <div class="side-label" style="color:#ffb0a0;">সতেজ ও তাজা</div>
-          <div class="side-title" style="color:#fff;">সরিষার তৈল<br>ও বোরহানী</div>
-          <div class="side-price" style="color:#ffe066;">৳১৫০</div>
-          <button class="side-shop-btn" style="background:#c0392b;" onclick="event.stopPropagation();goProductsPage()"><i class="fa-solid fa-cart-plus"></i> কিনুন</button>
-          </div>
-        </div>
-      </div>
+      <!-- Right Side: 4 promo banners (admin-controlled via Hero slides marked side=true) -->
+      <div class="hero-side-col" id="heroSideCol1"></div>
+      <div class="hero-side-col" id="heroSideCol2"></div>
     </div>
   </div>
   <div class="cat-bar-outer">
@@ -1853,7 +1811,6 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     <h2><span class="my-cart-cnt-lbl">My Cart</span> <span class="my-cart-cnt">(<span id="myCartCount">0</span>)</span></h2>
     <button class="cls-cart-new home-ic" onclick="goHome();toggleCart();" aria-label="হোম"><i class="fa-solid fa-house"></i></button>
   </div>
-  <div class="cart-pin">Pincode: <span id="cartPincode">380015</span> <i class="fa-solid fa-chevron-down" style="font-size:.6rem;color:#aaa"></i></div>
   <div class="cart-its" id="cartIts"></div>
   <div class="cart-related-section" id="cartRelSection" style="display:none">
     <div class="cart-rel-hd">
@@ -1866,11 +1823,8 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     <div class="cart-rel-track"><div class="cart-rel-row" id="cartRelRow"></div></div>
   </div>
   <div class="cart-ft" id="cartFt" style="display:none;padding:0;border:none;background:#fcfbf8;">
-    <div class="cart-promo" id="cartPromo">🎁 EXTRA 5% OFF*-এর জন্য অগ্রিম ডেলিভারি চার্জ পরিশোধ করুন। T&amp;C প্রযোজ্য।</div>
     <div class="cart-summary-new">
       <div class="cart-sum-row"><span>Sub Total</span><span id="cartSubTotal">৳0</span></div>
-      <div class="cart-sum-row"><span>Tax 5%</span><span id="cartTax">৳0</span></div>
-      <div class="cart-sum-row"><span>Service</span><span id="cartService">৳42</span></div>
     </div>
     <div class="cart-checkout-bar">
       <div><div style="font-size:.7rem;color:#888;line-height:1">Total</div><div class="total-l" id="cartTotal">৳0</div></div>
@@ -1878,6 +1832,17 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     </div>
   </div>
 </div>
+
+<div class="cart-ov" id="recentOv" onclick="toggleRecent()"></div>
+<aside class="cart-sb" id="recentSb">
+  <div class="cart-hd-new">
+    <button class="cls-cart-new" onclick="toggleRecent()" aria-label="বন্ধ"><i class="fa-solid fa-xmark"></i></button>
+    <h2><span class="my-cart-cnt-lbl">সম্প্রতি দেখা</span> <span class="my-cart-cnt">(<span id="recentCount">0</span>)</span></h2>
+    <button class="cls-cart-new home-ic" onclick="clearRecent()" aria-label="মুছুন" title="সব মুছুন"><i class="fa-solid fa-trash-can"></i></button>
+  </div>
+  <div class="cart-its" id="recentIts"></div>
+</aside>
+
 <div class="order-ov" id="orderOv">
   <div class="order-modal" id="orderModal">
     <div class="om-hd">
@@ -2050,14 +2015,16 @@ function addProductStructuredData(product) {
 }
 async function loadAllData() {
   try {
-    const [prodsRes, catsRes, heroRes] = await Promise.all([
+    const [prodsRes, catsRes, heroRes, sideRes] = await Promise.all([
       api('/api/products?active=true&limit=200'),
       api('/api/categories'),
-      api('/api/hero'),
+      api('/api/hero?type=main'),
+      api('/api/hero?type=side').catch(() => []),
     ]);
     prods = prodsRes.products || [];
     cats = catsRes || [];
-    heroSlides = heroRes || [];
+    heroSlides = (heroRes || []).filter(h => !h.type || h.type === 'main');
+    window.heroSideBanners = (sideRes || []).filter(h => h.type === 'side');
     dataLoaded = true;
     buildUI();
     loadAboutPageContent().catch(()=>{});
@@ -2080,6 +2047,7 @@ function buildUI() {
   }
   renderAll();
   buildHero();
+  buildHeroSideBanners();
   buildFooter();
   const catSel = document.getElementById('prodCatFilter');
   if (catSel && cats.length) {
@@ -2116,6 +2084,29 @@ function buildHero() {
   goSlide(0);
   if (heroTimer) clearInterval(heroTimer);
   heroTimer = setInterval(() => goSlide((cur+1) % heroSlides.length), 4500);
+}
+function buildHeroSideBanners() {
+  const col1 = document.getElementById('heroSideCol1');
+  const col2 = document.getElementById('heroSideCol2');
+  if (!col1 || !col2) return;
+  const sides = (window.heroSideBanners || []).filter(s => s.active !== false).sort((a,b)=>(a.order||0)-(b.order||0));
+  const renderBanner = (b) => {
+    const link = b.link || '';
+    const onclick = link ? `onclick="window.location.hash='${link}'"` : `onclick="goProductsPage()"`;
+    const bgImg = b.img ? `background-image:url('${b.img}');background-size:cover;background-position:center;background-blend-mode:multiply;` : '';
+    const overlayBg = b.overlay || 'rgba(30,80,20,0.55)';
+    return `<div class="hero-side-banner" style="cursor:pointer;${bgImg}" ${onclick}>
+      <div style="position:absolute;inset:0;background:${overlayBg};border-radius:8px;z-index:0;"></div>
+      <div style="position:relative;z-index:1;">
+        <div class="side-label" style="color:${b.labelColor||'#d4f5a0'};">${b.label||''}</div>
+        <div class="side-title" style="color:#fff;">${(b.title||'').replace(/\n/g,'<br>')}</div>
+        ${b.price?`<div class="side-price" style="color:#ffe066;">৳${b.price}</div>`:''}
+        <button class="side-shop-btn" style="${b.btnBg?`background:${b.btnBg};`:''}" onclick="event.stopPropagation();${link?`window.location.hash='${link}'`:'goProductsPage()'}"><i class="fa-solid fa-cart-plus"></i> ${b.btnText||'কিনুন'}</button>
+      </div>
+    </div>`;
+  };
+  col1.innerHTML = (sides[0]?renderBanner(sides[0]):'') + (sides[1]?renderBanner(sides[1]):'');
+  col2.innerHTML = (sides[2]?renderBanner(sides[2]):'') + (sides[3]?renderBanner(sides[3]):'');
 }
 function goSlide(n) {
   if (!heroSlides.length) return;
@@ -2336,10 +2327,78 @@ function trackPageView() {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function trackProductClick(productId) {
   if (!productId) return;
+  // Local recently viewed
+  try {
+    const KEY = 'recentlyViewed';
+    let arr = JSON.parse(localStorage.getItem(KEY) || '[]');
+    arr = arr.filter(id => id !== productId);
+    arr.unshift(productId);
+    if (arr.length > 20) arr = arr.slice(0, 20);
+    localStorage.setItem(KEY, JSON.stringify(arr));
+  } catch(_) {}
   fetch(API_BASE + `/api/analytics/product-click/${productId}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
   }).catch(() => {}); // নীরবে ব্যর্থ হলে চলে যাবে
+}
+function getRecentIds() {
+  try { return JSON.parse(localStorage.getItem('recentlyViewed') || '[]'); } catch(_) { return []; }
+}
+function toggleRecent() {
+  const ov = document.getElementById('recentOv');
+  const sb = document.getElementById('recentSb');
+  if (!ov || !sb) return;
+  const isOpen = sb.classList.contains('open');
+  if (isOpen) {
+    ov.classList.remove('open'); sb.classList.remove('open');
+    document.body.style.overflow = '';
+  } else {
+    renderRecent();
+    ov.classList.add('open'); sb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+}
+function clearRecent() {
+  localStorage.removeItem('recentlyViewed');
+  renderRecent();
+  showToast('🗑️ সম্প্রতি দেখা পণ্য মুছে ফেলা হয়েছে');
+}
+function renderRecent() {
+  const wrap = document.getElementById('recentIts');
+  const cntEl = document.getElementById('recentCount');
+  if (!wrap) return;
+  const ids = getRecentIds();
+  const items = ids.map(id => prods.find(p => (p._id||p.id) === id)).filter(Boolean);
+  if (cntEl) cntEl.textContent = items.length;
+  if (!items.length) {
+    wrap.innerHTML = '<div class="empty-c"><span>🕒</span>এখনো কোন পণ্য দেখা হয়নি</div>';
+    return;
+  }
+  wrap.innerHTML = items.map(p => {
+    const bp = getBasePrice(p);
+    const bo = getBaseOld(p);
+    const so = isStockOut(p);
+    const id = p._id || p.id;
+    const imgHtml = p.img ? `<img src="${p.img}" alt="${p.nm}" onerror="this.style.display='none';this.parentElement.textContent='${p.em||'📦'}'">` : (p.em || '📦');
+    return `<div class="cart-card" onclick="goProduct('${id}');toggleRecent()" style="cursor:pointer">
+      <div class="cart-card-img">${imgHtml}</div>
+      <div class="cart-card-info">
+        <div class="cart-card-nm">${p.nm}</div>
+        <div class="cart-card-pp">৳${bp.toLocaleString('en')}${bo?` <span style="text-decoration:line-through;color:#aaa;font-size:.78rem">৳${bo.toLocaleString('en')}</span>`:''}</div>
+        <div style="margin-top:6px">
+          <button class="cart-qty-btn" style="width:auto;padding:4px 10px;font-size:.78rem;border-radius:6px" onclick="event.stopPropagation();${so?`showToast('❌ স্টক নেই')`:`addToCartBase('${id}')`}">${so?'স্টক নেই':'+ কার্টে যোগ'}</button>
+        </div>
+      </div>
+      <div>
+        <button class="cart-card-del" onclick="event.stopPropagation();removeFromRecent('${id}')" title="মুছুন"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function removeFromRecent(id) {
+  let arr = getRecentIds().filter(x => x !== id);
+  localStorage.setItem('recentlyViewed', JSON.stringify(arr));
+  renderRecent();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -2853,6 +2912,11 @@ function pdpAddCart(id) {
   if (isStockOut(p)) { showToast('❌ এই পণ্যটি স্টক আউট, কার্টে যোগ করা যাবে না'); return; }
   const v = p.variants?.[pdpState.varIdx] || { p: getBasePrice(p), lbl: 'Default' };
   const cartKey = `${id}_${pdpState.varIdx}`;
+  const inCart = cart[cartKey]?.qty || 0;
+  const avail = getAvailableStock(p, v.lbl || '');
+  if (avail > 0 && inCart + pdpState.qty > avail) {
+    showToast(`❌ স্টকে মাত্র ${avail} টি আছে, এর বেশি যোগ করা যাবে না`); return;
+  }
   if (!cart[cartKey]) cart[cartKey] = { ...p, qty: 0, cartPrice: v.p, varLabel: v.lbl || '', cartKey };
   cart[cartKey].qty += pdpState.qty;
   updateCart();
@@ -2862,11 +2926,24 @@ function pdpAddCart(id) {
 }
 let cart = {};
 let relIdx = 0, relItems = [], relTimer = null;
+function getAvailableStock(p, varLabel) {
+  if (!p) return 0;
+  if (varLabel && p.variants?.length) {
+    const v = p.variants.find(v => v.lbl === varLabel);
+    if (v) return Math.max(0, v.stock || 0);
+  }
+  return Math.max(0, p.stockQuantity || 0);
+}
 function addToCartBase(id) {
   const p = prods.find(x => (x._id || x.id) === id); if (!p) return;
   if (isStockOut(p)) { showToast('❌ এই পণ্যটি স্টক আউট, কার্টে যোগ করা যাবে না'); return; }
   const v = p.variants?.[0] || { p: getBasePrice(p), lbl: '' };
   const cartKey = `${id}_0`;
+  const inCart = cart[cartKey]?.qty || 0;
+  const avail = getAvailableStock(p, v.lbl || '');
+  if (avail > 0 && inCart + 1 > avail) {
+    showToast(`❌ স্টকে মাত্র ${avail} টি আছে, এর বেশি যোগ করা যাবে না`); return;
+  }
   if (!cart[cartKey]) cart[cartKey] = { ...p, qty: 0, cartPrice: v.p, varLabel: v.lbl || '', cartKey };
   cart[cartKey].qty += 1;
   updateCart();
@@ -2876,6 +2953,14 @@ function changeQty(cartKey, d) {
   if (!cart[cartKey]) return;
   const nq = cart[cartKey].qty + d;
   if (nq <= 0) return;
+  if (d > 0) {
+    const item = cart[cartKey];
+    const p = prods.find(x => (x._id||x.id) === (item._id||item.id)) || item;
+    const avail = getAvailableStock(p, item.varLabel || '');
+    if (avail > 0 && nq > avail) {
+      showToast(`❌ স্টকে মাত্র ${avail} টি আছে`); return;
+    }
+  }
   cart[cartKey].qty = nq;
   updateCart();
 }
@@ -2924,12 +3009,8 @@ function updateCart() {
     stopRelScroll();
   }
   const subTotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
-  const tax = Math.round(subTotal * 0.05);
-  const service = items.length ? 42 : 0;
-  const grand = subTotal + tax + service;
+  const grand = subTotal;
   const subEl = document.getElementById('cartSubTotal'); if (subEl) subEl.textContent = '৳' + subTotal.toLocaleString('en');
-  const taxEl = document.getElementById('cartTax'); if (taxEl) taxEl.textContent = '৳' + tax.toLocaleString('en');
-  const svcEl = document.getElementById('cartService'); if (svcEl) svcEl.textContent = '৳' + service.toLocaleString('en');
   const totEl = document.getElementById('cartTotal'); if (totEl) totEl.textContent = '৳' + grand.toLocaleString('en');
   const cntEl = document.getElementById('myCartCount'); if (cntEl) cntEl.textContent = tot;
   fel.style.display = 'block';

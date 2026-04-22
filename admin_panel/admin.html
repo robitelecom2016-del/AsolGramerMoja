@@ -1530,6 +1530,13 @@ textarea.form-control { resize:vertical; min-height:80px; }
     </div>
     <div class="modal-body">
       <input type="hidden" id="heroId">
+      <div class="form-group2">
+        <label>স্লাইডের ধরন <span>*</span></label>
+        <select class="form-control" id="hType" onchange="toggleHeroTypeFields()">
+          <option value="main">প্রধান স্লাইডার (বড় বামদিকে)</option>
+          <option value="side">সাইড ব্যানার (ডানদিকে ছোট ৪টি)</option>
+        </select>
+      </div>
       <div class="form-group2"><label>শিরোনাম <span>*</span></label><input type="text" class="form-control" id="hTitle" placeholder="হিরো শিরোনাম"></div>
       <div class="form-group2"><label>সাবটাইটেল</label><input type="text" class="form-control" id="hSub" placeholder="সাবটাইটেল"></div>
       <div class="form-group2">
@@ -1557,6 +1564,23 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="form-group2">
         <label>CTA বাটন টেক্সট (ঐচ্ছিক)</label>
         <input type="text" class="form-control" id="hCtaText" placeholder="এখনই অর্ডার করুন">
+      </div>
+      <!-- Side-banner only fields -->
+      <div id="sideBannerFields" style="display:none;border-top:1px dashed var(--border);padding-top:12px;margin-top:8px;">
+        <div style="font-size:.85rem;color:var(--txt2);margin-bottom:10px;font-weight:600;"><i class="fa-solid fa-tag"></i> সাইড ব্যানার সেটিংস</div>
+        <div class="form-row">
+          <div class="form-group2"><label>ছোট লেবেল</label><input type="text" class="form-control" id="hLabel" placeholder="যেমন: প্রিমিয়াম মানের"></div>
+          <div class="form-group2"><label>মূল্য (ঐচ্ছিক)</label><input type="text" class="form-control" id="hPrice" placeholder="যেমন: ১৮০"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group2"><label>বাটন টেক্সট</label><input type="text" class="form-control" id="hBtnText" placeholder="কিনুন"></div>
+          <div class="form-group2"><label>বাটন রং (HEX)</label><input type="text" class="form-control" id="hBtnBg" placeholder="যেমন: #1a6fa8"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group2"><label>লেবেল রং</label><input type="text" class="form-control" id="hLabelColor" placeholder="#d4f5a0"></div>
+          <div class="form-group2"><label>ওভারলে রং (rgba)</label><input type="text" class="form-control" id="hOverlay" placeholder="rgba(30,80,20,0.55)"></div>
+        </div>
+        <div class="form-group2"><label>লিঙ্ক (hash route)</label><input type="text" class="form-control" id="hLink" placeholder="যেমন: #/products/honey বা #/special"></div>
       </div>
       <div class="form-group2">
         <label>সক্রিয়</label>
@@ -3115,6 +3139,15 @@ async function loadHero() {
 
 function openHeroModal(slide=null) {
   document.getElementById('heroId').value=slide?slide._id:'';
+  document.getElementById('hType').value=slide?.type || 'main';
+  document.getElementById('hLabel').value=slide?.label || '';
+  document.getElementById('hPrice').value=slide?.price || '';
+  document.getElementById('hBtnText').value=slide?.btnText || 'কিনুন';
+  document.getElementById('hBtnBg').value=slide?.btnBg || '';
+  document.getElementById('hLabelColor').value=slide?.labelColor || '#d4f5a0';
+  document.getElementById('hOverlay').value=slide?.overlay || 'rgba(30,80,20,0.55)';
+  document.getElementById('hLink').value=slide?.link || '';
+  toggleHeroTypeFields();
   document.getElementById('hTitle').value=slide?slide.title:'';
   document.getElementById('hSub').value=slide?slide.subtitle||'':'';
   document.getElementById('hGradient').value=slide?slide.gradient:'s1';
@@ -3135,6 +3168,10 @@ function openHeroModal(slide=null) {
   openModal('heroModal');
 }
 
+function toggleHeroTypeFields() {
+  const t = document.getElementById('hType').value;
+  document.getElementById('sideBannerFields').style.display = (t === 'side') ? 'block' : 'none';
+}
 function editHero(slide) { openHeroModal(slide); }
 
 async function uploadHeroImg(input) {
@@ -3168,7 +3205,15 @@ function toggleHeroActive() {
 
 async function saveHero() {
   const id=document.getElementById('heroId').value;
-  const data={title:document.getElementById('hTitle').value.trim(),subtitle:document.getElementById('hSub').value.trim(),gradient:document.getElementById('hGradient').value,order:parseInt(document.getElementById('hOrder').value)||1,active:document.getElementById('hActive').value==='true',img:document.getElementById('hImg').value,imgPublicId:document.getElementById('hImgPid').value,ctaText:document.getElementById('hCtaText').value.trim()};
+  const data={
+    type: document.getElementById('hType').value || 'main',
+    label: document.getElementById('hLabel').value.trim(),
+    price: document.getElementById('hPrice').value.trim(),
+    btnText: document.getElementById('hBtnText').value.trim() || 'কিনুন',
+    btnBg: document.getElementById('hBtnBg').value.trim(),
+    labelColor: document.getElementById('hLabelColor').value.trim() || '#d4f5a0',
+    overlay: document.getElementById('hOverlay').value.trim() || 'rgba(30,80,20,0.55)',
+    link: document.getElementById('hLink').value.trim(),title:document.getElementById('hTitle').value.trim(),subtitle:document.getElementById('hSub').value.trim(),gradient:document.getElementById('hGradient').value,order:parseInt(document.getElementById('hOrder').value)||1,active:document.getElementById('hActive').value==='true',img:document.getElementById('hImg').value,imgPublicId:document.getElementById('hImgPid').value,ctaText:document.getElementById('hCtaText').value.trim()};
   if (!data.title) { toast('শিরোনাম দিন','error'); return; }
   try {
     if(id) await api('PUT',`/api/hero/${id}`,data); else await api('POST','/api/hero',data);
