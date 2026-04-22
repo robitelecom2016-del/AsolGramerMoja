@@ -8,111 +8,103 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📧 Nodemailer — Gmail-এ অর্ডার নোটিফিকেশন (lazy + safe)
-// nodemailer install না থাকলেও সার্ভার crash করবে না
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const ORDER_NOTIFY_EMAIL = process.env.ORDER_NOTIFY_EMAIL || 'robitelecom2016@gmail.com';
-const GMAIL_USER = process.env.GMAIL_USER || 'robitelecom2016@gmail.com';
-const GMAIL_APP_PASSWORD = (process.env.GMAIL_APP_PASSWORD || 'twur bijq agrg syzq').replace(/\s+/g, '');
+const app = express();
+const PORT = process.env.PORT || 5000;
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 📧 Gmail SMTP — অর্ডার নোটিফিকেশন
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Render dashboard → Environment-এ এই ৩টি ভেরিয়েবল যোগ করুন:
+//   GMAIL_USER           = robitelecom2016@gmail.com
+//   GMAIL_APP_PASSWORD   = twur bijq agrg syzq   (স্পেস সহ ১৬ অক্ষর)
+//   ORDER_NOTIFY_EMAIL   = robitelecom2016@gmail.com  (যেখানে অর্ডার মেইল আসবে)
 let mailTransporter = null;
-let nodemailer = null;
 try {
-  nodemailer = require('nodemailer');
-  mailTransporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD },
-  });
-  // verify চালান কিন্তু error-এ crash নয়
-  mailTransporter.verify((err) => {
-    if (err) {
-      console.error('⚠️  Gmail SMTP verify failed (অর্ডার ইমেইল disabled):', err.message);
-      mailTransporter = null;
-    } else {
-      console.log('✅ Gmail SMTP ready — অর্ডার নোটিফিকেশন পাঠাতে প্রস্তুত');
-    }
-  });
+  const nodemailer = require('nodemailer');
+  if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    mailTransporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        // App password থেকে স্পেস সরিয়ে দিচ্ছি (Gmail স্পেস সহ/ছাড়া উভয় গ্রহণ করে)
+        pass: (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, ''),
+      },
+    });
+    mailTransporter.verify((err) => {
+      if (err) {
+        console.warn('⚠️ Gmail SMTP verify failed:', err.message);
+      } else {
+        console.log('✅ Gmail SMTP ready — অর্ডার মেইল পাঠানো যাবে');
+      }
+    });
+  } else {
+    console.warn('⚠️ GMAIL_USER / GMAIL_APP_PASSWORD সেট নেই — অর্ডার মেইল পাঠানো হবে না');
+  }
 } catch (e) {
-  console.warn('⚠️  Nodemailer not available — `npm install nodemailer` চালান। সার্ভার চলবে কিন্তু ইমেইল যাবে না। কারণ:', e.message);
-  mailTransporter = null;
+  console.warn('⚠️ nodemailer ইনস্টল নেই:', e.message);
 }
 
 function buildOrderEmailHtml(order) {
-  const itemsHtml = (order.items || []).map(i => `
+  const itemsRows = (order.items || []).map(i => `
     <tr>
-      <td style="padding:8px;border:1px solid #ddd;">${i.nm || ''} ${i.em || ''}</td>
-      <td style="padding:8px;border:1px solid #ddd;">${i.varLabel || '-'}</td>
-      <td style="padding:8px;border:1px solid #ddd;text-align:center;">${i.qty || 1}</td>
-      <td style="padding:8px;border:1px solid #ddd;text-align:right;">৳${((i.cartPrice||0) * (i.qty||1)).toLocaleString('en')}</td>
+      <td style="padding:8px;border:1px solid #eee;">${i.nm || ''} <br><small style="color:#888">${i.varLabel || ''}</small></td>
+      <td style="padding:8px;border:1px solid #eee;text-align:center;">${i.qty || 1}</td>
+      <td style="padding:8px;border:1px solid #eee;text-align:right;">৳${((i.cartPrice || 0) * (i.qty || 1)).toLocaleString('en')}</td>
     </tr>`).join('');
-  const adv = order.advanceDelivery && order.advanceDelivery.paid
-    ? `<p style="background:#fff8e6;border:1px solid #f0a500;padding:10px;border-radius:6px;">
-         💳 <strong>অগ্রিম পেমেন্ট:</strong> ৳${order.advanceDelivery.amount} —
-         TrxID: <code>${order.advanceDelivery.trxId}</code>
-       </p>` : '';
+  const adv = order.advanceDelivery || {};
+  const advHtml = adv.paid
+    ? `<tr><td colspan="3" style="padding:10px;border:1px solid #eee;background:#fff8e6;">
+         💳 <b>অগ্রিম ডেলিভারি চার্জ পরিশোধিত</b><br>
+         ট্রানজেকশন ID: <b>${adv.trxId || '-'}</b> | পরিমাণ: ৳${adv.amount || 0}
+       </td></tr>` : '';
   return `
-  <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;color:#222;">
-    <h2 style="background:#2ea043;color:#fff;padding:14px;border-radius:8px 8px 0 0;margin:0;">
-      🛍️ নতুন অর্ডার — ${order.orderNum}
-    </h2>
-    <div style="border:1px solid #ddd;border-top:none;padding:18px;border-radius:0 0 8px 8px;">
-      <h3 style="margin:0 0 8px;">গ্রাহকের তথ্য</h3>
-      <p style="margin:4px 0;"><strong>নাম:</strong> ${order.customer?.name || ''}</p>
-      <p style="margin:4px 0;"><strong>মোবাইল:</strong>
-        <a href="tel:${order.customer?.phone || ''}">${order.customer?.phone || ''}</a></p>
-      <p style="margin:4px 0;"><strong>ঠিকানা:</strong> ${order.customer?.address || ''}</p>
-      ${order.customer?.note ? `<p style="margin:4px 0;"><strong>নোট:</strong> ${order.customer.note}</p>` : ''}
-
-      <h3 style="margin:18px 0 8px;">পণ্য</h3>
+    <div style="font-family:Arial,'Hind Siliguri',sans-serif;max-width:640px;margin:auto;color:#222;">
+      <h2 style="color:#2d5a27;margin:0 0 6px;">🛒 নতুন অর্ডার এসেছে!</h2>
+      <p style="margin:0 0 14px;color:#555;">অর্ডার নং: <b>${order.orderNum}</b> · ${new Date(order.createdAt || Date.now()).toLocaleString('en-GB')}</p>
+      <h3 style="margin:14px 0 6px;">👤 কাস্টমার</h3>
       <table style="width:100%;border-collapse:collapse;font-size:14px;">
-        <thead style="background:#f5f5f5;">
-          <tr>
-            <th style="padding:8px;border:1px solid #ddd;text-align:left;">পণ্য</th>
-            <th style="padding:8px;border:1px solid #ddd;text-align:left;">ভ্যারিয়েন্ট</th>
-            <th style="padding:8px;border:1px solid #ddd;">পরিমাণ</th>
-            <th style="padding:8px;border:1px solid #ddd;text-align:right;">মূল্য</th>
-          </tr>
-        </thead>
-        <tbody>${itemsHtml}</tbody>
+        <tr><td style="padding:6px 8px;border:1px solid #eee;width:120px;"><b>নাম</b></td><td style="padding:6px 8px;border:1px solid #eee;">${order.customer?.name || ''}</td></tr>
+        <tr><td style="padding:6px 8px;border:1px solid #eee;"><b>ফোন</b></td><td style="padding:6px 8px;border:1px solid #eee;"><a href="tel:${order.customer?.phone || ''}">${order.customer?.phone || ''}</a></td></tr>
+        <tr><td style="padding:6px 8px;border:1px solid #eee;"><b>ঠিকানা</b></td><td style="padding:6px 8px;border:1px solid #eee;">${order.customer?.address || ''}</td></tr>
+        ${order.customer?.note ? `<tr><td style="padding:6px 8px;border:1px solid #eee;"><b>নোট</b></td><td style="padding:6px 8px;border:1px solid #eee;">${order.customer.note}</td></tr>` : ''}
+        <tr><td style="padding:6px 8px;border:1px solid #eee;"><b>ডেলিভারি</b></td><td style="padding:6px 8px;border:1px solid #eee;">${order.delivery?.type || ''} — ৳${order.delivery?.charge || 0}</td></tr>
       </table>
-
-      <h3 style="margin:18px 0 8px;">সারসংক্ষেপ</h3>
-      <p style="margin:4px 0;"><strong>সাবটোটাল:</strong> ৳${(order.subtotal||0).toLocaleString('en')}</p>
-      <p style="margin:4px 0;"><strong>ডেলিভারি (${order.delivery?.type || ''}):</strong>
-         ৳${(order.delivery?.charge || 0).toLocaleString('en')}</p>
-      <p style="margin:4px 0;font-size:18px;color:#2ea043;">
-         <strong>সর্বমোট: ৳${(order.total||0).toLocaleString('en')}</strong></p>
-      ${adv}
-      <p style="font-size:12px;color:#888;margin-top:18px;">
-        সময়: ${new Date(order.createdAt || Date.now()).toLocaleString('bn-BD')}
-      </p>
-    </div>
-  </div>`;
+      <h3 style="margin:14px 0 6px;">📦 পণ্য</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:14px;">
+        <thead><tr style="background:#f5f5f5;">
+          <th style="padding:8px;border:1px solid #eee;text-align:left;">পণ্য</th>
+          <th style="padding:8px;border:1px solid #eee;">পরিমাণ</th>
+          <th style="padding:8px;border:1px solid #eee;text-align:right;">মূল্য</th>
+        </tr></thead>
+        <tbody>
+          ${itemsRows}
+          ${advHtml}
+          <tr><td colspan="2" style="padding:8px;border:1px solid #eee;text-align:right;"><b>সাবটোটাল</b></td><td style="padding:8px;border:1px solid #eee;text-align:right;">৳${(order.subtotal||0).toLocaleString('en')}</td></tr>
+          <tr><td colspan="2" style="padding:8px;border:1px solid #eee;text-align:right;"><b>ডেলিভারি</b></td><td style="padding:8px;border:1px solid #eee;text-align:right;">৳${(order.delivery?.charge||0).toLocaleString('en')}</td></tr>
+          <tr style="background:#f7f3ec;"><td colspan="2" style="padding:10px;border:1px solid #eee;text-align:right;font-size:16px;"><b>সর্বমোট</b></td><td style="padding:10px;border:1px solid #eee;text-align:right;font-size:16px;color:#e8660a;"><b>৳${(order.total||0).toLocaleString('en')}</b></td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:18px;color:#888;font-size:12px;">— gramerasolmoja.shop</p>
+    </div>`;
 }
 
 async function sendOrderEmail(order) {
-  if (!mailTransporter) { console.log('ℹ️  mailTransporter unavailable — skip email'); return; }
-  if (!mailTransporter) {
-    console.warn('⚠️ Mail transporter not ready — order email skipped');
-    return;
-  }
+  if (!mailTransporter) return;
+  const to = process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER;
+  if (!to) return;
   try {
     const info = await mailTransporter.sendMail({
-      from: `"আসল গ্রামের মজা" <${GMAIL_USER}>`,
-      to: ORDER_NOTIFY_EMAIL,
-      replyTo: order.customer?.phone ? undefined : GMAIL_USER,
-      subject: `🛍️ নতুন অর্ডার ${order.orderNum} — ${order.customer?.name || ''} (৳${order.total || 0})`,
+      from: `"আসল গ্রামের মজা" <${process.env.GMAIL_USER}>`,
+      to,
+      subject: `🛒 নতুন অর্ডার ${order.orderNum} — ${order.customer?.name || ''} (৳${order.total || 0})`,
       html: buildOrderEmailHtml(order),
+      replyTo: process.env.GMAIL_USER,
     });
-    console.log('✅ Order email sent:', order.orderNum, info.messageId);
-  } catch (e) {
-    console.error('❌ Order email failed:', e.message);
+    console.log(`📧 অর্ডার মেইল পাঠানো হয়েছে: ${info.messageId} → ${to}`);
+  } catch (err) {
+    console.error('❌ অর্ডার মেইল ব্যর্থ:', err.message);
   }
 }
-
-const app = express();
-const PORT = process.env.PORT || 5000;
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -1042,8 +1034,8 @@ app.post('/api/orders', async (req, res) => {
       }
     }
 
-    // 📧 অর্ডার তৈরি হওয়ার সাথে সাথে Gmail-এ নোটিফিকেশন পাঠাও (non-blocking)
-    sendOrderEmail(order).catch(e => console.error('email dispatch error:', e.message));
+    // 📧 অর্ডার নোটিফিকেশন মেইল পাঠাও (response block করো না)
+    sendOrderEmail(order).catch(e => console.error('mail err:', e.message));
 
     res.status(201).json(order);
   } catch (err) {

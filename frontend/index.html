@@ -1904,24 +1904,16 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
             <div class="om-pay-method">
               <div class="om-pay-logo bk">বি</div>
               <div class="om-pay-details">
-                <div class="om-pay-type">বিকাশ — Send Money</div>
+                <div class="om-pay-type">বিকাশ — Payment</div>
                 <div class="om-pay-num" id="omBkashNum"></div>
               </div>
               <button class="om-pay-copy" onclick="copyPayNum('bkash',this)">কপি</button>
-            </div>
-            <div class="om-pay-method" style="margin-top:8px;">
-              <div class="om-pay-logo ng">ন</div>
-              <div class="om-pay-details">
-                <div class="om-pay-type">নগদ — Send Money</div>
-                <div class="om-pay-num" id="omNagadNum"></div>
-              </div>
-              <button class="om-pay-copy" onclick="copyPayNum('nagad',this)">কপি</button>
             </div>
           </div>
           <div class="om-advance-amt" id="omAdvanceAmtText"></div>
           <div style="margin-top:12px;">
             <div class="om-trx-label"><i class="fa-solid fa-receipt" style="color:#e67e00"></i> ট্রানজেকশন ID <span style="color:#e00;margin-left:2px;">*</span></div>
-            <input type="text" class="om-trx-input" id="omTrxId" placeholder="বিকাশ/নগদ ট্রানজেকশন ID লিখুন (যেমন: 8F3K9X2P)">
+            <input type="text" class="om-trx-input" id="omTrxId" placeholder="বিকাশ ট্রানজেকশন ID লিখুন (যেমন: 8F3K9X2P)">
           </div>
         </div>
       </div>
@@ -1964,17 +1956,9 @@ let heroSlides = [];
 let settings = {};
 let deliveryCharges = { inside: 80, outside: 130 };
 let storePhone = '01712345678';
-const ADVANCE_DELIVERY_CATS = [
-  // মিষ্টিজাতীয়
-  'মিষ্টি','রসগোল্লা','রশমালাই','রসমালাই','সন্দেশ','চমচম','কালোজাম','লাড্ডু','লাঠ্ঠু','বরফি','জিলাপি','জিলেপি','গুলাব জামুন','গোলাপজাম','রসকদম','রসকদমা','মিহিদানা','মণ্ডা','মন্ডা','বালুসাই','ছানার মিষ্টি','ছানার পায়েস','ক্ষীরের মিষ্টি','মালাই','মালাইকারি','দইমিষ্টি','সরভাজা','সরপুরিয়া','প্যারা',
-  // দুধজাতীয়
-  'দই','মিষ্টি দই','টক দই','ঘোল','মাঠা','লাচ্ছি','লাচ্চি','দুধ','দুধজাতীয়','ছানা','পনির','ক্ষীর','খির','পায়েস','ফিরনি','ক্ষীরশা','সরভাজা','মাখন','ঘি','ক্রিম',
-  // গ্রীষ্মকালীন পানীয়
-  'গ্রীষ্মকালীন পানীয়','শরবত','বেলের শরবত','লেবুর শরবত','তোকমা','ইসবগুল','আমপানা','পানীয়'
-];
+const ADVANCE_DELIVERY_CATS = ['মিষ্টি', 'দই', 'গ্রীষ্মকালীন পানীয়', 'রশমালাই'];
 const ADVANCE_PAYMENT_INFO = {
   bkash: '01881245554',
-  nagad: '01881245554',
 };
 let dataLoaded = false;
 let prodPage = 1;
@@ -3016,7 +3000,6 @@ function checkAdvanceDelivery(items) {
   return found;
 }
 function openOrderModal() {
-  try {
   const items = Object.values(cart);
   if (!items.length) { showToast('❌ কার্টে কোনো পণ্য নেই'); return; }
   selectedDelivery = null;
@@ -3061,7 +3044,6 @@ function openOrderModal() {
     const catNames = [...new Set(advItems.map(i => i.cat))].join(', ');
     document.getElementById('omAdvanceCatList').textContent = catNames;
     document.getElementById('omBkashNum').textContent = ADVANCE_PAYMENT_INFO.bkash;
-    document.getElementById('omNagadNum').textContent = ADVANCE_PAYMENT_INFO.nagad;
     advBox.style.display = 'block';
     if (legalEl) legalEl.innerHTML = '⚠️ এই অর্ডারে <strong>ডেলিভারি চার্জ অগ্রিম</strong> পরিশোধ করতে হবে। বাকি পণ্যমূল্য ডেলিভারিতে দিন।';
   } else {
@@ -3081,10 +3063,6 @@ function openOrderModal() {
   } else {
     orderOv.classList.add('open');
     document.body.style.overflow = 'hidden';
-  }
-  } catch (e) {
-    console.error('openOrderModal error:', e);
-    showToast('❌ অর্ডার ফর্ম খুলতে সমস্যা — পেজ রিফ্রেশ করুন');
   }
 }
 function closeOrderModal() {
@@ -3193,7 +3171,7 @@ async function submitOrder() {
   if (requiresAdvanceDelivery) {
     trxId = (document.getElementById('omTrxId')?.value || '').trim();
     if (!trxId) {
-      showToast('❌ বিকাশ/নগদ ট্রানজেকশন ID দিন');
+      showToast('❌ বিকাশ ট্রানজেকশন ID দিন');
       document.getElementById('omTrxId')?.focus();
       document.getElementById('omAdvanceBox')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
@@ -3531,7 +3509,13 @@ if (!heroTimer) {
 }
 
 
-// (debug block removed)
+console.log("openOrderModal called", items.length);
+try {
+  // ... বাকি সব কোড (যা আগে ছিল)
+} catch(e) {
+  console.error("Order modal error:", e);
+  showToast("টেকনিক্যাল সমস্যা, পরে আবার চেষ্টা করুন");
+}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // সম্প্রতি দেখা (Recently Viewed)
