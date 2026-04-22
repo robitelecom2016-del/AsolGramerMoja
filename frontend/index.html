@@ -1113,23 +1113,24 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
 .retry-btn{margin-top:12px;background:var(--gd);color:#fff;border:none;padding:9px 20px;border-radius:5px;font-family:inherit;font-size:.84rem;cursor:pointer;}
 .toast{
   position:fixed;
-  bottom:20px;
-  right:16px;
-  left:auto;
-  width:290px;
+  bottom:28px;
+  left:50%;
+  right:auto;
+  transform:translateX(-50%) translateY(20px);
+  width:320px;
+  max-width:calc(100vw - 32px);
   background:#fff;
   border-radius:12px;
   z-index:9999;
   box-shadow:0 8px 32px rgba(0,0,0,.18);
   border-left:5px solid var(--gd);
   overflow:hidden;
-  transform:translateX(calc(100% + 32px));
   opacity:0;
   transition:transform .38s cubic-bezier(.34,1.28,.64,1), opacity .25s ease;
   pointer-events:none;
 }
 .toast.show{
-  transform:translateX(0);
+  transform:translateX(-50%) translateY(0);
   opacity:1;
   pointer-events:auto;
 }
@@ -1177,7 +1178,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
   .cat-bar-title-tabs{display:none;}
 }
 @media(max-width:900px){
-  .toast{bottom:20px;width:calc(100vw - 32px);max-width:290px;}
+  .toast{bottom:20px;left:50%;width:calc(100vw - 32px);max-width:340px;}
 }
 .om-advance-box{background:#fff8e6;border:1.5px solid #f0a500;border-radius:10px;padding:14px 16px;margin:0 0 4px;}
 .om-advance-title{font-size:.85rem;font-weight:700;color:#b45000;display:flex;align-items:center;gap:7px;margin-bottom:10px;}
@@ -1829,7 +1830,6 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     <h2><span class="my-cart-cnt-lbl">My Cart</span> <span class="my-cart-cnt">(<span id="myCartCount">0</span>)</span></h2>
     <button class="cls-cart-new home-ic" onclick="goHome();toggleCart();" aria-label="হোম"><i class="fa-solid fa-house"></i></button>
   </div>
-  <div class="cart-pin">Pincode: <span id="cartPincode">380015</span> <i class="fa-solid fa-chevron-down" style="font-size:.6rem;color:#aaa"></i></div>
   <div class="cart-its" id="cartIts"></div>
   <div class="cart-related-section" id="cartRelSection" style="display:none">
     <div class="cart-rel-hd">
@@ -1842,11 +1842,8 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     <div class="cart-rel-track"><div class="cart-rel-row" id="cartRelRow"></div></div>
   </div>
   <div class="cart-ft" id="cartFt" style="display:none;padding:0;border:none;background:#fcfbf8;">
-    <div class="cart-promo" id="cartPromo">🎁 EXTRA 5% OFF*-এর জন্য অগ্রিম ডেলিভারি চার্জ পরিশোধ করুন। T&amp;C প্রযোজ্য।</div>
     <div class="cart-summary-new">
       <div class="cart-sum-row"><span>Sub Total</span><span id="cartSubTotal">৳0</span></div>
-      <div class="cart-sum-row"><span>Tax 5%</span><span id="cartTax">৳0</span></div>
-      <div class="cart-sum-row"><span>Service</span><span id="cartService">৳42</span></div>
     </div>
     <div class="cart-checkout-bar">
       <div><div style="font-size:.7rem;color:#888;line-height:1">Total</div><div class="total-l" id="cartTotal">৳0</div></div>
@@ -1912,7 +1909,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
               </div>
               <button class="om-pay-copy" onclick="copyPayNum('bkash',this)">কপি</button>
             </div>
-            <div class="om-pay-method">
+            <div class="om-pay-method" style="margin-top:8px;">
               <div class="om-pay-logo ng">ন</div>
               <div class="om-pay-details">
                 <div class="om-pay-type">নগদ — Send Money</div>
@@ -1967,10 +1964,17 @@ let heroSlides = [];
 let settings = {};
 let deliveryCharges = { inside: 80, outside: 130 };
 let storePhone = '01712345678';
-const ADVANCE_DELIVERY_CATS = ['মিষ্টি', 'দই', 'গ্রীষ্মকালীন পানীয়', 'রশমালাই'];
+const ADVANCE_DELIVERY_CATS = [
+  // মিষ্টিজাতীয়
+  'মিষ্টি','রসগোল্লা','রশমালাই','রসমালাই','সন্দেশ','চমচম','কালোজাম','লাড্ডু','লাঠ্ঠু','বরফি','জিলাপি','জিলেপি','গুলাব জামুন','গোলাপজাম','রসকদম','রসকদমা','মিহিদানা','মণ্ডা','মন্ডা','বালুসাই','ছানার মিষ্টি','ছানার পায়েস','ক্ষীরের মিষ্টি','মালাই','মালাইকারি','দইমিষ্টি','সরভাজা','সরপুরিয়া','প্যারা',
+  // দুধজাতীয়
+  'দই','মিষ্টি দই','টক দই','ঘোল','মাঠা','লাচ্ছি','লাচ্চি','দুধ','দুধজাতীয়','ছানা','পনির','ক্ষীর','খির','পায়েস','ফিরনি','ক্ষীরশা','সরভাজা','মাখন','ঘি','ক্রিম',
+  // গ্রীষ্মকালীন পানীয়
+  'গ্রীষ্মকালীন পানীয়','শরবত','বেলের শরবত','লেবুর শরবত','তোকমা','ইসবগুল','আমপানা','পানীয়'
+];
 const ADVANCE_PAYMENT_INFO = {
-  bkash: '01316380515',
-  nagad: '01316380515',
+  bkash: '01881245554',
+  nagad: '01881245554',
 };
 let dataLoaded = false;
 let prodPage = 1;
@@ -2934,13 +2938,8 @@ function updateCart() {
     stopRelScroll();
   }
   const subTotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
-  const tax = Math.round(subTotal * 0.05);
-  const service = items.length ? 42 : 0;
-  const grand = subTotal + tax + service;
   const subEl = document.getElementById('cartSubTotal'); if (subEl) subEl.textContent = '৳' + subTotal.toLocaleString('en');
-  const taxEl = document.getElementById('cartTax'); if (taxEl) taxEl.textContent = '৳' + tax.toLocaleString('en');
-  const svcEl = document.getElementById('cartService'); if (svcEl) svcEl.textContent = '৳' + service.toLocaleString('en');
-  const totEl = document.getElementById('cartTotal'); if (totEl) totEl.textContent = '৳' + grand.toLocaleString('en');
+  const totEl = document.getElementById('cartTotal'); if (totEl) totEl.textContent = '৳' + subTotal.toLocaleString('en');
   const cntEl = document.getElementById('myCartCount'); if (cntEl) cntEl.textContent = tot;
   fel.style.display = 'block';
 }
@@ -3017,6 +3016,7 @@ function checkAdvanceDelivery(items) {
   return found;
 }
 function openOrderModal() {
+  try {
   const items = Object.values(cart);
   if (!items.length) { showToast('❌ কার্টে কোনো পণ্য নেই'); return; }
   selectedDelivery = null;
@@ -3081,6 +3081,10 @@ function openOrderModal() {
   } else {
     orderOv.classList.add('open');
     document.body.style.overflow = 'hidden';
+  }
+  } catch (e) {
+    console.error('openOrderModal error:', e);
+    showToast('❌ অর্ডার ফর্ম খুলতে সমস্যা — পেজ রিফ্রেশ করুন');
   }
 }
 function closeOrderModal() {
@@ -3527,13 +3531,7 @@ if (!heroTimer) {
 }
 
 
-console.log("openOrderModal called", items.length);
-try {
-  // ... বাকি সব কোড (যা আগে ছিল)
-} catch(e) {
-  console.error("Order modal error:", e);
-  showToast("টেকনিক্যাল সমস্যা, পরে আবার চেষ্টা করুন");
-}
+// (debug block removed)
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // সম্প্রতি দেখা (Recently Viewed)
@@ -3563,7 +3561,7 @@ function toggleRecent() {
   }
 }
 function renderRecentPanel() {
-  const items = getRecentlyViewed();
+  const items = getRecentlyViewed().filter(r => r && r.nm && r.nm !== 'undefined' && r._id);
   const body = document.getElementById('recentBody');
   if (!items.length) {
     body.innerHTML = '<div class="recent-empty"><i class="fa-regular fa-clock" style="font-size:2rem;display:block;margin-bottom:10px"></i>এখনো কোনো পণ্য দেখা হয়নি</div>';
