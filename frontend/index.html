@@ -192,6 +192,24 @@ body{
 }
 .nb-recently:hover{color:#f5a623;}
 .nb-recently i{font-size:.85rem;}
+
+/* Recently Viewed Panel */
+.recent-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9998;display:none;backdrop-filter:blur(2px);}
+.recent-overlay.open{display:block;}
+.recent-panel{position:fixed;top:0;right:-400px;width:380px;max-width:92vw;height:100vh;background:#fff;z-index:9999;box-shadow:-4px 0 24px rgba(0,0,0,.18);transition:right .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;}
+.recent-panel.open{right:0;}
+.recent-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #eee;background:#fafafa;}
+.recent-hd h3{margin:0;font-size:1rem;font-weight:700;color:#222;}
+.recent-hd button{background:none;border:none;font-size:1.2rem;cursor:pointer;color:#999;padding:4px;}
+.recent-body{flex:1;overflow-y:auto;padding:12px;}
+.recent-item{display:flex;gap:12px;padding:10px;border-radius:8px;cursor:pointer;transition:background .2s;border:1px solid #f0f0f0;margin-bottom:8px;}
+.recent-item:hover{background:#f8f4ec;}
+.recent-item img{width:60px;height:60px;object-fit:cover;border-radius:6px;flex-shrink:0;}
+.recent-item-info{flex:1;min-width:0;}
+.recent-item-name{font-size:.85rem;font-weight:600;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.recent-item-price{font-size:.82rem;color:#e05c00;font-weight:700;margin-top:4px;}
+.recent-empty{text-align:center;padding:40px 20px;color:#aaa;font-size:.9rem;}
+
 .cart-btn{
   background:var(--or);color:#fff;border:none;
   padding:7px 14px;border-radius:5px;cursor:pointer;
@@ -1477,22 +1495,6 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
   .footer-main{grid-template-columns:1fr;gap:20px;}
 }
 /* ===== END FOOTER STYLES ===== */
-
-/* Recently Viewed Panel */
-.recent-panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;display:none;}
-.recent-panel-overlay.open{display:block;}
-.recent-panel{position:fixed;top:0;right:-380px;width:370px;max-width:90vw;height:100vh;background:#fff;z-index:9999;box-shadow:-4px 0 20px rgba(0,0,0,.15);transition:right .3s ease;display:flex;flex-direction:column;}
-.recent-panel.open{right:0;}
-.recent-panel-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #f0f0f0;}
-.recent-panel-hd h3{margin:0;font-size:1rem;font-weight:700;color:#333;}
-.recent-panel-body{flex:1;overflow-y:auto;padding:12px;}
-.recent-item{display:flex;gap:12px;padding:10px;border-radius:8px;cursor:pointer;transition:background .15s;}
-.recent-item:hover{background:#f8f8f8;}
-.recent-item img{width:60px;height:60px;object-fit:cover;border-radius:6px;flex-shrink:0;}
-.recent-item-info{flex:1;min-width:0;}
-.recent-item-name{font-size:.85rem;font-weight:600;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.recent-item-price{font-size:.8rem;color:#e05c00;font-weight:700;margin-top:4px;}
-.recent-item-time{font-size:.7rem;color:#aaa;margin-top:2px;}
 </style>
 </head>
 <body>
@@ -1521,7 +1523,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
         <button class="search-icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
         <div class="search-dropdown" id="deskDrop"></div>
       </div>
-      <span class="nb-recently" onclick="toggleRecentPanel()">
+      <span class="nb-recently" onclick="toggleRecent()">
         <i class="fa-regular fa-clock"></i> সম্প্রতি দেখা
       </span>
       <button class="cart-btn" onclick="toggleCart()">
@@ -1610,7 +1612,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
           <div class="dot" onclick="goSlide(2)"></div>
         </div>
       </div>
-      <!-- Right Side: 2 columns × 2 rows of promo banners (dynamic from admin) -->
+      <!-- Right Side: 2 columns × 2 rows of promo banners -->
       <div class="hero-side-col" id="heroSideCol1"></div>
       <div class="hero-side-col" id="heroSideCol2"></div>
     </div>
@@ -1827,6 +1829,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     <h2><span class="my-cart-cnt-lbl">My Cart</span> <span class="my-cart-cnt">(<span id="myCartCount">0</span>)</span></h2>
     <button class="cls-cart-new home-ic" onclick="goHome();toggleCart();" aria-label="হোম"><i class="fa-solid fa-house"></i></button>
   </div>
+  <div class="cart-pin">Pincode: <span id="cartPincode">380015</span> <i class="fa-solid fa-chevron-down" style="font-size:.6rem;color:#aaa"></i></div>
   <div class="cart-its" id="cartIts"></div>
   <div class="cart-related-section" id="cartRelSection" style="display:none">
     <div class="cart-rel-hd">
@@ -1839,8 +1842,11 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     <div class="cart-rel-track"><div class="cart-rel-row" id="cartRelRow"></div></div>
   </div>
   <div class="cart-ft" id="cartFt" style="display:none;padding:0;border:none;background:#fcfbf8;">
+    <div class="cart-promo" id="cartPromo">🎁 EXTRA 5% OFF*-এর জন্য অগ্রিম ডেলিভারি চার্জ পরিশোধ করুন। T&amp;C প্রযোজ্য।</div>
     <div class="cart-summary-new">
       <div class="cart-sum-row"><span>Sub Total</span><span id="cartSubTotal">৳0</span></div>
+      <div class="cart-sum-row"><span>Tax 5%</span><span id="cartTax">৳0</span></div>
+      <div class="cart-sum-row"><span>Service</span><span id="cartService">৳42</span></div>
     </div>
     <div class="cart-checkout-bar">
       <div><div style="font-size:.7rem;color:#888;line-height:1">Total</div><div class="total-l" id="cartTotal">৳0</div></div>
@@ -2050,6 +2056,7 @@ function buildUI() {
   }
   renderAll();
   buildHero();
+  buildSideBanners();
   buildFooter();
   const catSel = document.getElementById('prodCatFilter');
   if (catSel && cats.length) {
@@ -2058,48 +2065,7 @@ function buildUI() {
 }
 let cur = 0;
 let heroTimer = null;
-
-// ===== Dynamic Side Banners =====
-const defaultSideBanners = [
-  {img:'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&auto=format&fit=crop&q=80',overlay:'rgba(30,80,20,0.55)',labelColor:'#d4f5a0',label:'প্রিমিয়াম মানের',title:'খাঁটি মধু<br>ও দেশি মিষ্টি',price:'৳১৮০',btnBg:'',btnText:'কিনুন'},
-  {img:'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&auto=format&fit=crop&q=80',overlay:'rgba(10,60,100,0.55)',labelColor:'#a8d8f0',label:'তাজা ও বিশুদ্ধ',title:'দেশি দই<br>ও রসমালাই',price:'৳৫০',btnBg:'#1a6fa8',btnText:'কিনুন'},
-  {img:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&auto=format&fit=crop&q=80',overlay:'rgba(100,60,0,0.5)',labelColor:'#ffd080',label:'১০০% অর্গানিক',title:'পরিবারকে দিন<br>সেরা পুষ্টি',price:'৳৩৯০',btnBg:'',btnText:'কিনুন'},
-  {img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&auto=format&fit=crop&q=80',overlay:'rgba(120,20,20,0.5)',labelColor:'#ffb0a0',label:'সতেজ ও তাজা',title:'সরিষার তৈল<br>ও বোরহানী',price:'৳১৫০',btnBg:'#c0392b',btnText:'কিনুন'}
-];
-function buildSideBanners() {
-  const sideBanners = heroSlides.filter(s => s.type === 'side' && s.active !== false);
-  const banners = sideBanners.length >= 2 ? sideBanners : defaultSideBanners;
-  const col1 = document.getElementById('heroSideCol1');
-  const col2 = document.getElementById('heroSideCol2');
-  if (!col1 || !col2) return;
-  const renderBanner = (b) => {
-    const imgUrl = b.img || '';
-    const overlay = b.overlay || 'rgba(30,80,20,0.55)';
-    const labelColor = b.labelColor || '#d4f5a0';
-    const label = b.label || b.subtitle || '';
-    const title = b.title || '';
-    const price = b.price ? '৳' + b.price : '';
-    const btnBg = b.btnBg ? `background:${b.btnBg};` : '';
-    const btnText = b.btnText || 'কিনুন';
-    const link = b.link || '';
-    const onclick = link ? `window.location.hash='${link}'` : 'goProductsPage()';
-    return `<div class="hero-side-banner" style="cursor:pointer;${imgUrl?`background-image:url('${imgUrl}');background-size:cover;background-position:center;background-blend-mode:multiply;`:''}" onclick="${onclick}">
-      <div style="position:absolute;inset:0;background:${overlay};border-radius:8px;z-index:0;"></div>
-      <div style="position:relative;z-index:1;">
-        <div class="side-label" style="color:${labelColor};">${label}</div>
-        <div class="side-title" style="color:#fff;">${title}</div>
-        ${price ? `<div class="side-price" style="color:#ffe066;">${price}</div>` : ''}
-        <button class="side-shop-btn" style="${btnBg}" onclick="event.stopPropagation();${onclick}"><i class="fa-solid fa-cart-plus"></i> ${btnText}</button>
-      </div>
-    </div>`;
-  };
-  const half = Math.ceil(banners.length / 2);
-  col1.innerHTML = banners.slice(0, half).map(renderBanner).join('');
-  col2.innerHTML = banners.slice(half, half + 2).map(renderBanner).join('');
-}
-
 function buildHero() {
-  buildSideBanners();
   if (!heroSlides.length) return;
   const section = document.getElementById('heroSection');
   const dots = document.getElementById('slideDots');
@@ -2145,6 +2111,37 @@ function goSlide(n) {
   cur = n;
   if (heroTimer) { clearInterval(heroTimer); heroTimer = setInterval(() => goSlide(cur+1), 4500); }
 }
+
+function buildSideBanners() {
+  const sideBanners = heroSlides.filter(s => s.type === 'side' && s.active !== false);
+  const defaults = [
+    { title:'খাঁটি মধু<br>ও দেশি মিষ্টি', label:'প্রিমিয়াম মানের', price:'১৮০', img:'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&auto=format&fit=crop&q=80', overlay:'rgba(30,80,20,0.55)', labelColor:'#d4f5a0', btnText:'কিনুন', btnBg:'', link:'' },
+    { title:'দেশি দই<br>ও রসমালাই', label:'তাজা ও বিশুদ্ধ', price:'৫০', img:'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&auto=format&fit=crop&q=80', overlay:'rgba(10,60,100,0.55)', labelColor:'#a8d8f0', btnText:'কিনুন', btnBg:'#1a6fa8', link:'' },
+    { title:'পরিবারকে দিন<br>সেরা পুষ্টি', label:'১০০% অর্গানিক', price:'৩৯০', img:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&auto=format&fit=crop&q=80', overlay:'rgba(100,60,0,0.5)', labelColor:'#ffd080', btnText:'কিনুন', btnBg:'', link:'' },
+    { title:'সরিষার তৈল<br>ও বোরহানী', label:'সতেজ ও তাজা', price:'১৫০', img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&auto=format&fit=crop&q=80', overlay:'rgba(120,20,20,0.5)', labelColor:'#ffb0a0', btnText:'কিনুন', btnBg:'#c0392b', link:'' },
+  ];
+  const banners = sideBanners.length >= 4 ? sideBanners.slice(0,4) : defaults;
+  function renderBanner(b) {
+    const imgUrl = b.img || '';
+    const ov = b.overlay || 'rgba(0,0,0,0.5)';
+    const lc = b.labelColor || '#fff';
+    const btnBgStyle = b.btnBg ? `background:${b.btnBg};` : '';
+    const link = b.link || '';
+    const onclick = link ? `location.hash='${link}'` : 'goProductsPage()';
+    return `<div class="hero-side-banner" style="cursor:pointer;background-image:url('${imgUrl}');background-size:cover;background-position:center;background-blend-mode:multiply;" onclick="${onclick}">
+      <div style="position:absolute;inset:0;background:${ov};border-radius:8px;z-index:0;"></div>
+      <div style="position:relative;z-index:1;">
+        <div class="side-label" style="color:${lc};">${b.label||''}</div>
+        <div class="side-title" style="color:#fff;">${b.title||''}</div>
+        <div class="side-price" style="color:#ffe066;">৳${b.price||''}</div>
+        <button class="side-shop-btn" style="${btnBgStyle}" onclick="event.stopPropagation();${onclick}"><i class="fa-solid fa-cart-plus"></i> ${b.btnText||'কিনুন'}</button>
+      </div>
+    </div>`;
+  }
+  document.getElementById('heroSideCol1').innerHTML = renderBanner(banners[0]) + renderBanner(banners[1]);
+  document.getElementById('heroSideCol2').innerHTML = renderBanner(banners[2]) + renderBanner(banners[3]);
+}
+
 function buildFooter() {
   const catLinks = document.getElementById('footerCatLinks');
   const linksHtml = cats.map(c => `<li><a onclick="goProductsPage('${c.id}')">${c.em} ${c.lbl}</a></li>`).join('');
@@ -2937,9 +2934,12 @@ function updateCart() {
     stopRelScroll();
   }
   const subTotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
-  const grand = subTotal;
+  const tax = Math.round(subTotal * 0.05);
+  const service = items.length ? 42 : 0;
+  const grand = subTotal + tax + service;
   const subEl = document.getElementById('cartSubTotal'); if (subEl) subEl.textContent = '৳' + subTotal.toLocaleString('en');
-
+  const taxEl = document.getElementById('cartTax'); if (taxEl) taxEl.textContent = '৳' + tax.toLocaleString('en');
+  const svcEl = document.getElementById('cartService'); if (svcEl) svcEl.textContent = '৳' + service.toLocaleString('en');
   const totEl = document.getElementById('cartTotal'); if (totEl) totEl.textContent = '৳' + grand.toLocaleString('en');
   const cntEl = document.getElementById('myCartCount'); if (cntEl) cntEl.textContent = tot;
   fel.style.display = 'block';
@@ -3534,18 +3534,61 @@ try {
   console.error("Order modal error:", e);
   showToast("টেকনিক্যাল সমস্যা, পরে আবার চেষ্টা করুন");
 }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// সম্প্রতি দেখা (Recently Viewed)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function getRecentlyViewed() {
+  try { return JSON.parse(localStorage.getItem('recentlyViewed') || '[]'); } catch { return []; }
+}
+function addToRecentlyViewed(p) {
+  if (!p || !p._id) return;
+  let recent = getRecentlyViewed();
+  recent = recent.filter(r => r._id !== p._id);
+  recent.unshift({ _id: p._id, nm: p.nm, img: p.img || '', em: p.em || '', price: p.variants?.[0]?.p || 0 });
+  if (recent.length > 20) recent = recent.slice(0, 20);
+  localStorage.setItem('recentlyViewed', JSON.stringify(recent));
+}
+function toggleRecent() {
+  const panel = document.getElementById('recentPanel');
+  const overlay = document.getElementById('recentOverlay');
+  const isOpen = panel.classList.contains('open');
+  if (isOpen) {
+    panel.classList.remove('open');
+    overlay.classList.remove('open');
+  } else {
+    renderRecentPanel();
+    panel.classList.add('open');
+    overlay.classList.add('open');
+  }
+}
+function renderRecentPanel() {
+  const items = getRecentlyViewed();
+  const body = document.getElementById('recentBody');
+  if (!items.length) {
+    body.innerHTML = '<div class="recent-empty"><i class="fa-regular fa-clock" style="font-size:2rem;display:block;margin-bottom:10px"></i>এখনো কোনো পণ্য দেখা হয়নি</div>';
+    return;
+  }
+  body.innerHTML = items.map(r => `
+    <div class="recent-item" onclick="toggleRecent();goProduct('${r._id}')">
+      ${r.img ? `<img src="${r.img}" alt="${r.nm}" onerror="this.style.display='none'">` : `<div style="width:60px;height:60px;display:flex;align-items:center;justify-content:center;font-size:2rem;background:#f8f4ec;border-radius:6px;flex-shrink:0">${r.em}</div>`}
+      <div class="recent-item-info">
+        <div class="recent-item-name">${r.nm}</div>
+        <div class="recent-item-price">৳${(r.price||0).toLocaleString('en')}</div>
+      </div>
+    </div>`).join('');
+}
+
 </script>
 
-<!-- সম্প্রতি দেখা প্যানেল -->
-<div class="recent-panel-overlay" id="recentOverlay" onclick="toggleRecentPanel()"></div>
+<!-- Recently Viewed Panel -->
+<div class="recent-overlay" id="recentOverlay" onclick="toggleRecent()"></div>
 <div class="recent-panel" id="recentPanel">
-  <div class="recent-panel-hd">
-    <h3><i class="fa-regular fa-clock"></i> সম্প্রতি দেখা পণ্য</h3>
-    <button onclick="toggleRecentPanel()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#888"><i class="fa-solid fa-xmark"></i></button>
+  <div class="recent-hd">
+    <h3><i class="fa-regular fa-clock"></i> সম্প্রতি দেখা</h3>
+    <button onclick="toggleRecent()"><i class="fa-solid fa-xmark"></i></button>
   </div>
-  <div class="recent-panel-body" id="recentPanelBody">
-    <div style="padding:30px;text-align:center;color:#aaa">কোনো পণ্য দেখা হয়নি</div>
-  </div>
+  <div class="recent-body" id="recentBody"></div>
 </div>
 </body>
 </html>

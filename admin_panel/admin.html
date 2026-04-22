@@ -972,7 +972,7 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="card">
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>ক্রম</th><th>ধরন</th><th>ছবি</th><th>শিরোনাম</th><th>সাবটাইটেল</th><th>গ্র্যাডিয়েন্ট</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+            <thead><tr><th>ক্রম</th><th>ছবি</th><th>শিরোনাম</th><th>সাবটাইটেল</th><th>গ্র্যাডিয়েন্ট</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
             <tbody id="heroTableBody"></tbody>
           </table>
         </div>
@@ -3120,11 +3120,10 @@ async function loadHero() {
   try {
     const slides=await api('GET','/api/hero/all');
     const tbody=document.getElementById('heroTableBody');
-    if (!slides.length) { tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-images"></i><h3>কোনো স্লাইড নেই</h3></div></td></tr>'; return; }
+    if (!slides.length) { tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-images"></i><h3>কোনো স্লাইড নেই</h3></div></td></tr>'; return; }
     tbody.innerHTML=slides.map((s,i)=>`
       <tr>
         <td style="color:var(--txt3)">${s.order||i+1}</td>
-        <td><span class="badge ${s.type==='side'?'orange':'blue'}">${s.type==='side'?'সাইড':'প্রধান'}</span></td>
         <td>${s.img?`<div class="td-img"><img src="${s.img}" alt="" style="width:60px;height:35px;object-fit:cover;border-radius:5px"><span class="badge green">ছবি</span></div>`:'<span class="badge gray">গ্র্যাডিয়েন্ট</span>'}</td>
         <td><div class="td-name">${s.title}</div></td>
         <td style="color:var(--txt2);font-size:.8rem">${s.subtitle||'—'}</td>
