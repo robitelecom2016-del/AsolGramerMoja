@@ -1956,19 +1956,7 @@ let heroSlides = [];
 let settings = {};
 let deliveryCharges = { inside: 80, outside: 130 };
 let storePhone = '01712345678';
-const ADVANCE_DELIVERY_CATS = [
-  'মিষ্টি', 'মিস্টি', 'রসগোল্লা', 'রশমালাই', 'রসমালাই', 'রসমলাই',
-  'সন্দেশ', 'চমচম', 'কালোজাম', 'ছানা', 'ছানার মিষ্টি',
-  'লাড্ডু', 'বরফি', 'বরফী', 'পান্তুয়া', 'কাঁচাগোল্লা',
-  'দই', 'মিষ্টি দই', 'টক দই', 'মাঠা', 'মাখন', 'ঘি',
-  'ক্ষীর', 'খির', 'পায়েস', 'ফিরনি', 'লাচ্ছি', 'লাচ্ছী',
-  'পনির', 'দুধ', 'দুগ্ধ', 'দুধজাত', 'দুধজাতীয়',
-  'গ্রীষ্মকালীন পানীয়', 'শরবত', 'লস্যি'
-];
-// Normalize Bengali text for robust matching (trim + lowercase)
-function normCat(s) {
-  return String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
-}
+const ADVANCE_DELIVERY_CATS = ['মিষ্টি', 'দই', 'গ্রীষ্মকালীন পানীয়', 'রশমালাই'];
 const ADVANCE_PAYMENT_INFO = {
   bkash: '01881245554',
   nagad: '01881245554',
@@ -3008,12 +2996,11 @@ let requiresAdvanceDelivery = false;
 function checkAdvanceDelivery(items) {
   const found = items.filter(i => {
     const cat = (i.cat || '').trim();
-    return ADVANCE_DELIVERY_CATS.some(ac => { const n = normCat(ac); const c = normCat(cat); return c.includes(n) || n.includes(c); });
+    return ADVANCE_DELIVERY_CATS.some(ac => cat.includes(ac) || ac.includes(cat));
   });
   return found;
 }
 function openOrderModal() {
-  try {
   const items = Object.values(cart);
   if (!items.length) { showToast('❌ কার্টে কোনো পণ্য নেই'); return; }
   selectedDelivery = null;
@@ -3049,7 +3036,7 @@ function openOrderModal() {
   document.querySelectorAll('.ctg-area-chip').forEach(c => c.classList.remove('active'));
   const advItems = items.filter(i => {
     const cat = (i.cat || '').trim();
-    return ADVANCE_DELIVERY_CATS.some(ac => { const n = normCat(ac); const c = normCat(cat); return c.includes(n) || n.includes(c); });
+    return ADVANCE_DELIVERY_CATS.some(ac => cat.includes(ac) || ac.includes(cat));
   });
   requiresAdvanceDelivery = advItems.length > 0;
   const advBox = document.getElementById('omAdvanceBox');
@@ -3078,17 +3065,6 @@ function openOrderModal() {
   } else {
     orderOv.classList.add('open');
     document.body.style.overflow = 'hidden';
-  }
-  } catch (e) {
-    console.error('openOrderModal error:', e);
-    try {
-      const orderOv = document.getElementById('orderOv');
-      if (orderOv) {
-        orderOv.classList.add('open');
-        document.body.style.overflow = 'hidden';
-      }
-    } catch (_) {}
-    showToast('⚠️ একটি সমস্যা হয়েছে, আবার চেষ্টা করুন');
   }
 }
 function closeOrderModal() {
@@ -3535,7 +3511,13 @@ if (!heroTimer) {
 }
 
 
-// (removed broken debug block — was throwing ReferenceError on load)
+console.log("openOrderModal called", items.length);
+try {
+  // ... বাকি সব কোড (যা আগে ছিল)
+} catch(e) {
+  console.error("Order modal error:", e);
+  showToast("টেকনিক্যাল সমস্যা, পরে আবার চেষ্টা করুন");
+}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // সম্প্রতি দেখা (Recently Viewed)
