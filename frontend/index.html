@@ -3001,6 +3001,7 @@ function checkAdvanceDelivery(items) {
   return found;
 }
 function openOrderModal() {
+  try {
   const items = Object.values(cart);
   if (!items.length) { showToast('❌ কার্টে কোনো পণ্য নেই'); return; }
   selectedDelivery = null;
@@ -3065,6 +3066,17 @@ function openOrderModal() {
   } else {
     orderOv.classList.add('open');
     document.body.style.overflow = 'hidden';
+  }
+  } catch (e) {
+    console.error('openOrderModal error:', e);
+    try {
+      const orderOv = document.getElementById('orderOv');
+      if (orderOv) {
+        orderOv.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+    } catch (_) {}
+    showToast('⚠️ একটি সমস্যা হয়েছে, আবার চেষ্টা করুন');
   }
 }
 function closeOrderModal() {
@@ -3511,13 +3523,7 @@ if (!heroTimer) {
 }
 
 
-console.log("openOrderModal called", items.length);
-try {
-  // ... বাকি সব কোড (যা আগে ছিল)
-} catch(e) {
-  console.error("Order modal error:", e);
-  showToast("টেকনিক্যাল সমস্যা, পরে আবার চেষ্টা করুন");
-}
+// (removed broken debug block — was throwing ReferenceError on load)
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // সম্প্রতি দেখা (Recently Viewed)
