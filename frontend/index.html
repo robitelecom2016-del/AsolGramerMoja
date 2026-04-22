@@ -2080,6 +2080,7 @@ function buildUI() {
   }
   renderAll();
   buildHero();
+  buildSideBanners();
   buildFooter();
   const catSel = document.getElementById('prodCatFilter');
   if (catSel && cats.length) {
@@ -2133,6 +2134,48 @@ function goSlide(n) {
   }
   cur = n;
   if (heroTimer) { clearInterval(heroTimer); heroTimer = setInterval(() => goSlide(cur+1), 4500); }
+}
+
+function buildSideBanners() {
+  const sideBanners = heroSlides.filter(s => s.type === 'side' && s.active !== false);
+  const col1 = document.getElementById('heroSideCol1');
+  const col2 = document.getElementById('heroSideCol2');
+  if (!col1 || !col2) return;
+
+  // Default fallback banners if none from API
+  const defaults = [
+    { title:'খাঁটি মধু<br>ও দেশি মিষ্টি', label:'প্রিমিয়াম মানের', price:'৳১৮০', img:'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&auto=format&fit=crop&q=80', overlay:'rgba(30,80,20,0.55)', labelColor:'#d4f5a0', btnBg:'', btnText:'কিনুন' },
+    { title:'দেশি দই<br>ও রসমালাই', label:'তাজা ও বিশুদ্ধ', price:'৳৫০', img:'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&auto=format&fit=crop&q=80', overlay:'rgba(10,60,100,0.55)', labelColor:'#a8d8f0', btnBg:'#1a6fa8', btnText:'কিনুন' },
+    { title:'পরিবারকে দিন<br>সেরা পুষ্টি', label:'১০০% অর্গানিক', price:'৳৩৯০', img:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&auto=format&fit=crop&q=80', overlay:'rgba(100,60,0,0.5)', labelColor:'#ffd080', btnBg:'', btnText:'কিনুন' },
+    { title:'সরিষার তৈল<br>ও বোরহানী', label:'সতেজ ও তাজা', price:'৳১৫০', img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&auto=format&fit=crop&q=80', overlay:'rgba(120,20,20,0.5)', labelColor:'#ffb0a0', btnBg:'#c0392b', btnText:'কিনুন' },
+  ];
+
+  const banners = sideBanners.length >= 4 ? sideBanners.slice(0, 4) : (sideBanners.length > 0 ? sideBanners : defaults);
+
+  function renderBanner(b) {
+    const bgImg = b.img ? `background-image:url('${b.img}');background-size:cover;background-position:center;background-blend-mode:multiply;` : '';
+    const overlay = b.overlay || 'rgba(30,80,20,0.55)';
+    const labelColor = b.labelColor || '#d4f5a0';
+    const btnBg = b.btnBg ? `background:${b.btnBg};` : '';
+    const btnText = b.btnText || 'কিনুন';
+    const price = b.price ? `৳${b.price.replace(/৳/g,'')}` : '';
+    const link = b.link || '';
+    const onclick = link ? `window.location.hash='${link}'` : `goProductsPage()`;
+    return `<div class="hero-side-banner" style="cursor:pointer;${bgImg}" onclick="${onclick}">
+      <div style="position:absolute;inset:0;background:${overlay};border-radius:8px;z-index:0;"></div>
+      <div style="position:relative;z-index:1;">
+        <div class="side-label" style="color:${labelColor};">${b.label||''}</div>
+        <div class="side-title" style="color:#fff;">${b.title||''}</div>
+        ${price ? `<div class="side-price" style="color:#ffe066;">${price}</div>` : ''}
+        <button class="side-shop-btn" style="${btnBg}" onclick="event.stopPropagation();${onclick}"><i class="fa-solid fa-cart-plus"></i> ${btnText}</button>
+      </div>
+    </div>`;
+  }
+
+  // Fill col1 with first 2, col2 with next 2
+  const b = banners;
+  col1.innerHTML = (b[0] ? renderBanner(b[0]) : '') + (b[1] ? renderBanner(b[1]) : '');
+  col2.innerHTML = (b[2] ? renderBanner(b[2]) : '') + (b[3] ? renderBanner(b[3]) : '');
 }
 function buildFooter() {
   const catLinks = document.getElementById('footerCatLinks');

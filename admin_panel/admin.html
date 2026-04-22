@@ -943,7 +943,7 @@ textarea.form-control { resize:vertical; min-height:80px; }
               <th>নোট</th>
             </tr></thead>
             <tbody id="slLogTableBody">
-              <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--txt3)">
+              <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--txt3)">
                 <i class="fa-solid fa-spinner"></i> লোড হচ্ছে...
               </td></tr>
             </tbody>
@@ -972,7 +972,7 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="card">
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>ক্রম</th><th>ছবি</th><th>শিরোনাম</th><th>সাবটাইটেল</th><th>গ্র্যাডিয়েন্ট</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+            <thead><tr><th>ক্রম</th><th>ধরন</th><th>ছবি</th><th>শিরোনাম</th><th>সাবটাইটেল</th><th>গ্র্যাডিয়েন্ট</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
             <tbody id="heroTableBody"></tbody>
           </table>
         </div>
@@ -1952,7 +1952,7 @@ async function loadProducts() {
   const active = document.getElementById('prodActiveFilter').value;
   const best = document.getElementById('prodBestFilter').value;
   const tbody = document.getElementById('prodTableBody');
-  tbody.innerHTML = '<tr><td colspan="7"><div class="loader"><i class="fa-solid fa-spinner"></i></div></td></tr>';
+  tbody.innerHTML = '<tr><td colspan="8"><div class="loader"><i class="fa-solid fa-spinner"></i></div></td></tr>';
   try {
     let url = `/api/products?page=${prodPage}&limit=15`;
     if (cat) url += `&cat=${encodeURIComponent(cat)}`;
@@ -1963,7 +1963,7 @@ async function loadProducts() {
     let filtered = allProds;
     if (search) filtered = allProds.filter(p => p.nm.includes(search) || p.sub?.includes(search));
     document.getElementById('prodCount').textContent = `${filtered.length} পণ্য`;
-    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>কোনো পণ্য নেই</h3></div></td></tr>'; return; }
+    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>কোনো পণ্য নেই</h3></div></td></tr>'; return; }
     tbody.innerHTML = filtered.map((p,i) => {
       const sellPrice = p.variants?.[0]?.p || 0;
       const buyPrice = p.variants?.[0]?.bp;
@@ -2313,7 +2313,7 @@ let allStockData = [];
 async function loadStockPage() {
   const tbody = document.getElementById('stockTableBody');
   const summaryGrid = document.getElementById('stockSummaryGrid');
-  tbody.innerHTML = '<tr><td colspan="7"><div class="loader"><i class="fa-solid fa-spinner"></i></div></td></tr>';
+  tbody.innerHTML = '<tr><td colspan="8"><div class="loader"><i class="fa-solid fa-spinner"></i></div></td></tr>';
   summaryGrid.innerHTML = '<div class="loader"><i class="fa-solid fa-spinner"></i></div>';
 
   try {
@@ -2361,7 +2361,7 @@ async function loadStockPage() {
 
     renderStockTable(allStockData);
   } catch(err) {
-    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>লোড ব্যর্থ: ${err.message}</h3></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><h3>লোড ব্যর্থ: ${err.message}</h3></div></td></tr>`;
     toast('স্টক লোড ব্যর্থ: ' + err.message, 'error');
   }
 }
@@ -2370,7 +2370,7 @@ function renderStockTable(products) {
   const tbody = document.getElementById('stockTableBody');
   document.getElementById('stockProdCount').textContent = `${products.length} পণ্য`;
   if (!products.length) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>কোনো পণ্য নেই</h3></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>কোনো পণ্য নেই</h3></div></td></tr>';
     return;
   }
   tbody.innerHTML = products.map((p, i) => {
@@ -2622,7 +2622,7 @@ async function loadStockLogs() {
   const tbody = document.getElementById('slLogTableBody');
   const summaryGrid = document.getElementById('slSummaryGrid');
 
-  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--txt3)"><i class="fa-solid fa-spinner fa-spin"></i> লোড হচ্ছে...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--txt3)"><i class="fa-solid fa-spinner fa-spin"></i> লোড হচ্ছে...</td></tr>';
 
   try {
     let url = `/api/stock/logs?days=${days}`;
@@ -2652,7 +2652,7 @@ async function loadStockLogs() {
       </div>`;
 
     if (!data.logs.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--txt3)"><i class="fa-solid fa-inbox" style="font-size:1.8rem;display:block;margin-bottom:8px"></i>কোনো লেনদেন পাওয়া যায়নি</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--txt3)"><i class="fa-solid fa-inbox" style="font-size:1.8rem;display:block;margin-bottom:8px"></i>কোনো লেনদেন পাওয়া যায়নি</td></tr>';
       return;
     }
 
@@ -2672,7 +2672,7 @@ async function loadStockLogs() {
       </tr>`;
     }).join('');
   } catch(err) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--red2)">লোড ব্যর্থ: ${err.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--red2)">লোড ব্যর্থ: ${err.message}</td></tr>`;
   }
 }
 
@@ -3120,10 +3120,11 @@ async function loadHero() {
   try {
     const slides=await api('GET','/api/hero/all');
     const tbody=document.getElementById('heroTableBody');
-    if (!slides.length) { tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-images"></i><h3>কোনো স্লাইড নেই</h3></div></td></tr>'; return; }
+    if (!slides.length) { tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-images"></i><h3>কোনো স্লাইড নেই</h3></div></td></tr>'; return; }
     tbody.innerHTML=slides.map((s,i)=>`
       <tr>
         <td style="color:var(--txt3)">${s.order||i+1}</td>
+        <td><span class="badge ${s.type==='side'?'orange':'blue'}">${s.type==='side'?'সাইড':'প্রধান'}</span></td>
         <td>${s.img?`<div class="td-img"><img src="${s.img}" alt="" style="width:60px;height:35px;object-fit:cover;border-radius:5px"><span class="badge green">ছবি</span></div>`:'<span class="badge gray">গ্র্যাডিয়েন্ট</span>'}</td>
         <td><div class="td-name">${s.title}</div></td>
         <td style="color:var(--txt2);font-size:.8rem">${s.subtitle||'—'}</td>

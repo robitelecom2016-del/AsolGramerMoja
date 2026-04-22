@@ -209,6 +209,15 @@ const heroSchema = new mongoose.Schema({
   ctaText: { type: String, default: '' },
   active: { type: Boolean, default: true },
   order: { type: Number, default: 0 },
+  // Side banner fields
+  type: { type: String, enum: ['main', 'side'], default: 'main' },
+  label: { type: String, default: '' },
+  price: { type: String, default: '' },
+  btnText: { type: String, default: 'কিনুন' },
+  btnBg: { type: String, default: '' },
+  labelColor: { type: String, default: '#d4f5a0' },
+  overlay: { type: String, default: 'rgba(30,80,20,0.55)' },
+  link: { type: String, default: '' },
 });
 const Hero = mongoose.model('Hero', heroSchema);
 
