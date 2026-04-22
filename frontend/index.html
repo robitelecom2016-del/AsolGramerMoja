@@ -1477,6 +1477,22 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
   .footer-main{grid-template-columns:1fr;gap:20px;}
 }
 /* ===== END FOOTER STYLES ===== */
+
+/* Recently Viewed Panel */
+.recent-panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;display:none;}
+.recent-panel-overlay.open{display:block;}
+.recent-panel{position:fixed;top:0;right:-380px;width:370px;max-width:90vw;height:100vh;background:#fff;z-index:9999;box-shadow:-4px 0 20px rgba(0,0,0,.15);transition:right .3s ease;display:flex;flex-direction:column;}
+.recent-panel.open{right:0;}
+.recent-panel-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #f0f0f0;}
+.recent-panel-hd h3{margin:0;font-size:1rem;font-weight:700;color:#333;}
+.recent-panel-body{flex:1;overflow-y:auto;padding:12px;}
+.recent-item{display:flex;gap:12px;padding:10px;border-radius:8px;cursor:pointer;transition:background .15s;}
+.recent-item:hover{background:#f8f8f8;}
+.recent-item img{width:60px;height:60px;object-fit:cover;border-radius:6px;flex-shrink:0;}
+.recent-item-info{flex:1;min-width:0;}
+.recent-item-name{font-size:.85rem;font-weight:600;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.recent-item-price{font-size:.8rem;color:#e05c00;font-weight:700;margin-top:4px;}
+.recent-item-time{font-size:.7rem;color:#aaa;margin-top:2px;}
 </style>
 </head>
 <body>
@@ -1505,7 +1521,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
         <button class="search-icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
         <div class="search-dropdown" id="deskDrop"></div>
       </div>
-      <span class="nb-recently" onclick="toggleCart()">
+      <span class="nb-recently" onclick="toggleRecentPanel()">
         <i class="fa-regular fa-clock"></i> সম্প্রতি দেখা
       </span>
       <button class="cart-btn" onclick="toggleCart()">
@@ -1594,51 +1610,9 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
           <div class="dot" onclick="goSlide(2)"></div>
         </div>
       </div>
-      <!-- Right Side: 2 columns × 2 rows of promo banners -->
-      <div class="hero-side-col">
-        <!-- Top banner col 2 -->
-        <div class="hero-side-banner sb-green" style="cursor:pointer;background-image:url('https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&auto=format&fit=crop&q=80');background-size:cover;background-position:center;background-blend-mode:multiply;" onclick="goProductsPage()">
-          <div style="position:absolute;inset:0;background:rgba(30,80,20,0.55);border-radius:8px;z-index:0;"></div>
-          <div style="position:relative;z-index:1;">
-          <div class="side-label" style="color:#d4f5a0;">প্রিমিয়াম মানের</div>
-          <div class="side-title" style="color:#fff;">খাঁটি মধু<br>ও দেশি মিষ্টি</div>
-          <div class="side-price" style="color:#ffe066;">৳১৮০</div>
-          <button class="side-shop-btn" onclick="event.stopPropagation();goProductsPage()"><i class="fa-solid fa-cart-plus"></i> কিনুন</button>
-          </div>
-        </div>
-        <!-- Bottom banner col 2 -->
-        <div class="hero-side-banner sb-blue" style="cursor:pointer;background-image:url('https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&auto=format&fit=crop&q=80');background-size:cover;background-position:center;background-blend-mode:multiply;" onclick="goProductsPage()">
-          <div style="position:absolute;inset:0;background:rgba(10,60,100,0.55);border-radius:8px;z-index:0;"></div>
-          <div style="position:relative;z-index:1;">
-          <div class="side-label" style="color:#a8d8f0;">তাজা ও বিশুদ্ধ</div>
-          <div class="side-title" style="color:#fff;">দেশি দই<br>ও রসমালাই</div>
-          <div class="side-price" style="color:#ffe066;">৳৫০</div>
-          <button class="side-shop-btn" style="background:#1a6fa8;" onclick="event.stopPropagation();goProductsPage()"><i class="fa-solid fa-cart-plus"></i> কিনুন</button>
-          </div>
-        </div>
-      </div>
-      <div class="hero-side-col">
-        <!-- Top banner col 3 -->
-        <div class="hero-side-banner" style="cursor:pointer;background-image:url('https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&auto=format&fit=crop&q=80');background-size:cover;background-position:center;background-blend-mode:multiply;" onclick="goProductsPage()">
-          <div style="position:absolute;inset:0;background:rgba(100,60,0,0.5);border-radius:8px;z-index:0;"></div>
-          <div style="position:relative;z-index:1;">
-          <div class="side-label" style="color:#ffd080;">১০০% অর্গানিক</div>
-          <div class="side-title" style="color:#fff;">পরিবারকে দিন<br>সেরা পুষ্টি</div>
-          <div class="side-price" style="color:#ffe066;">৳৩৯০</div>
-          <button class="side-shop-btn dark" onclick="event.stopPropagation();goProductsPage()"><i class="fa-solid fa-cart-plus"></i> কিনুন</button>
-          </div>
-        </div>
-        <!-- Bottom banner col 3 -->
-        <div class="hero-side-banner" style="cursor:pointer;background-image:url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&auto=format&fit=crop&q=80');background-size:cover;background-position:center;background-blend-mode:multiply;" onclick="goProductsPage()">
-          <div style="position:absolute;inset:0;background:rgba(120,20,20,0.5);border-radius:8px;z-index:0;"></div>
-          <div style="position:relative;z-index:1;">
-          <div class="side-label" style="color:#ffb0a0;">সতেজ ও তাজা</div>
-          <div class="side-title" style="color:#fff;">সরিষার তৈল<br>ও বোরহানী</div>
-          <div class="side-price" style="color:#ffe066;">৳১৫০</div>
-          <button class="side-shop-btn" style="background:#c0392b;" onclick="event.stopPropagation();goProductsPage()"><i class="fa-solid fa-cart-plus"></i> কিনুন</button>
-          </div>
-        </div>
-      </div>
+      <!-- Right Side: 2 columns × 2 rows of promo banners (dynamic from admin) -->
+      <div class="hero-side-col" id="heroSideCol1"></div>
+      <div class="hero-side-col" id="heroSideCol2"></div>
     </div>
   </div>
   <div class="cat-bar-outer">
@@ -1853,7 +1827,6 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     <h2><span class="my-cart-cnt-lbl">My Cart</span> <span class="my-cart-cnt">(<span id="myCartCount">0</span>)</span></h2>
     <button class="cls-cart-new home-ic" onclick="goHome();toggleCart();" aria-label="হোম"><i class="fa-solid fa-house"></i></button>
   </div>
-  <div class="cart-pin">Pincode: <span id="cartPincode">380015</span> <i class="fa-solid fa-chevron-down" style="font-size:.6rem;color:#aaa"></i></div>
   <div class="cart-its" id="cartIts"></div>
   <div class="cart-related-section" id="cartRelSection" style="display:none">
     <div class="cart-rel-hd">
@@ -1866,11 +1839,8 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     <div class="cart-rel-track"><div class="cart-rel-row" id="cartRelRow"></div></div>
   </div>
   <div class="cart-ft" id="cartFt" style="display:none;padding:0;border:none;background:#fcfbf8;">
-    <div class="cart-promo" id="cartPromo">🎁 EXTRA 5% OFF*-এর জন্য অগ্রিম ডেলিভারি চার্জ পরিশোধ করুন। T&amp;C প্রযোজ্য।</div>
     <div class="cart-summary-new">
       <div class="cart-sum-row"><span>Sub Total</span><span id="cartSubTotal">৳0</span></div>
-      <div class="cart-sum-row"><span>Tax 5%</span><span id="cartTax">৳0</span></div>
-      <div class="cart-sum-row"><span>Service</span><span id="cartService">৳42</span></div>
     </div>
     <div class="cart-checkout-bar">
       <div><div style="font-size:.7rem;color:#888;line-height:1">Total</div><div class="total-l" id="cartTotal">৳0</div></div>
@@ -2080,7 +2050,6 @@ function buildUI() {
   }
   renderAll();
   buildHero();
-  buildSideBanners();
   buildFooter();
   const catSel = document.getElementById('prodCatFilter');
   if (catSel && cats.length) {
@@ -2089,7 +2058,48 @@ function buildUI() {
 }
 let cur = 0;
 let heroTimer = null;
+
+// ===== Dynamic Side Banners =====
+const defaultSideBanners = [
+  {img:'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&auto=format&fit=crop&q=80',overlay:'rgba(30,80,20,0.55)',labelColor:'#d4f5a0',label:'প্রিমিয়াম মানের',title:'খাঁটি মধু<br>ও দেশি মিষ্টি',price:'৳১৮০',btnBg:'',btnText:'কিনুন'},
+  {img:'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&auto=format&fit=crop&q=80',overlay:'rgba(10,60,100,0.55)',labelColor:'#a8d8f0',label:'তাজা ও বিশুদ্ধ',title:'দেশি দই<br>ও রসমালাই',price:'৳৫০',btnBg:'#1a6fa8',btnText:'কিনুন'},
+  {img:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&auto=format&fit=crop&q=80',overlay:'rgba(100,60,0,0.5)',labelColor:'#ffd080',label:'১০০% অর্গানিক',title:'পরিবারকে দিন<br>সেরা পুষ্টি',price:'৳৩৯০',btnBg:'',btnText:'কিনুন'},
+  {img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&auto=format&fit=crop&q=80',overlay:'rgba(120,20,20,0.5)',labelColor:'#ffb0a0',label:'সতেজ ও তাজা',title:'সরিষার তৈল<br>ও বোরহানী',price:'৳১৫০',btnBg:'#c0392b',btnText:'কিনুন'}
+];
+function buildSideBanners() {
+  const sideBanners = heroSlides.filter(s => s.type === 'side' && s.active !== false);
+  const banners = sideBanners.length >= 2 ? sideBanners : defaultSideBanners;
+  const col1 = document.getElementById('heroSideCol1');
+  const col2 = document.getElementById('heroSideCol2');
+  if (!col1 || !col2) return;
+  const renderBanner = (b) => {
+    const imgUrl = b.img || '';
+    const overlay = b.overlay || 'rgba(30,80,20,0.55)';
+    const labelColor = b.labelColor || '#d4f5a0';
+    const label = b.label || b.subtitle || '';
+    const title = b.title || '';
+    const price = b.price ? '৳' + b.price : '';
+    const btnBg = b.btnBg ? `background:${b.btnBg};` : '';
+    const btnText = b.btnText || 'কিনুন';
+    const link = b.link || '';
+    const onclick = link ? `window.location.hash='${link}'` : 'goProductsPage()';
+    return `<div class="hero-side-banner" style="cursor:pointer;${imgUrl?`background-image:url('${imgUrl}');background-size:cover;background-position:center;background-blend-mode:multiply;`:''}" onclick="${onclick}">
+      <div style="position:absolute;inset:0;background:${overlay};border-radius:8px;z-index:0;"></div>
+      <div style="position:relative;z-index:1;">
+        <div class="side-label" style="color:${labelColor};">${label}</div>
+        <div class="side-title" style="color:#fff;">${title}</div>
+        ${price ? `<div class="side-price" style="color:#ffe066;">${price}</div>` : ''}
+        <button class="side-shop-btn" style="${btnBg}" onclick="event.stopPropagation();${onclick}"><i class="fa-solid fa-cart-plus"></i> ${btnText}</button>
+      </div>
+    </div>`;
+  };
+  const half = Math.ceil(banners.length / 2);
+  col1.innerHTML = banners.slice(0, half).map(renderBanner).join('');
+  col2.innerHTML = banners.slice(half, half + 2).map(renderBanner).join('');
+}
+
 function buildHero() {
+  buildSideBanners();
   if (!heroSlides.length) return;
   const section = document.getElementById('heroSection');
   const dots = document.getElementById('slideDots');
@@ -2134,48 +2144,6 @@ function goSlide(n) {
   }
   cur = n;
   if (heroTimer) { clearInterval(heroTimer); heroTimer = setInterval(() => goSlide(cur+1), 4500); }
-}
-
-function buildSideBanners() {
-  const sideBanners = heroSlides.filter(s => s.type === 'side' && s.active !== false);
-  const col1 = document.getElementById('heroSideCol1');
-  const col2 = document.getElementById('heroSideCol2');
-  if (!col1 || !col2) return;
-
-  // Default fallback banners if none from API
-  const defaults = [
-    { title:'খাঁটি মধু<br>ও দেশি মিষ্টি', label:'প্রিমিয়াম মানের', price:'৳১৮০', img:'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&auto=format&fit=crop&q=80', overlay:'rgba(30,80,20,0.55)', labelColor:'#d4f5a0', btnBg:'', btnText:'কিনুন' },
-    { title:'দেশি দই<br>ও রসমালাই', label:'তাজা ও বিশুদ্ধ', price:'৳৫০', img:'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&auto=format&fit=crop&q=80', overlay:'rgba(10,60,100,0.55)', labelColor:'#a8d8f0', btnBg:'#1a6fa8', btnText:'কিনুন' },
-    { title:'পরিবারকে দিন<br>সেরা পুষ্টি', label:'১০০% অর্গানিক', price:'৳৩৯০', img:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&auto=format&fit=crop&q=80', overlay:'rgba(100,60,0,0.5)', labelColor:'#ffd080', btnBg:'', btnText:'কিনুন' },
-    { title:'সরিষার তৈল<br>ও বোরহানী', label:'সতেজ ও তাজা', price:'৳১৫০', img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&auto=format&fit=crop&q=80', overlay:'rgba(120,20,20,0.5)', labelColor:'#ffb0a0', btnBg:'#c0392b', btnText:'কিনুন' },
-  ];
-
-  const banners = sideBanners.length >= 4 ? sideBanners.slice(0, 4) : (sideBanners.length > 0 ? sideBanners : defaults);
-
-  function renderBanner(b) {
-    const bgImg = b.img ? `background-image:url('${b.img}');background-size:cover;background-position:center;background-blend-mode:multiply;` : '';
-    const overlay = b.overlay || 'rgba(30,80,20,0.55)';
-    const labelColor = b.labelColor || '#d4f5a0';
-    const btnBg = b.btnBg ? `background:${b.btnBg};` : '';
-    const btnText = b.btnText || 'কিনুন';
-    const price = b.price ? `৳${b.price.replace(/৳/g,'')}` : '';
-    const link = b.link || '';
-    const onclick = link ? `window.location.hash='${link}'` : `goProductsPage()`;
-    return `<div class="hero-side-banner" style="cursor:pointer;${bgImg}" onclick="${onclick}">
-      <div style="position:absolute;inset:0;background:${overlay};border-radius:8px;z-index:0;"></div>
-      <div style="position:relative;z-index:1;">
-        <div class="side-label" style="color:${labelColor};">${b.label||''}</div>
-        <div class="side-title" style="color:#fff;">${b.title||''}</div>
-        ${price ? `<div class="side-price" style="color:#ffe066;">${price}</div>` : ''}
-        <button class="side-shop-btn" style="${btnBg}" onclick="event.stopPropagation();${onclick}"><i class="fa-solid fa-cart-plus"></i> ${btnText}</button>
-      </div>
-    </div>`;
-  }
-
-  // Fill col1 with first 2, col2 with next 2
-  const b = banners;
-  col1.innerHTML = (b[0] ? renderBanner(b[0]) : '') + (b[1] ? renderBanner(b[1]) : '');
-  col2.innerHTML = (b[2] ? renderBanner(b[2]) : '') + (b[3] ? renderBanner(b[3]) : '');
 }
 function buildFooter() {
   const catLinks = document.getElementById('footerCatLinks');
@@ -2315,6 +2283,7 @@ function goProduct(idOrSlug) {
   if (!p) { loadProductById(idOrSlug); return; }
   // প্রোডাক্ট ক্লিক রেকর্ড করো
   trackProductClick(p._id);
+  addToRecentlyViewed(p);
   buildPdp(p);
   document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
   document.getElementById('page-product').classList.add('active');
@@ -2335,6 +2304,7 @@ async function loadProductById(id) {
     const p = await api(`/api/products/${id}`);
     // প্রোডাক্ট ক্লিক রেকর্ড করো (API থেকে লোড হলেও)
     trackProductClick(p._id);
+    addToRecentlyViewed(p);
     buildPdp(p);
     const slug = p.slug || p.nm.replace(/\s+/g, '-');
     window.history.pushState({ pid: p._id }, '', `#/product/${slug}`);
@@ -2967,12 +2937,9 @@ function updateCart() {
     stopRelScroll();
   }
   const subTotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
-  const tax = Math.round(subTotal * 0.05);
-  const service = items.length ? 42 : 0;
-  const grand = subTotal + tax + service;
+  const grand = subTotal;
   const subEl = document.getElementById('cartSubTotal'); if (subEl) subEl.textContent = '৳' + subTotal.toLocaleString('en');
-  const taxEl = document.getElementById('cartTax'); if (taxEl) taxEl.textContent = '৳' + tax.toLocaleString('en');
-  const svcEl = document.getElementById('cartService'); if (svcEl) svcEl.textContent = '৳' + service.toLocaleString('en');
+
   const totEl = document.getElementById('cartTotal'); if (totEl) totEl.textContent = '৳' + grand.toLocaleString('en');
   const cntEl = document.getElementById('myCartCount'); if (cntEl) cntEl.textContent = tot;
   fel.style.display = 'block';
@@ -3556,7 +3523,7 @@ if (!heroTimer) {
       document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === next));
       cur = next;
     }
-  }, 4500); 
+  }, 4500);
 }
 
 
@@ -3568,5 +3535,17 @@ try {
   showToast("টেকনিক্যাল সমস্যা, পরে আবার চেষ্টা করুন");
 }
 </script>
+
+<!-- সম্প্রতি দেখা প্যানেল -->
+<div class="recent-panel-overlay" id="recentOverlay" onclick="toggleRecentPanel()"></div>
+<div class="recent-panel" id="recentPanel">
+  <div class="recent-panel-hd">
+    <h3><i class="fa-regular fa-clock"></i> সম্প্রতি দেখা পণ্য</h3>
+    <button onclick="toggleRecentPanel()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#888"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="recent-panel-body" id="recentPanelBody">
+    <div style="padding:30px;text-align:center;color:#aaa">কোনো পণ্য দেখা হয়নি</div>
+  </div>
+</div>
 </body>
 </html>
