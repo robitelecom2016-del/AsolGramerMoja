@@ -33,15 +33,21 @@ try {
     mailTransporter.verify((err) => {
       if (err) {
         console.warn('⚠️ Gmail SMTP verify failed:', err.message);
+        console.warn('   → App Password সঠিক কিনা চেক করুন: https://myaccount.google.com/apppasswords');
       } else {
         console.log('✅ Gmail SMTP ready — অর্ডার মেইল পাঠানো যাবে');
+        console.log('   → মেইল যাবে:', process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER);
       }
     });
   } else {
     console.warn('⚠️ GMAIL_USER / GMAIL_APP_PASSWORD সেট নেই — অর্ডার মেইল পাঠানো হবে না');
+    console.warn('   GMAIL_USER:', process.env.GMAIL_USER ? '✓ সেট আছে' : '✗ অনুপস্থিত');
+    console.warn('   GMAIL_APP_PASSWORD:', process.env.GMAIL_APP_PASSWORD ? '✓ সেট আছে' : '✗ অনুপস্থিত');
   }
 } catch (e) {
-  console.warn('⚠️ nodemailer ইনস্টল নেই:', e.message);
+  console.error('❌ nodemailer ইনস্টল নেই! Render-এ build command-এ যোগ করুন: npm install nodemailer');
+  console.error('   অথবা package.json-এ "nodemailer": "^6.9.14" যোগ করুন');
+  console.error('   বিস্তারিত:', e.message);
 }
 
 function buildOrderEmailHtml(order) {
@@ -1620,6 +1626,32 @@ app.get('/robots.txt', (req, res) => {
 Allow: /
 Sitemap: ${process.env.FRONTEND_URL || 'https://asolgramermoja.netlify.app'}/sitemap.xml
 `);
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🧪 Email diagnostics & test endpoint
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app.get('/api/test-email', async (req, res) => {
+  const status = {
+    nodemailerLoaded: !!mailTransporter,
+    GMAIL_USER: process.env.GMAIL_USER ? '✓ set' : '✗ missing',
+    GMAIL_APP_PASSWORD: process.env.GMAIL_APP_PASSWORD ? '✓ set (' + (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g,'').length + ' chars)' : '✗ missing',
+    ORDER_NOTIFY_EMAIL: process.env.ORDER_NOTIFY_EMAIL || '(using GMAIL_USER)',
+  };
+  if (!mailTransporter) {
+    return res.status(500).json({ ok: false, status, error: 'mailTransporter not initialized — check server startup logs' });
+  }
+  try {
+    const info = await mailTransporter.sendMail({
+      from: `"আসল গ্রামের মজা (টেস্ট)" <${process.env.GMAIL_USER}>`,
+      to: process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER,
+      subject: '✅ Test email — ' + new Date().toLocaleString('en-GB'),
+      html: '<h2>এটা একটা টেস্ট ইমেইল</h2><p>আপনার Gmail SMTP কনফিগারেশন সঠিকভাবে কাজ করছে।</p>',
+    });
+    res.json({ ok: true, status, messageId: info.messageId, accepted: info.accepted });
+  } catch (err) {
+    res.status(500).json({ ok: false, status, error: err.message, code: err.code, command: err.command });
+  }
 });
 
 app.use((req, res) => {
