@@ -143,6 +143,11 @@ const productSchema = new mongoose.Schema({
   metaDescription: { type: String, default: '' },
   slug: { type: String, unique: true, sparse: true },
   stockOut: { type: Boolean, default: false },
+  // ━━━ বিশেষ মূল্য / Special Price feature ━━━
+  isOnSale: { type: Boolean, default: false },
+  specialPrice: { type: Number, default: 0 },          // discounted price (per base variant)
+  specialDiscount: { type: Number, default: 0 },       // percent off (informational)
+  specialNote: { type: String, default: '' },          // optional note shown on card
   order: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
@@ -393,6 +398,19 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
+// ━━━ বিশেষ মূল্য — শুধুমাত্র সেল-এ থাকা পণ্য ━━━
+app.get('/api/products/special', async (req, res) => {
+  await connectDB();
+  try {
+    const products = await Product.find({ isOnSale: true, active: true })
+      .sort({ updatedAt: -1 })
+      .lean();
+    res.json({ products });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/products/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -467,6 +485,20 @@ app.patch('/api/products/:id/best', authMiddleware, async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
     product.best = !product.best;
+    await product.save();
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ━━━ বিশেষ মূল্য / সেল toggle ━━━
+app.patch('/api/products/:id/sale', authMiddleware, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+    product.isOnSale = !product.isOnSale;
+    product.updatedAt = new Date();
     await product.save();
     res.json(product);
   } catch (err) {

@@ -858,6 +858,117 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
 .btn-co:hover{background:var(--orl);}
 .empty-c{text-align:center;padding:36px 20px;color:#bbb;}
 .empty-c span{font-size:2.5rem;display:block;margin-bottom:8px;}
+
+/* ━━━ চট্টগ্রাম সাব-এরিয়া chips ━━━ */
+.ctg-area-chip{display:inline-block;padding:6px 12px;background:#fff;border:1.5px solid #f5a623;border-radius:20px;font-size:.78rem;font-weight:600;color:#7a4500;cursor:pointer;transition:all .15s;}
+.ctg-area-chip:hover{background:#f5a623;color:#fff;}
+.ctg-area-chip.active{background:#f5a623;color:#fff;box-shadow:0 2px 8px rgba(245,166,35,.4);}
+
+/* ━━━ Cart Redesign — "My Cart" style (image-2 reference) ━━━ */
+.cart-sb{background:#fcfbf8;}
+.cart-hd-new{background:#fff;color:#1a1a1a;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;border-bottom:1px solid #eee;}
+.cart-hd-new h2{font-size:1.15rem;font-weight:700;color:#1a1a1a;display:flex;align-items:center;gap:6px;}
+.cart-hd-new h2 .my-cart-cnt{color:#f5a623;}
+.cart-hd-new .cls-cart-new{background:transparent;border:none;font-size:1.4rem;color:#1a1a1a;cursor:pointer;padding:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;}
+.cart-hd-new .home-ic{color:#f5a623;font-size:1.2rem;}
+.cart-pin{padding:4px 16px 8px;font-size:.74rem;color:#888;background:#fff;border-bottom:1px solid #f0f0f0;}
+.cart-pin span{color:#1a1a1a;font-weight:600;}
+.cart-card{background:#fff;border-radius:12px;padding:10px 12px;margin:8px 12px;display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.cart-card-img{width:64px;height:64px;border-radius:8px;background:#fafafa;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:2rem;}
+.cart-card-img img{width:100%;height:100%;object-fit:cover;}
+.cart-card-info .cart-card-nm{font-size:.92rem;font-weight:700;color:#1a1a1a;margin-bottom:2px;}
+.cart-card-info .cart-card-pp{font-size:.74rem;color:#888;margin-bottom:6px;}
+.cart-qty-row{display:inline-flex;align-items:center;gap:8px;background:#fff7ed;border-radius:20px;padding:3px 6px;}
+.cart-qty-btn{width:24px;height:24px;border-radius:50%;background:#f5a623;color:#fff;border:none;font-size:.95rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;}
+.cart-qty-btn:hover{background:#e6951c;}
+.cart-qty-num{min-width:20px;text-align:center;font-weight:700;font-size:.88rem;color:#1a1a1a;}
+.cart-card-total{font-size:.95rem;font-weight:700;color:#1a1a1a;text-align:right;align-self:flex-start;padding-top:8px;}
+.cart-card-del{background:none;border:none;color:#aaa;font-size:.85rem;cursor:pointer;margin-top:6px;display:block;margin-left:auto;}
+.cart-card-del:hover{color:#dc2626;}
+
+.cart-promo{background:linear-gradient(135deg,#d4f0e8,#cce8e0);color:#1a5f4a;font-size:.74rem;font-weight:600;text-align:center;padding:8px 14px;margin:8px 12px 0;border-radius:8px;}
+
+.cart-summary-new{background:#fff;padding:14px 18px 10px;margin-top:8px;border-top:1px solid #f0f0f0;}
+.cart-sum-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.86rem;color:#555;}
+.cart-sum-row.total{font-size:1.05rem;font-weight:800;color:#1a1a1a;border-top:1px dashed #ddd;padding-top:8px;margin-top:4px;}
+.cart-checkout-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px 14px;background:#fff;}
+.cart-checkout-bar .total-l{font-size:1.05rem;font-weight:800;color:#1a1a1a;}
+.cart-checkout-btn{background:linear-gradient(90deg,#ff9020,#f5a623);color:#fff;border:none;border-radius:24px;padding:10px 28px;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;letter-spacing:.5px;box-shadow:0 4px 12px rgba(245,166,35,.4);}
+.cart-checkout-btn:hover{filter:brightness(1.05);}
+
+/* ━━━ Special Price Page ━━━ */
+.special-page{max-width:var(--mw);margin:0 auto;padding:24px 16px 60px;}
+.special-hero{background:linear-gradient(135deg,#fff7ed,#ffe8d6);border-radius:14px;padding:28px 22px;text-align:center;margin-bottom:22px;border:2px dashed #f5a623;}
+.special-hero h1{font-size:1.7rem;font-weight:800;color:#7a4500;margin-bottom:6px;}
+.special-hero p{font-size:.92rem;color:#a0613b;}
+.special-hero .sp-ic{font-size:2.2rem;margin-bottom:6px;}
+.special-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+.special-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;cursor:pointer;transition:transform .2s,box-shadow .2s;}
+.special-card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,.1);}
+.special-card .sp-disc-badge{position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:.78rem;font-weight:800;padding:5px 10px;border-radius:6px;z-index:2;box-shadow:0 2px 6px rgba(220,38,38,.4);}
+.special-card .sp-img-wrap{height:160px;background:#fafafa;display:flex;align-items:center;justify-content:center;font-size:3rem;overflow:hidden;}
+.special-card .sp-img-wrap img{width:100%;height:100%;object-fit:cover;}
+.special-card .sp-info{padding:12px 14px 14px;}
+.special-card .sp-cat{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
+.special-card .sp-nm{font-size:.95rem;font-weight:700;color:#1a1a1a;margin-bottom:6px;line-height:1.35;height:2.6em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.special-card .sp-prices{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;}
+.special-card .sp-new-price{font-size:1.15rem;font-weight:800;color:#dc2626;}
+.special-card .sp-old-price{font-size:.85rem;color:#aaa;text-decoration:line-through;}
+.special-card .sp-note{font-size:.72rem;color:#7a4500;background:#fff7ed;padding:3px 8px;border-radius:4px;display:inline-block;margin-top:4px;}
+.special-card .sp-add-btn{width:100%;background:#f5a623;color:#fff;border:none;padding:8px;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;margin-top:8px;border-radius:6px;}
+.special-card .sp-add-btn:hover{background:#e6951c;}
+.special-empty{text-align:center;padding:60px 20px;color:#aaa;}
+.special-empty .sp-em-ic{font-size:3rem;display:block;margin-bottom:10px;}
+
+/* ━━━ About Page Redesign (image-3 reference) ━━━ */
+.aboutv2-wrap{max-width:var(--mw);margin:0 auto;padding:0 16px 60px;}
+.aboutv2-hero{text-align:center;padding:40px 20px 30px;background:linear-gradient(180deg,#f0f7e8,transparent);}
+.aboutv2-hero h1{font-size:2.4rem;font-weight:800;color:#1a3c2a;margin-bottom:10px;letter-spacing:-.5px;}
+.aboutv2-hero p{max-width:600px;margin:0 auto;font-size:.92rem;color:#666;line-height:1.7;}
+.aboutv2-banner-strip{height:140px;background:url('https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1400&auto=format&fit=crop&q=80') center/cover;margin-bottom:50px;border-radius:0;position:relative;}
+.aboutv2-banner-strip::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.3),transparent);}
+.aboutv2-section{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;margin-bottom:60px;position:relative;}
+.aboutv2-section.reverse{direction:rtl;}
+.aboutv2-section.reverse > *{direction:ltr;}
+.aboutv2-img{width:100%;height:340px;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.12);position:relative;}
+.aboutv2-img img{width:100%;height:100%;object-fit:cover;}
+.aboutv2-img::before{content:'';position:absolute;width:80px;height:80px;background:#f5a623;border-radius:50%;opacity:.85;top:-20px;right:-20px;z-index:1;}
+.aboutv2-section.reverse .aboutv2-img::before{left:-20px;right:auto;}
+.aboutv2-text h2{font-size:2rem;font-weight:800;color:#1a3c2a;margin-bottom:14px;line-height:1.2;}
+.aboutv2-text p{font-size:.92rem;color:#666;line-height:1.75;margin-bottom:14px;}
+.aboutv2-hours{margin-top:18px;}
+.aboutv2-hours h4{font-size:.92rem;font-weight:700;color:#1a3c2a;margin-bottom:8px;}
+.aboutv2-hour-row{display:flex;justify-content:space-between;font-size:.84rem;color:#666;padding:4px 0;max-width:280px;}
+.aboutv2-hour-row span:last-child{color:#f5a623;font-weight:600;}
+.aboutv2-socials{display:flex;gap:8px;margin-top:14px;}
+.aboutv2-socials a{width:34px;height:34px;border-radius:50%;background:#f0ede6;color:#666;display:flex;align-items:center;justify-content:center;font-size:.85rem;text-decoration:none;transition:all .2s;}
+.aboutv2-socials a:hover{background:#f5a623;color:#fff;}
+.aboutv2-cta{display:inline-block;background:#f5a623;color:#fff;padding:9px 22px;border-radius:5px;text-decoration:none;font-weight:600;font-size:.85rem;margin-top:14px;transition:background .2s;border:none;cursor:pointer;font-family:inherit;}
+.aboutv2-cta:hover{background:#e6951c;}
+
+.aboutv2-benefits{margin-top:30px;text-align:center;}
+.aboutv2-benefits h2{font-size:2rem;font-weight:800;color:#1a3c2a;margin-bottom:10px;}
+.aboutv2-benefits > p{max-width:520px;margin:0 auto 30px;font-size:.88rem;color:#666;}
+.aboutv2-benefits-grid{display:grid;grid-template-columns:1fr 200px 1fr;gap:24px;align-items:center;}
+.aboutv2-bcol{display:flex;flex-direction:column;gap:14px;}
+.aboutv2-bcol.right{text-align:right;}
+.aboutv2-bcard{background:#fff7ed;border-radius:8px;padding:14px 18px;text-align:left;}
+.aboutv2-bcard h4{font-size:.95rem;font-weight:700;color:#1a3c2a;margin-bottom:4px;}
+.aboutv2-bcard p{font-size:.78rem;color:#888;margin:0;}
+.aboutv2-benefits-img{width:200px;height:200px;border-radius:50%;overflow:hidden;background:#fff7ed;display:flex;align-items:center;justify-content:center;font-size:5rem;}
+.aboutv2-benefits-img img{width:100%;height:100%;object-fit:cover;}
+
+@media (max-width:768px){
+  .aboutv2-section{grid-template-columns:1fr;gap:24px;direction:ltr;}
+  .aboutv2-img{height:240px;}
+  .aboutv2-hero h1{font-size:1.7rem;}
+  .aboutv2-text h2{font-size:1.45rem;}
+  .aboutv2-benefits h2{font-size:1.45rem;}
+  .aboutv2-benefits-grid{grid-template-columns:1fr;}
+  .aboutv2-bcol.right{text-align:left;}
+  .aboutv2-benefits-img{width:160px;height:160px;margin:0 auto;font-size:3.5rem;}
+}
+
 /* ===== PRODUCT DETAIL PAGE (PDP) — NEW DESIGN ===== */
 #page-product{background:#f5f5f5;min-height:60vh;}
 .pdp-wrap{max-width:var(--mw);margin:0 auto;padding:20px 16px 40px;}
@@ -1378,7 +1489,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     <!-- Desktop Nav Links -->
     <ul class="nav-links">
       <li><a onclick="goHome()" id="navHome" class="active"><i class="fa-solid fa-house"></i> হোম</a></li>
-      <li><a onclick="goProductsPage()" id="navProducts"><i class="fa-solid fa-tag"></i> বিশেষ মূল্য</a></li>
+      <li><a onclick="goSpecialPage()" id="navSpecial"><i class="fa-solid fa-tag"></i> বিশেষ মূল্য</a></li>
       <li class="nav-cat-dropdown-wrap" style="position:relative;">
         <a style="cursor:pointer;" id="navCatLink"><i class="fa-solid fa-th-large"></i> ক্যাটাগরি <i class="fa-solid fa-chevron-down" style="font-size:.6rem;"></i></a>
         <div class="nav-cat-dropdown" id="navCatDropdown"></div>
@@ -1618,6 +1729,16 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     <div id="productsPagination" class="prod-pagination"></div>
   </div>
 </div>
+<div class="page" id="page-special">
+  <div class="special-page">
+    <div class="special-hero">
+      <div class="sp-ic">🏷️</div>
+      <h1>বিশেষ মূল্য</h1>
+      <p>সীমিত সময়ের জন্য বিশেষ ছাড়ে পাচ্ছেন এই পণ্যগুলো। দ্রুত অর্ডার করুন!</p>
+    </div>
+    <div id="specialGrid" class="special-grid"></div>
+  </div>
+</div>
 <div class="page" id="page-about">
   <div class="about-page" id="aboutContent"></div>
 </div>
@@ -1727,7 +1848,12 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
 </nav>
 <div class="cart-ov" id="cartOv" onclick="toggleCart()"></div>
 <div class="cart-sb" id="cartSb">
-  <div class="cart-hd"><h2>🛒 আপনার কার্ট</h2><button class="cls-cart" onclick="toggleCart()">✕</button></div>
+  <div class="cart-hd-new">
+    <button class="cls-cart-new" onclick="toggleCart()" aria-label="বন্ধ"><i class="fa-solid fa-xmark"></i></button>
+    <h2><span class="my-cart-cnt-lbl">My Cart</span> <span class="my-cart-cnt">(<span id="myCartCount">0</span>)</span></h2>
+    <button class="cls-cart-new home-ic" onclick="goHome();toggleCart();" aria-label="হোম"><i class="fa-solid fa-house"></i></button>
+  </div>
+  <div class="cart-pin">Pincode: <span id="cartPincode">380015</span> <i class="fa-solid fa-chevron-down" style="font-size:.6rem;color:#aaa"></i></div>
   <div class="cart-its" id="cartIts"></div>
   <div class="cart-related-section" id="cartRelSection" style="display:none">
     <div class="cart-rel-hd">
@@ -1739,9 +1865,17 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     </div>
     <div class="cart-rel-track"><div class="cart-rel-row" id="cartRelRow"></div></div>
   </div>
-  <div class="cart-ft" id="cartFt" style="display:none">
-    <div class="cart-tot"><span>মোট:</span><span id="cartTotal">৳0</span></div>
-    <button class="btn-co" onclick="openOrderModal()">অর্ডার করুন</button>
+  <div class="cart-ft" id="cartFt" style="display:none;padding:0;border:none;background:#fcfbf8;">
+    <div class="cart-promo" id="cartPromo">🎁 EXTRA 5% OFF*-এর জন্য অগ্রিম ডেলিভারি চার্জ পরিশোধ করুন। T&amp;C প্রযোজ্য।</div>
+    <div class="cart-summary-new">
+      <div class="cart-sum-row"><span>Sub Total</span><span id="cartSubTotal">৳0</span></div>
+      <div class="cart-sum-row"><span>Tax 5%</span><span id="cartTax">৳0</span></div>
+      <div class="cart-sum-row"><span>Service</span><span id="cartService">৳42</span></div>
+    </div>
+    <div class="cart-checkout-bar">
+      <div><div style="font-size:.7rem;color:#888;line-height:1">Total</div><div class="total-l" id="cartTotal">৳0</div></div>
+      <button class="cart-checkout-btn" onclick="openOrderModal()">CHECKOUT</button>
+    </div>
   </div>
 </div>
 <div class="order-ov" id="orderOv">
@@ -1766,12 +1900,16 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
         <div class="om-field"><label>মোবাইল নম্বর <span>*</span></label><input type="tel" id="omPhone" placeholder="১১ ডিজিটের মোবাইল নম্বর" maxlength="14"></div>
         <div class="om-field"><label>ঠিকানা <span>*</span></label><textarea id="omAddress" placeholder="আপনার সম্পূর্ণ ঠিকানা লিখুন"></textarea></div>
         <div class="om-field"><label>অর্ডার নোট</label><input type="text" id="omNote" placeholder="বিশেষ কিছু জানাতে চাইলে লিখুন (ঐচ্ছিক)"></div>
-        <div class="om-sec-label" style="margin-top:4px;"><i class="fa-solid fa-truck" style="color:var(--gd)"></i> ডেলিভারি পদ্ধতি <span style="color:#e00;font-size:.75rem;font-weight:400;margin-left:4px;">* বাধ্যতামূলক</span></div>
+        <div class="om-sec-label" style="margin-top:4px;"><i class="fa-solid fa-truck" style="color:var(--gd)"></i> ডেলিভারি পদ্ধতি <span style="color:#e00;font-size:.75rem;font-weight:400;margin-left:4px;">*</span></div>
         <div class="om-delivery-opts" id="deliveryOpts">
-          <div class="om-del-opt" id="delOpt1" onclick="selectDelivery(deliveryCharges.inside,'delOpt1','চট্টগ্রামেরভিতরে')">
+          <div class="om-del-opt" id="delOpt1" onclick="selectInsideDelivery()">
             <div class="om-del-radio"></div>
-            <div class="om-del-info"><div class="om-del-name">🏙️ চট্টগ্রামের ভিতরে</div><div class="om-del-desc">চট্টগ্রাম সিটি কর্পোরেশন এলাকার মধ্যে</div></div>
-            <div class="om-del-price" id="delCharge1">৳80</div>
+            <div class="om-del-info"><div class="om-del-name">🏙️ চট্টগ্রামের ভিতরে</div><div class="om-del-desc">নির্দিষ্ট এরিয়া বেছে নিন</div></div>
+            <div class="om-del-price" id="delCharge1">—</div>
+          </div>
+          <div id="ctgSubAreaWrap" style="display:none;background:#fff8ee;border:1px dashed #f5a623;border-radius:8px;padding:10px 12px;margin:-2px 0 4px;">
+            <div style="font-size:.78rem;font-weight:700;color:#7a4500;margin-bottom:6px;">📍 আপনার এরিয়া বেছে নিন:</div>
+            <div id="ctgSubAreaList" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
           </div>
           <div class="om-del-opt" id="delOpt2" onclick="selectDelivery(deliveryCharges.outside,'delOpt2','চট্টগ্রামের বাহিরে')">
             <div class="om-del-radio"></div>
@@ -2040,7 +2178,7 @@ function closeMobSearchOutside(e) {
 function setActiveNav(page) {
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
   document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
-  const map = { home: ['navHome','bnavHome'], products: ['navProducts','bnavProducts'], about: ['navAbout','bnavAbout'], contact: ['navContact','bnavContact'] };
+  const map = { home: ['navHome','bnavHome'], products: ['navProducts','bnavProducts'], special: ['navSpecial'], about: ['navAbout','bnavAbout'], contact: ['navContact','bnavContact'] };
   if (map[page]) {
     map[page].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('active'); });
   }
@@ -2066,6 +2204,52 @@ function goProductsPage(cat = '') {
   }
   window.scrollTo(0, 0);
   loadProductsPage(1);
+}
+function goSpecialPage() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-special').classList.add('active');
+  setActiveNav('special');
+  window.history.pushState({}, '', '#/special');
+  window.scrollTo(0, 0);
+  loadSpecialContent();
+}
+async function loadSpecialContent() {
+  const grid = document.getElementById('specialGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:#f5a623"></i></div>';
+  try {
+    const data = await api('/api/products/special');
+    const list = data.products || [];
+    if (!list.length) {
+      grid.innerHTML = '<div class="special-empty" style="grid-column:1/-1;"><span class="sp-em-ic">🛒</span><p>এই মুহূর্তে কোনো বিশেষ মূল্যের পণ্য নেই।</p><p style="font-size:.85rem;margin-top:6px;">শীঘ্রই নতুন অফার আসছে — চোখ রাখুন!</p></div>';
+      return;
+    }
+    grid.innerHTML = list.map(p => {
+      const v = (p.variants && p.variants[0]) || {};
+      const oldPrice = p.specialPrice ? (v.p || v.op || 0) : (v.op || 0);
+      const newPrice = p.specialPrice || v.p || 0;
+      const disc = p.specialDiscount || (oldPrice && newPrice && oldPrice > newPrice ? Math.round((1 - newPrice / oldPrice) * 100) : 0);
+      const stockOut = p.stockOut || (typeof isStockOut === 'function' && isStockOut(p));
+      return `
+        <div class="special-card" onclick="goProduct('${p._id}')">
+          ${disc ? `<div class="sp-disc-badge">-${disc}%</div>` : ''}
+          <div class="sp-img-wrap" style="background:${p.bg||'#fafafa'}22;">
+            ${p.img ? `<img src="${p.img}" alt="${p.nm}" onerror="this.style.display='none';this.parentElement.textContent='${p.em||'📦'}'">` : (p.em || '📦')}
+          </div>
+          <div class="sp-info">
+            <div class="sp-cat">${p.cat || ''}</div>
+            <div class="sp-nm">${p.nm}</div>
+            <div class="sp-prices">
+              <span class="sp-new-price">৳${newPrice.toLocaleString('en')}</span>
+              ${oldPrice && oldPrice > newPrice ? `<span class="sp-old-price">৳${oldPrice.toLocaleString('en')}</span>` : ''}
+            </div>
+            ${p.specialNote ? `<div class="sp-note">${p.specialNote}</div>` : ''}
+            <button class="sp-add-btn" onclick="event.stopPropagation();${stockOut?'showToast(\'❌ স্টক আউট\')':`addToCartBase('${p._id}')`}">${stockOut?'স্টক নেই':'<i class=\'fa-solid fa-cart-plus\'></i> কার্টে যোগ'}</button>
+          </div>
+        </div>`;
+    }).join('');
+  } catch (err) {
+    grid.innerHTML = '<div class="special-empty" style="grid-column:1/-1;"><span class="sp-em-ic">⚠️</span><p>লোড করা যায়নি, পরে আবার চেষ্টা করুন।</p></div>';
+  }
 }
 function goAboutPage() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -2127,6 +2311,8 @@ window.addEventListener('popstate', e => {
     goProductsPage(cat);
   } else if (h === '#/products') {
     goProductsPage('');
+  } else if (h === '#/special') {
+    goSpecialPage();
   } else if (h === '#/about') {
     goAboutPage();
   } else if (h === '#/contact') {
@@ -2169,6 +2355,8 @@ window.addEventListener('DOMContentLoaded', () => {
     loadAllData().then(() => goProductsPage(cat));
   } else if (h === '#/products') {
     loadAllData().then(() => goProductsPage(''));
+  } else if (h === '#/special') {
+    loadAllData().then(() => goSpecialPage());
   } else if (h === '#/about') {
     loadAllData().then(() => goAboutPage());
   } else if (h === '#/contact') {
@@ -2704,24 +2892,27 @@ function updateCart() {
   if (!items.length) {
     iel.innerHTML = '<div class="empty-c"><span>🛒</span>আপনার কার্ট খালি</div>';
     fel.style.display = 'none'; relSec.style.display = 'none';
+    const cntEl = document.getElementById('myCartCount'); if (cntEl) cntEl.textContent = '0';
     stopRelScroll();
     return;
   }
-  iel.innerHTML = `<div class="cart-items-list">` + items.map(i => `
-    <div class="cart-it">
-      <div class="ci-ic">${i.img ? `<img src="${i.img}" alt="${i.nm}" onerror="this.style.display='none';this.parentElement.textContent='${i.em||'📦'}'">` : (i.em || '📦')}</div>
-      <div class="ci-info">
-        <h4>${i.nm}</h4>
-        <p>৳${i.cartPrice.toLocaleString('en')} · ${i.varLabel}</p>
-        <div class="qty-ctrl">
-          <button class="qbtn del" onclick="deleteFromCart('${i.cartKey}')"><i class="fa-solid fa-trash-can" style="font-size:.7rem"></i></button>
-          <button class="qbtn" onclick="changeQty('${i.cartKey}',-1)">−</button>
-          <span style="min-width:18px;text-align:center;font-weight:700;font-size:.88rem">${i.qty}</span>
-          <button class="qbtn" onclick="changeQty('${i.cartKey}',1)">+</button>
+  iel.innerHTML = items.map(i => `
+    <div class="cart-card">
+      <div class="cart-card-img">${i.img ? `<img src="${i.img}" alt="${i.nm}" onerror="this.style.display='none';this.parentElement.textContent='${i.em||'📦'}'">` : (i.em || '📦')}</div>
+      <div class="cart-card-info">
+        <div class="cart-card-nm">${i.nm}</div>
+        <div class="cart-card-pp">৳${i.cartPrice.toLocaleString('en')} / ${i.varLabel||''}</div>
+        <div class="cart-qty-row">
+          <button class="cart-qty-btn" onclick="changeQty('${i.cartKey}',-1)">−</button>
+          <span class="cart-qty-num">${i.qty}</span>
+          <button class="cart-qty-btn" onclick="changeQty('${i.cartKey}',1)">+</button>
         </div>
       </div>
-      <div class="ci-price">৳${(i.cartPrice * i.qty).toLocaleString('en')}</div>
-    </div>`).join('') + `</div>`;
+      <div>
+        <div class="cart-card-total">৳${(i.cartPrice * i.qty).toLocaleString('en')}</div>
+        <button class="cart-card-del" onclick="deleteFromCart('${i.cartKey}')" title="মুছুন"><i class="fa-solid fa-trash-can"></i></button>
+      </div>
+    </div>`).join('');
   const cartPids = new Set(items.map(i => i._id || i.id));
   const cartCats = [...new Set(items.map(i => i.cat))];
   relItems = prods.filter(p => cartCats.includes(p.cat) && !cartPids.has(p._id || p.id) && p.active !== false);
@@ -2732,7 +2923,15 @@ function updateCart() {
     relSec.style.display = 'none';
     stopRelScroll();
   }
-  document.getElementById('cartTotal').textContent = '৳' + items.reduce((s, i) => s + i.cartPrice * i.qty, 0).toLocaleString('en');
+  const subTotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
+  const tax = Math.round(subTotal * 0.05);
+  const service = items.length ? 42 : 0;
+  const grand = subTotal + tax + service;
+  const subEl = document.getElementById('cartSubTotal'); if (subEl) subEl.textContent = '৳' + subTotal.toLocaleString('en');
+  const taxEl = document.getElementById('cartTax'); if (taxEl) taxEl.textContent = '৳' + tax.toLocaleString('en');
+  const svcEl = document.getElementById('cartService'); if (svcEl) svcEl.textContent = '৳' + service.toLocaleString('en');
+  const totEl = document.getElementById('cartTotal'); if (totEl) totEl.textContent = '৳' + grand.toLocaleString('en');
+  const cntEl = document.getElementById('myCartCount'); if (cntEl) cntEl.textContent = tot;
   fel.style.display = 'block';
 }
 let relScrollX = 0, relScrollRAF = null;
@@ -2835,8 +3034,12 @@ function openOrderModal() {
   document.getElementById('omGrandTotal').textContent = '৳' + subtotal.toLocaleString('en');
   document.getElementById('omGrand2').textContent = '৳' + subtotal.toLocaleString('en');
   document.getElementById('omSubmitTotal').textContent = '৳' + subtotal.toLocaleString('en');
-  document.getElementById('delCharge1').textContent = '৳' + deliveryCharges.inside;
+  // Inside charge depends on sub-area — show placeholder
+  document.getElementById('delCharge1').textContent = '—';
   document.getElementById('delCharge2').textContent = '৳' + deliveryCharges.outside;
+  // Also reset sub-area UI on every open
+  const subWrap = document.getElementById('ctgSubAreaWrap'); if (subWrap) subWrap.style.display = 'none';
+  document.querySelectorAll('.ctg-area-chip').forEach(c => c.classList.remove('active'));
   const advItems = items.filter(i => {
     const cat = (i.cat || '').trim();
     return ADVANCE_DELIVERY_CATS.some(ac => cat.includes(ac) || ac.includes(cat));
@@ -2873,8 +3076,80 @@ function openOrderModal() {
 function closeOrderModal() {
   document.getElementById('orderOv').classList.remove('open');
   document.body.style.overflow = '';
+  // Full reset so the next order works without page refresh
+  setTimeout(() => {
+    selectedDelivery = null;
+    selectedDeliveryType = '';
+    requiresAdvanceDelivery = false;
+    document.getElementById('omMainContent').style.display = 'block';
+    document.getElementById('omSuccess').classList.remove('show');
+    const btn = document.getElementById('omSubmitBtn');
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> অর্ডার কনফার্ম করুন <span id="omSubmitTotal"></span>';
+    }
+    document.querySelectorAll('.om-del-opt').forEach(o => o.classList.remove('selected'));
+    document.querySelectorAll('.ctg-area-chip').forEach(c => c.classList.remove('active'));
+    const sub = document.getElementById('ctgSubAreaWrap');
+    if (sub) sub.style.display = 'none';
+  }, 320);
+}
+function selectInsideDelivery() {
+  // Open the sub-area selector instead of immediately picking a charge
+  document.querySelectorAll('.om-del-opt').forEach(o => o.classList.remove('selected'));
+  document.getElementById('delOpt1').classList.add('selected');
+  const wrap = document.getElementById('ctgSubAreaWrap');
+  if (wrap) {
+    wrap.style.display = 'block';
+    renderCtgSubAreas();
+    wrap.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+  // Until user picks a sub-area we do NOT set selectedDelivery
+  selectedDelivery = null;
+  selectedDeliveryType = '';
+  document.getElementById('delCharge1').textContent = '—';
+  document.getElementById('omDeliveryDisplay').textContent = '— এরিয়া বেছে নিন';
+  document.getElementById('omDelivery2').textContent = '—';
+  const subtotal = Object.values(cart).reduce((s, i) => s + i.cartPrice * i.qty, 0);
+  document.getElementById('omGrandTotal').textContent = '৳' + subtotal.toLocaleString('en');
+  document.getElementById('omGrand2').textContent = '৳' + subtotal.toLocaleString('en');
+  document.getElementById('omSubmitTotal').textContent = '৳' + subtotal.toLocaleString('en');
+}
+function renderCtgSubAreas() {
+  const list = document.getElementById('ctgSubAreaList');
+  if (!list) return;
+  const subAreas = (settings.ctgSubAreas && settings.ctgSubAreas.length)
+    ? settings.ctgSubAreas
+    : ['নিমতলা', 'পোর্ট কলোনি', 'ইস্ট কলোনি'];
+  const subCharge = settings.ctgSubAreaCharge || 30;
+  const othersCharge = settings.ctgOthersCharge || 80;
+  list.innerHTML =
+    subAreas.map(a => `<button type="button" class="ctg-area-chip" onclick="pickCtgArea('${a.replace(/'/g,"\\'")}',${subCharge},this)">${a} <span style="opacity:.75">৳${subCharge}</span></button>`).join('') +
+    `<button type="button" class="ctg-area-chip" onclick="pickCtgArea('আদারস (অন্যান্য)',${othersCharge},this)">আদারস <span style="opacity:.75">৳${othersCharge}</span></button>`;
+}
+function pickCtgArea(areaName, charge, btn) {
+  document.querySelectorAll('.ctg-area-chip').forEach(c => c.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  selectedDelivery = charge;
+  selectedDeliveryType = 'চট্টগ্রামের ভিতরে — ' + areaName;
+  document.getElementById('delCharge1').textContent = '৳' + charge;
+  const subtotal = Object.values(cart).reduce((s, i) => s + i.cartPrice * i.qty, 0);
+  const grand = subtotal + charge;
+  document.getElementById('omDeliveryDisplay').textContent = '৳' + charge + ' (' + areaName + ')';
+  document.getElementById('omDelivery2').textContent = '৳' + charge;
+  document.getElementById('omGrandTotal').textContent = '৳' + grand.toLocaleString('en');
+  document.getElementById('omGrand2').textContent = '৳' + grand.toLocaleString('en');
+  document.getElementById('omSubmitTotal').textContent = '৳' + grand.toLocaleString('en');
+  const advAmt = document.getElementById('omAdvanceAmtText');
+  if (advAmt && requiresAdvanceDelivery) {
+    advAmt.innerHTML = `📌 অগ্রিম পাঠাতে হবে: <strong>৳${charge.toLocaleString('en')}</strong> (ডেলিভারি চার্জ মাত্র)`;
+  }
 }
 function selectDelivery(charge, optId, type) {
+  // Outside selection — hide sub-area UI
+  const wrap = document.getElementById('ctgSubAreaWrap');
+  if (wrap) wrap.style.display = 'none';
+  document.querySelectorAll('.ctg-area-chip').forEach(c => c.classList.remove('active'));
   selectedDelivery = charge;
   selectedDeliveryType = type;
   document.querySelectorAll('.om-del-opt').forEach(o => o.classList.remove('selected'));
@@ -3011,67 +3286,74 @@ async function loadAboutPageContent() {
   const container = document.getElementById('aboutContent');
   container.innerHTML = '<div style="text-align:center;padding:40px"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--gd)"></i></div>';
   try {
-    const data = await api('/api/pages/about');
+    const data = await api('/api/pages/about').catch(() => ({}));
     const about = data || {};
-    const stats = about.stats || [];
-
-    // Banner section — same pattern as contact hero
-    const heroBg = about.bannerUrl
-      ? `<img src="${about.bannerUrl}" alt="About Banner" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">`
-      : `<img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1400&auto=format&fit=crop&q=80" alt="About Banner" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.minHeight='180px'">`;
-
-    const bannerHtml = `
-      <div class="about-banner">
-        ${heroBg}
-        <div class="about-banner-overlay"></div>
-        <div class="about-banner-title">${about.title || 'আমাদের সম্পর্কে'}</div>
-      </div>`;
-
-    // Stats bar
-    const defaultStats = [
-      { value: '১০০+', label: 'সন্তুষ্ট গ্রাহক' },
-      { value: '৫০+', label: 'দেশীয় পণ্য' },
-      { value: '৫ বছর', label: 'অভিজ্ঞতা' },
-      { value: '১০০%', label: 'খাঁটি পণ্য' },
+    const bannerImg = about.bannerUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1400&auto=format&fit=crop&q=80';
+    const storeImg1 = about.storeImage1 || 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=900&auto=format&fit=crop&q=80';
+    const storeImg2 = about.storeImage2 || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=900&auto=format&fit=crop&q=80';
+    const benefitImg = about.benefitImage || 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=80';
+    const title = about.title || 'আমাদের সম্পর্কে';
+    const subtitle = about.subtitle || 'আসল গ্রামের মজা — বিশুদ্ধ গ্রামীণ পণ্য সরাসরি কৃষক থেকে আপনার দরজায়। প্রতিটি পরিবারের সত্যিকারের খাঁটি খাবার পাওয়ার অধিকার রয়েছে।';
+    const story1Title = about.story1Title || 'গ্রামের আসল মজা';
+    const story1 = about.mission || 'বাংলাদেশের প্রতিটি ঘরে বিশুদ্ধ ও খাঁটি গ্রামীণ পণ্য পৌঁছে দেওয়াই আমাদের লক্ষ্য। ভেজালমুক্ত খাদ্য নিশ্চিত করে সুস্থ ও সুখী জীবনযাপনে সহায়তা করি।';
+    const story2Title = about.story2Title || 'খাঁটি পণ্য প্রতিদিন';
+    const story2 = about.vision || 'সরাসরি কৃষক থেকে সংগ্রহ করা পণ্য। কোনো ভেজাল নেই, কোনো রাসায়নিক নেই। বিশ্বস্ত উৎসের গ্যারান্টি — আপনি পাবেন আসল গ্রামের স্বাদ।';
+    const benefits = about.benefits && about.benefits.length ? about.benefits : [
+      { title: 'বিশাল বৈচিত্র্য', desc: '৫০+ দেশীয় পণ্য একই জায়গায়' },
+      { title: 'দীর্ঘ মেয়াদে টাটকা', desc: 'প্যাকেজিং ও সংরক্ষণে সর্বোচ্চ যত্ন' },
+      { title: 'অসাধারণ স্বাদ', desc: 'সরাসরি গ্রাম থেকে আপনার দরজায়' },
+      { title: 'ফলিক অ্যাসিড সমৃদ্ধ', desc: 'স্বাস্থ্যের জন্য পুষ্টিকর' },
+      { title: 'প্রিবায়োটিক উপাদান', desc: 'হজমে সহায়ক, পেটের জন্য ভালো' },
+      { title: 'সাশ্রয়ী মূল্য', desc: 'ন্যায্য দামে খাঁটি পণ্য নিশ্চিত' },
     ];
-    const statsData = stats.length ? stats : defaultStats;
-    const statsHtml = `<div class="about-stats">${statsData.map(s => `
-      <div class="about-stat-item">
-        <span class="about-stat-value">${s.value}</span>
-        <div class="about-stat-label">${s.label}</div>
-      </div>`).join('')}</div>`;
-
-    // Values / Why Us cards
-    const valuesHtml = `
-      <div class="about-values">
-        <div class="about-value-card">
-          <div class="about-value-ico">🌿</div>
-          <h4>বিশুদ্ধতার নিশ্চয়তা</h4>
-          <p>সরাসরি কৃষক থেকে সংগ্রহ। কোনো ভেজাল নেই, কোনো রাসায়নিক নেই।</p>
-        </div>
-        <div class="about-value-card">
-          <div class="about-value-ico">🚚</div>
-          <h4>দ্রুত ডেলিভারি</h4>
-          <p>সারাদেশে হোম ডেলিভারি। ঘরে বসেই পান আসল গ্রামের স্বাদ।</p>
-        </div>
-        <div class="about-value-card">
-          <div class="about-value-ico">💚</div>
-          <h4>কৃষক বান্ধব</h4>
-          <p>স্থানীয় কৃষকদের সাথে সরাসরি কাজ করি। ন্যায্য মূল্য নিশ্চিত করি।</p>
-        </div>
-      </div>`;
-
     container.innerHTML = `
-      ${bannerHtml}
-      <div class="about-body">
-        ${about.tagline ? `<div class="about-title" style="font-size:1.6rem">${about.title || 'আমাদের পরিচয়'}</div><div class="about-tagline">${about.tagline}</div>` : `<div class="about-title">আমাদের পরিচয়</div><div class="about-tagline">আসল গ্রামের মজা — বিশুদ্ধ গ্রামীণ পণ্য সরাসরি কৃষক থেকে আপনার দরজায়। আমরা বিশ্বাস করি প্রতিটি পরিবার সত্যিকারের খাঁটি খাবার পাওয়ার অধিকার রাখে।</div>`}
-        <div class="about-mv">
-          ${about.mission ? `<div class="about-mv-card"><h3><i class="fa-solid fa-bullseye"></i> আমাদের লক্ষ্য</h3><p>${about.mission}</p></div>` : `<div class="about-mv-card"><h3><i class="fa-solid fa-bullseye"></i> আমাদের লক্ষ্য</h3><p>বাংলাদেশের প্রতিটি ঘরে বিশুদ্ধ ও খাঁটি গ্রামীণ পণ্য পৌঁছে দেওয়া। ভেজালমুক্ত খাদ্য নিশ্চিত করে সুস্থ ও সুখী জীবনযাপনে সহায়তা করা।</p></div>`}
-          ${about.vision ? `<div class="about-mv-card"><h3><i class="fa-solid fa-eye"></i> আমাদের স্বপ্ন</h3><p>${about.vision}</p></div>` : `<div class="about-mv-card"><h3><i class="fa-solid fa-eye"></i> আমাদের স্বপ্ন</h3><p>দেশের সকল কৃষক ও ভোক্তার মধ্যে সেতুবন্ধন তৈরি করা। একটি এমন প্ল্যাটফর্ম গড়া যেখানে মানের সাথে কোনো আপোস নেই।</p></div>`}
+      <div class="aboutv2-wrap">
+        <div class="aboutv2-hero">
+          <h1>${title}</h1>
+          <p>${subtitle}</p>
         </div>
-        ${statsHtml}
-        ${valuesHtml}
-        ${about.content ? `<div class="about-content">${about.content}</div>` : ''}
+        <div class="aboutv2-banner-strip" style="background-image:url('${bannerImg}')"></div>
+
+        <div class="aboutv2-section">
+          <div class="aboutv2-img"><img src="${storeImg1}" alt="${story1Title}" onerror="this.style.display='none'"></div>
+          <div class="aboutv2-text">
+            <h2>${story1Title}</h2>
+            <p>${story1}</p>
+            <div class="aboutv2-hours">
+              <h4>খোলার সময়:</h4>
+              <div class="aboutv2-hour-row"><span>সোমবার - শুক্রবার</span><span>${about.hoursWeek || '09:00 - 19:00'}</span></div>
+              <div class="aboutv2-hour-row"><span>শনিবার - রবিবার</span><span>${about.hoursWeekend || '10:00 - 18:00'}</span></div>
+            </div>
+            <div class="aboutv2-socials">
+              <a href="${about.fbUrl || '#'}" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+              <a href="${about.igUrl || '#'}" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+              <a href="mailto:${about.email || 'info@gramerasolmoja.shop'}" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="aboutv2-section reverse">
+          <div class="aboutv2-img"><img src="${storeImg2}" alt="${story2Title}" onerror="this.style.display='none'"></div>
+          <div class="aboutv2-text">
+            <h2>${story2Title}</h2>
+            <p>${story2}</p>
+            <button class="aboutv2-cta" onclick="goProductsPage()">পণ্য দেখুন</button>
+          </div>
+        </div>
+
+        <div class="aboutv2-benefits">
+          <h2>আমাদের পণ্যের বৈশিষ্ট্য</h2>
+          <p>কেন গ্রাহকরা আমাদেরকে বেছে নেন — কিছু বিশেষ কারণ।</p>
+          <div class="aboutv2-benefits-grid">
+            <div class="aboutv2-bcol">
+              ${benefits.slice(0,3).map(b => `<div class="aboutv2-bcard"><h4>${b.title}</h4><p>${b.desc}</p></div>`).join('')}
+            </div>
+            <div class="aboutv2-benefits-img"><img src="${benefitImg}" alt="benefits" onerror="this.parentElement.textContent='🌿'"></div>
+            <div class="aboutv2-bcol right">
+              ${benefits.slice(3,6).map(b => `<div class="aboutv2-bcard"><h4>${b.title}</h4><p>${b.desc}</p></div>`).join('')}
+            </div>
+          </div>
+        </div>
       </div>`;
   } catch {
     container.innerHTML = '<div class="error-state"><i class="fa-solid fa-circle-exclamation"></i><p>পৃষ্ঠা লোড হয়নি</p></div>';

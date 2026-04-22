@@ -1150,6 +1150,21 @@ textarea.form-control { resize:vertical; min-height:80px; }
             <div class="form-group2"><label>চট্টগ্রামের বাহিরে চার্জ (৳)</label><input type="number" class="form-control" id="dlivOutside" placeholder="130"></div>
           </div>
           <div class="form-group2"><label>ফ্রি ডেলিভারির ন্যূনতম পরিমাণ (৳)</label><input type="number" class="form-control" id="freeDlivMin" placeholder="0 = বন্ধ"></div>
+          <div class="form-group2">
+            <label>🏙️ চট্টগ্রামের ভিতরে — সাব-এরিয়া (কম চার্জে)</label>
+            <textarea class="form-control" id="ctgSubAreas" rows="2" placeholder="নিমতলা, পোর্ট কলোনি, ইস্ট কলোনি"></textarea>
+            <div class="form-hint">কমা দিয়ে আলাদা করুন। গ্রাহক "চট্টগ্রামের ভিতরে" বাছলে এই এরিয়াগুলো ছোট লিস্টে দেখাবে।</div>
+          </div>
+          <div class="form-row">
+            <div class="form-group2">
+              <label>সাব-এরিয়া চার্জ (৳)</label>
+              <input type="number" class="form-control" id="ctgSubAreaCharge" placeholder="30">
+            </div>
+            <div class="form-group2">
+              <label>"আদারস" (অন্যান্য) চার্জ (৳)</label>
+              <input type="number" class="form-control" id="ctgOthersCharge" placeholder="80">
+            </div>
+          </div>
           <button class="btn-primary" onclick="saveDeliverySettings()"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ করুন</button>
         </div>
       </div>
@@ -1394,6 +1409,35 @@ textarea.form-control { resize:vertical; min-height:80px; }
         <input type="text" class="form-control" id="pSlug" placeholder="যেমন: sorisha-fuler-modhu">
         <div class="form-hint">ফাঁকা রাখলে নাম থেকে অটো জেনারেট হবে।</div>
       </div>
+      <!-- ━━━ বিশেষ মূল্য (Special Price) ━━━ -->
+      <div class="form-group2" style="background:rgba(232,102,10,.08);border:1px solid rgba(232,102,10,.3);border-radius:8px;padding:14px;margin-top:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+          <div>
+            <label style="color:var(--orange2);font-weight:700;margin:0">🏷️ বিশেষ মূল্য / সেল-এ যোগ করুন</label>
+            <div class="form-hint" style="margin-top:2px">চালু করলে এই পণ্যটি ফ্রন্টএন্ডের "বিশেষ মূল্য" পেজে দেখাবে।</div>
+          </div>
+          <label class="toggle-switch" onclick="toggleProdField('pIsOnSale')">
+            <div class="toggle-track" id="pIsOnSaleTrack"><div class="toggle-thumb"></div></div>
+            <span id="pIsOnSaleLbl">বন্ধ</span>
+          </label>
+          <input type="hidden" id="pIsOnSale" value="false">
+        </div>
+        <div class="form-row">
+          <div class="form-group2">
+            <label>বিশেষ মূল্য (৳)</label>
+            <input type="number" class="form-control" id="pSpecialPrice" placeholder="যেমন: 99" min="0">
+          </div>
+          <div class="form-group2">
+            <label>ছাড়ের পরিমাণ (%)</label>
+            <input type="number" class="form-control" id="pSpecialDiscount" placeholder="যেমন: 20" min="0" max="100">
+          </div>
+        </div>
+        <div class="form-group2" style="margin-top:8px">
+          <label>সেল নোট (ঐচ্ছিক)</label>
+          <input type="text" class="form-control" id="pSpecialNote" placeholder="যেমন: সীমিত সময়ের অফার!">
+        </div>
+      </div>
+
       <div class="form-row" style="margin-top:6px">
         <div class="form-group2">
           <label>📦 মোট স্টক পরিমাণ</label>
@@ -1914,7 +1958,11 @@ async function loadProducts() {
             ${oldPrice?`<span style="font-size:.7rem;color:var(--txt3);text-decoration:line-through">৳${oldPrice.toLocaleString('en')}</span>`:''}
           </div>
         </td>
-        <td><button class="icon-btn star ${p.best?'star-active':''}" onclick="toggleBest('${p._id}',this)"><i class="fa-solid fa-star"></i></button></td>
+        <td><button class="icon-btn star ${p.best?'star-active':''}" onclick="toggleBest('${p._id}',this)" title="বেস্ট সেলার"><i class="fa-solid fa-star"></i></button>
+          <button class="icon-btn ${p.isOnSale?'warn':''}" title="${p.isOnSale?'সেল চালু — ক্লিক করে বন্ধ করুন':'সেল-এ যোগ করুন'}" style="margin-left:4px" onclick="toggleSale('${p._id}',this)">
+            <i class="fa-solid fa-tag" style="color:${p.isOnSale?'var(--orange)':'var(--txt3)'}"></i>
+          </button>
+        </td>
         <td><button class="icon-btn ${p.stockOut?'warn':''}" title="${p.stockOut?'স্টক আউট — ক্লিক করে ফিরিয়ে আনুন':'স্টকে আছে — ক্লিক করে স্টক আউট করুন'}" onclick="toggleStockOut('${p._id}',this)">
           ${p.stockOut
             ? `<i class='fa-solid fa-box-open' style='color:var(--orange)'></i>`
@@ -1972,6 +2020,12 @@ function openProdModal(prod=null) {
   document.getElementById('pBestLbl').textContent='না'; document.getElementById('pActiveLbl').textContent='হ্যাঁ';
   document.getElementById('pStockOut').value='false'; document.getElementById('pStockOutTrack').className='toggle-track'; document.getElementById('pStockOutLbl').textContent='না';
   document.getElementById('pStockQty').value='0';
+  document.getElementById('pIsOnSale').value='false';
+  document.getElementById('pIsOnSaleTrack').className='toggle-track';
+  document.getElementById('pIsOnSaleLbl').textContent='বন্ধ';
+  document.getElementById('pSpecialPrice').value='';
+  document.getElementById('pSpecialDiscount').value='';
+  document.getElementById('pSpecialNote').value='';
   document.getElementById('mainImgPreview').innerHTML=''; document.getElementById('thumbImgPreview').innerHTML='';
   document.getElementById('prodModalTitle').innerHTML='<i class="fa-solid fa-plus" style="color:var(--green)"></i> নতুন পণ্য যোগ করুন';
   document.getElementById('pMetaTitle').value = prod?.metaTitle || '';
@@ -2001,6 +2055,13 @@ function openProdModal(prod=null) {
     document.getElementById('pStockOutTrack').className='toggle-track '+(isStockOut?'on':'');
     document.getElementById('pStockOutLbl').textContent=isStockOut?'হ্যাঁ':'না';
     document.getElementById('pStockQty').value=prod.stockQuantity||0;
+    const isOnSale = prod.isOnSale === true;
+    document.getElementById('pIsOnSale').value = String(isOnSale);
+    document.getElementById('pIsOnSaleTrack').className = 'toggle-track ' + (isOnSale ? 'on' : '');
+    document.getElementById('pIsOnSaleLbl').textContent = isOnSale ? 'চালু' : 'বন্ধ';
+    document.getElementById('pSpecialPrice').value = prod.specialPrice || '';
+    document.getElementById('pSpecialDiscount').value = prod.specialDiscount || '';
+    document.getElementById('pSpecialNote').value = prod.specialNote || '';
     renderVariants(prod.variants||[]); renderHighlights(prod.highlights||[]);
   } else { renderVariants([{lbl:'',p:'',op:'',disc:''}]); renderHighlights(['']); }
   openModal('prodModal');
@@ -2151,7 +2212,11 @@ async function saveProd() {
     highlights:getHighlights(),
     metaTitle: document.getElementById('pMetaTitle').value.trim(),
     metaDescription: document.getElementById('pMetaDesc').value.trim(),
-    slug
+    slug,
+    isOnSale: document.getElementById('pIsOnSale').value === 'true',
+    specialPrice: parseFloat(document.getElementById('pSpecialPrice').value) || 0,
+    specialDiscount: parseFloat(document.getElementById('pSpecialDiscount').value) || 0,
+    specialNote: document.getElementById('pSpecialNote').value.trim()
   };
   const id=document.getElementById('prodId').value;
   const btn=document.getElementById('saveProdBtn');
@@ -2187,6 +2252,16 @@ async function toggleProd(id,btn) {
 async function toggleBest(id,btn) {
   try { const prod=await api('PATCH',`/api/products/${id}/best`); btn.className='icon-btn star '+(prod.best?'star-active':''); toast(`বেস্ট সেলার ${prod.best?'যোগ':'বাতিল'} করা হয়েছে`,'success'); }
   catch { toast('আপডেট ব্যর্থ','error'); }
+}
+
+async function toggleSale(id, btn) {
+  try {
+    const prod = await api('PATCH', `/api/products/${id}/sale`);
+    btn.className = 'icon-btn ' + (prod.isOnSale ? 'warn' : '');
+    btn.querySelector('i').style.color = prod.isOnSale ? 'var(--orange)' : 'var(--txt3)';
+    btn.title = prod.isOnSale ? 'সেল চালু — ক্লিক করে বন্ধ করুন' : 'সেল-এ যোগ করুন';
+    toast(`বিশেষ মূল্য ${prod.isOnSale ? 'চালু' : 'বন্ধ'} করা হয়েছে`, 'success');
+  } catch (err) { toast('ব্যর্থ: ' + (err.message||''), 'error'); }
 }
 
 async function toggleStockOut(id, btn) {
@@ -3292,6 +3367,9 @@ async function loadSettings() {
     document.getElementById('dlivInside').value=s.deliveryInside||80;
     document.getElementById('dlivOutside').value=s.deliveryOutside||130;
     document.getElementById('freeDlivMin').value=s.freeDeliveryMin||0;
+    document.getElementById('ctgSubAreas').value=(s.ctgSubAreas&&s.ctgSubAreas.length?s.ctgSubAreas:['নিমতলা','পোর্ট কলোনি','ইস্ট কলোনি']).join(', ');
+    document.getElementById('ctgSubAreaCharge').value=s.ctgSubAreaCharge||30;
+    document.getElementById('ctgOthersCharge').value=s.ctgOthersCharge||80;
     document.getElementById('apiUrlDisp').textContent=API;
     document.getElementById('apiUrlInp').value=API;
   } catch{}
@@ -3308,7 +3386,15 @@ async function saveStoreSettings() {
 
 async function saveDeliverySettings() {
   try {
-    await api('PUT','/api/settings',{deliveryInside:parseInt(document.getElementById('dlivInside').value)||80,deliveryOutside:parseInt(document.getElementById('dlivOutside').value)||130,freeDeliveryMin:parseInt(document.getElementById('freeDlivMin').value)||0});
+    const ctgAreas = document.getElementById('ctgSubAreas').value.split(',').map(x=>x.trim()).filter(Boolean);
+    await api('PUT','/api/settings',{
+      deliveryInside: parseInt(document.getElementById('dlivInside').value)||80,
+      deliveryOutside: parseInt(document.getElementById('dlivOutside').value)||130,
+      freeDeliveryMin: parseInt(document.getElementById('freeDlivMin').value)||0,
+      ctgSubAreas: ctgAreas,
+      ctgSubAreaCharge: parseInt(document.getElementById('ctgSubAreaCharge').value)||30,
+      ctgOthersCharge: parseInt(document.getElementById('ctgOthersCharge').value)||80,
+    });
     toast('ডেলিভারি সেটিংস সংরক্ষিত','success');
   } catch(err) { toast('ব্যর্থ: '+err.message,'error'); }
 }
