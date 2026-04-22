@@ -22,7 +22,7 @@
 <link rel="canonical" href="https://gramerasolmoja.shop">
 <!-- JSON-LD Structured Data for Google -->
 <script type="application/ld+json">
-{ 
+{
   "@context": "https://schema.org",
   "@type": "Store",
   "name": "আসল গ্রামের মজা",
@@ -1956,7 +1956,19 @@ let heroSlides = [];
 let settings = {};
 let deliveryCharges = { inside: 80, outside: 130 };
 let storePhone = '01712345678';
-const ADVANCE_DELIVERY_CATS = ['মিষ্টি', 'দই', 'গ্রীষ্মকালীন পানীয়', 'রশমালাই'];
+const ADVANCE_DELIVERY_CATS = [
+  'মিষ্টি', 'মিস্টি', 'রসগোল্লা', 'রশমালাই', 'রসমালাই', 'রসমলাই',
+  'সন্দেশ', 'চমচম', 'কালোজাম', 'ছানা', 'ছানার মিষ্টি',
+  'লাড্ডু', 'বরফি', 'বরফী', 'পান্তুয়া', 'কাঁচাগোল্লা',
+  'দই', 'মিষ্টি দই', 'টক দই', 'মাঠা', 'মাখন', 'ঘি',
+  'ক্ষীর', 'খির', 'পায়েস', 'ফিরনি', 'লাচ্ছি', 'লাচ্ছী',
+  'পনির', 'দুধ', 'দুগ্ধ', 'দুধজাত', 'দুধজাতীয়',
+  'গ্রীষ্মকালীন পানীয়', 'শরবত', 'লস্যি'
+];
+// Normalize Bengali text for robust matching (trim + lowercase)
+function normCat(s) {
+  return String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
 const ADVANCE_PAYMENT_INFO = {
   bkash: '01881245554',
   nagad: '01881245554',
@@ -2996,7 +3008,7 @@ let requiresAdvanceDelivery = false;
 function checkAdvanceDelivery(items) {
   const found = items.filter(i => {
     const cat = (i.cat || '').trim();
-    return ADVANCE_DELIVERY_CATS.some(ac => cat.includes(ac) || ac.includes(cat));
+    return ADVANCE_DELIVERY_CATS.some(ac => { const n = normCat(ac); const c = normCat(cat); return c.includes(n) || n.includes(c); });
   });
   return found;
 }
@@ -3037,7 +3049,7 @@ function openOrderModal() {
   document.querySelectorAll('.ctg-area-chip').forEach(c => c.classList.remove('active'));
   const advItems = items.filter(i => {
     const cat = (i.cat || '').trim();
-    return ADVANCE_DELIVERY_CATS.some(ac => cat.includes(ac) || ac.includes(cat));
+    return ADVANCE_DELIVERY_CATS.some(ac => { const n = normCat(ac); const c = normCat(cat); return c.includes(n) || n.includes(c); });
   });
   requiresAdvanceDelivery = advItems.length > 0;
   const advBox = document.getElementById('omAdvanceBox');

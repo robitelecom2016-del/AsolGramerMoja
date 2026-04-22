@@ -9,26 +9,33 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📧 Nodemailer — Gmail-এ অর্ডার নোটিফিকেশন পাঠানোর সেটআপ
+// 📧 Nodemailer — Gmail-এ অর্ডার নোটিফিকেশন (lazy + safe)
+// nodemailer install না থাকলেও সার্ভার crash করবে না
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const nodemailer = require('nodemailer');
-
 const ORDER_NOTIFY_EMAIL = process.env.ORDER_NOTIFY_EMAIL || 'robitelecom2016@gmail.com';
 const GMAIL_USER = process.env.GMAIL_USER || 'robitelecom2016@gmail.com';
 const GMAIL_APP_PASSWORD = (process.env.GMAIL_APP_PASSWORD || 'twur bijq agrg syzq').replace(/\s+/g, '');
 
 let mailTransporter = null;
+let nodemailer = null;
 try {
+  nodemailer = require('nodemailer');
   mailTransporter = nodemailer.createTransport({
     service: 'gmail',
     auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD },
   });
+  // verify চালান কিন্তু error-এ crash নয়
   mailTransporter.verify((err) => {
-    if (err) console.error('❌ Gmail SMTP verify failed:', err.message);
-    else console.log('✅ Gmail SMTP ready — অর্ডার নোটিফিকেশন পাঠাতে প্রস্তুত');
+    if (err) {
+      console.error('⚠️  Gmail SMTP verify failed (অর্ডার ইমেইল disabled):', err.message);
+      mailTransporter = null;
+    } else {
+      console.log('✅ Gmail SMTP ready — অর্ডার নোটিফিকেশন পাঠাতে প্রস্তুত');
+    }
   });
 } catch (e) {
-  console.error('❌ Mail transporter setup error:', e.message);
+  console.warn('⚠️  Nodemailer not available — `npm install nodemailer` চালান। সার্ভার চলবে কিন্তু ইমেইল যাবে না। কারণ:', e.message);
+  mailTransporter = null;
 }
 
 function buildOrderEmailHtml(order) {
@@ -85,6 +92,7 @@ function buildOrderEmailHtml(order) {
 }
 
 async function sendOrderEmail(order) {
+  if (!mailTransporter) { console.log('ℹ️  mailTransporter unavailable — skip email'); return; }
   if (!mailTransporter) {
     console.warn('⚠️ Mail transporter not ready — order email skipped');
     return;
