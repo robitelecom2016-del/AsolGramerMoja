@@ -190,7 +190,6 @@ const orderSchema = new mongoose.Schema({
     enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
     default: 'pending',
   },
-  stockDeducted: { type: Boolean, default: false },
   statusHistory: [{
     status: String,
     note: String,
@@ -210,16 +209,6 @@ const heroSchema = new mongoose.Schema({
   ctaText: { type: String, default: '' },
   active: { type: Boolean, default: true },
   order: { type: Number, default: 0 },
-  // type='main' হলো বড় স্লাইডার, 'side' হলো ডানদিকের ৪টি ছোট ব্যানার
-  type: { type: String, enum: ['main', 'side'], default: 'main' },
-  // side ব্যানারের জন্য অতিরিক্ত ফিল্ড
-  label: { type: String, default: '' },
-  price: { type: String, default: '' },
-  link: { type: String, default: '' },
-  btnText: { type: String, default: 'কিনুন' },
-  btnBg: { type: String, default: '' },
-  overlay: { type: String, default: 'rgba(30,80,20,0.55)' },
-  labelColor: { type: String, default: '#d4f5a0' },
 });
 const Hero = mongoose.model('Hero', heroSchema);
 
@@ -907,8 +896,40 @@ app.post('/api/orders', async (req, res) => {
       statusHistory: [{ status: 'pending', note: 'Order placed', time: new Date() }],
     });
 
-    // স্টক কমানো হবে কেবল delivered স্ট্যাটাসে — অর্ডার তৈরির সময় নয়।
-    // (See PATCH /api/orders/:id/status handler)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // অর্ডারের পর প্রতিটি পণ্যের স্টক কমাও
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    for (const item of enrichedItems) {
+      if (!item.productId) continue;
+      try {
+        const product = await Product.findById(item.productId);
+        if (!product) continue;
+        const qty = item.qty || 1;
+
+        // variant-এর stock কমাও
+        if (item.varLabel && product.variants?.length) {
+          const vIdx = product.variants.findIndex(v => v.lbl === item.varLabel);
+          if (vIdx !== -1) {
+            const newVarStock = (product.variants[vIdx].stock || 0) - qty;
+            product.variants[vIdx].stock = Math.max(0, newVarStock);
+          }
+        }
+
+        // মোট stockQuantity কমাও
+        const newTotal = (product.stockQuantity || 0) - qty;
+        product.stockQuantity = Math.max(0, newTotal);
+
+        // স্টক শেষ হলে স্বয়ংক্রিয়ভাবে stockOut = true
+        if (product.stockQuantity <= 0) {
+          product.stockOut = true;
+        }
+
+        product.updatedAt = new Date();
+        await product.save();
+      } catch (stockErr) {
+        console.error(`Stock update failed for ${item.productId}:`, stockErr.message);
+      }
+    }
 
     res.status(201).json(order);
   } catch (err) {
@@ -967,62 +988,13 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
     const { status, note, revenueAmount } = req.body;
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ error: 'Order not found' });
-    const prevStatus = order.status;
     order.status = status;
     order.statusHistory.push({ status, note, time: new Date() });
     order.updatedAt = new Date();
+    // delivered স্ট্যাটাসে revenueAmount পাঠানো হলে order.total আপডেট করুন
+    // এটি dashboard revenue গণনায় সঠিক amount দেখাবে
     if (status === 'delivered' && revenueAmount !== undefined && revenueAmount !== null) {
       order.total = Number(revenueAmount);
-    }
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // স্টক কেবল তখনই কমাও যখন প্রথমবার delivered হলো
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    if (status === 'delivered' && prevStatus !== 'delivered' && !order.stockDeducted) {
-      for (const item of (order.items || [])) {
-        if (!item.productId) continue;
-        try {
-          const product = await Product.findById(item.productId);
-          if (!product) continue;
-          const qty = item.qty || 1;
-          if (item.varLabel && product.variants?.length) {
-            const vIdx = product.variants.findIndex(v => v.lbl === item.varLabel);
-            if (vIdx !== -1) {
-              product.variants[vIdx].stock = Math.max(0, (product.variants[vIdx].stock || 0) - qty);
-            }
-          }
-          product.stockQuantity = Math.max(0, (product.stockQuantity || 0) - qty);
-          if (product.stockQuantity <= 0) product.stockOut = true;
-          product.updatedAt = new Date();
-          await product.save();
-        } catch (stockErr) {
-          console.error(`Stock deduct failed for ${item.productId}:`, stockErr.message);
-        }
-      }
-      order.stockDeducted = true;
-    }
-    // delivered থেকে অন্য স্ট্যাটাসে গেলে স্টক ফেরত দাও
-    if (prevStatus === 'delivered' && status !== 'delivered' && order.stockDeducted) {
-      for (const item of (order.items || [])) {
-        if (!item.productId) continue;
-        try {
-          const product = await Product.findById(item.productId);
-          if (!product) continue;
-          const qty = item.qty || 1;
-          if (item.varLabel && product.variants?.length) {
-            const vIdx = product.variants.findIndex(v => v.lbl === item.varLabel);
-            if (vIdx !== -1) {
-              product.variants[vIdx].stock = (product.variants[vIdx].stock || 0) + qty;
-            }
-          }
-          product.stockQuantity = (product.stockQuantity || 0) + qty;
-          if (product.stockQuantity > 0) product.stockOut = false;
-          product.updatedAt = new Date();
-          await product.save();
-        } catch (stockErr) {
-          console.error(`Stock restore failed for ${item.productId}:`, stockErr.message);
-        }
-      }
-      order.stockDeducted = false;
     }
     await order.save();
     res.json(order);
@@ -1033,9 +1005,7 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
 
 app.get('/api/hero', async (req, res) => {
   try {
-    const filter = { active: true };
-    if (req.query.type) filter.type = req.query.type;
-    const slides = await Hero.find(filter).sort({ order: 1 });
+    const slides = await Hero.find({ active: true }).sort({ order: 1 });
     res.json(slides);
   } catch (err) {
     res.status(500).json({ error: err.message });
