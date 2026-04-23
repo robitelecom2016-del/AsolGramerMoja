@@ -871,6 +871,75 @@ textarea.form-control { resize:vertical; min-height:80px; }
       </div>
     </div>
 
+    <div class="page-view" id="page-categories">
+      <div class="filters-bar">
+        <span class="filter-count" id="catCount">0 ক্যাটাগরি</span>
+        <button class="btn-primary ml-auto" onclick="openCatModal()"><i class="fa-solid fa-plus"></i> নতুন ক্যাটাগরি</button>
+      </div>
+      <div class="card">
+        <div class="cat-grid" id="catCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding:16px"></div>
+      </div>
+    </div>
+
+    <div class="page-view" id="page-hero">
+      <div class="filters-bar">
+        <span class="filter-count" id="heroCount">হিরো স্লাইড ও সাইড ব্যানার</span>
+        <button class="btn-primary ml-auto" onclick="openHeroModal()"><i class="fa-solid fa-plus"></i> নতুন স্লাইড</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>ক্রম</th><th>ছবি/গ্র্যাডিয়েন্ট</th><th>শিরোনাম</th><th>সাবটাইটেল</th><th>গ্র্যাডিয়েন্ট</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+            <tbody id="heroTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-view" id="page-about">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><h3><i class="fa-solid fa-circle-info" style="color:var(--blue)"></i> আমাদের সম্পর্কে পেজ</h3></div>
+        <div style="padding:16px;display:grid;gap:14px">
+          <div class="form-row">
+            <div class="form-group2"><label>পেজের শিরোনাম</label><input type="text" class="form-control" id="aboutTitle" placeholder="আমাদের সম্পর্কে"></div>
+            <div class="form-group2"><label>ট্যাগলাইন</label><input type="text" class="form-control" id="aboutTagline" placeholder="বিশুদ্ধ গ্রামীণ পণ্য"></div>
+          </div>
+          <div class="form-group2">
+            <label>ব্যানার ছবি</label>
+            <label class="img-upload-area" for="aboutBannerInput" style="display:block;cursor:pointer">
+              <i class="fa-solid fa-image"></i><p>ব্যানার ছবি আপলোড করুন</p>
+              <input type="file" id="aboutBannerInput" accept="image/*" onchange="uploadPageBanner('about',this)" onclick="this.value=''">
+            </label>
+            <div id="aboutBannerPreview"></div>
+            <input type="hidden" id="aboutBannerUrl">
+          </div>
+          <div class="form-group2"><label>মূল কনটেন্ট</label><textarea class="form-control" id="aboutContent" rows="5" placeholder="আমাদের সম্পর্কে বিস্তারিত লিখুন..."></textarea></div>
+          <div class="form-row">
+            <div class="form-group2"><label>আমাদের মিশন</label><textarea class="form-control" id="aboutMission" rows="3" placeholder="মিশন..."></textarea></div>
+            <div class="form-group2"><label>আমাদের ভিশন</label><textarea class="form-control" id="aboutVision" rows="3" placeholder="ভিশন..."></textarea></div>
+          </div>
+          <div class="form-group2">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <label style="margin:0">পরিসংখ্যান (Stats)</label>
+              <button class="btn-secondary" type="button" onclick="addAboutStat()" style="padding:6px 12px;font-size:.8rem"><i class="fa-solid fa-plus"></i> যোগ</button>
+            </div>
+            <div id="aboutStatsList" style="display:grid;gap:8px"></div>
+          </div>
+          <div class="form-group2">
+            <label>পেজ সক্রিয়</label>
+            <label class="toggle-switch" onclick="toggleAboutActive()">
+              <div class="toggle-track on" id="aboutActiveTrack"><div class="toggle-thumb"></div></div>
+              <span id="aboutActiveLbl">হ্যাঁ</span>
+            </label>
+            <input type="hidden" id="aboutActive" value="true">
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--border);padding-top:14px">
+            <button class="btn-primary" onclick="saveAboutPage()"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ করুন</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="page-view" id="page-contact">
       <div class="card" style="margin-bottom:16px">
         <div class="card-header">
@@ -2988,6 +3057,13 @@ async function deleteHero(id) {
     try { await api('DELETE',`/api/hero/${id}`); toast('স্লাইড মুছে ফেলা হয়েছে','success'); loadHero(); }
     catch { toast('মুছতে ব্যর্থ','error'); }
   });
+}
+
+function toggleAboutActive() {
+  const cur = document.getElementById('aboutActive').value === 'true';
+  document.getElementById('aboutActive').value = String(!cur);
+  document.getElementById('aboutActiveTrack').className = 'toggle-track ' + (!cur ? 'on' : '');
+  document.getElementById('aboutActiveLbl').textContent = !cur ? 'হ্যাঁ' : 'না';
 }
 
 async function loadAboutPage() {
