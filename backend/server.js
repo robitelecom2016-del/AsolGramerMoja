@@ -112,6 +112,43 @@ async function sendOrderEmail(order) {
   }
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 📧 স্টক-আউট অ্যালার্ট ইমেইল (variant-ভিত্তিক)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function sendStockOutEmail(product, variantLabel, orderNum) {
+  if (!mailTransporter) return;
+  const to = process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER;
+  if (!to) return;
+  try {
+    const subject = `⚠️ স্টক শেষ — ${product.nm} (${variantLabel})`;
+    const html = `
+      <div style="font-family:Arial,'Hind Siliguri',sans-serif;max-width:600px;margin:auto;color:#222;border:1px solid #eee;border-radius:8px;overflow:hidden;">
+        <div style="background:#da3633;color:#fff;padding:14px 18px;">
+          <h2 style="margin:0;font-size:18px;">⚠️ স্টক আউট সতর্কতা</h2>
+        </div>
+        <div style="padding:18px;">
+          <p style="margin:0 0 10px;font-size:15px;">নিচের পণ্যের একটি ভ্যারিয়েন্টের স্টক <b>শূন্য</b> হয়ে গেছে:</p>
+          <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:8px;">
+            <tr><td style="padding:8px;border:1px solid #eee;width:140px;"><b>পণ্যের নাম</b></td><td style="padding:8px;border:1px solid #eee;">${product.em||''} ${product.nm}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #eee;"><b>ক্যাটাগরি</b></td><td style="padding:8px;border:1px solid #eee;">${product.cat||'-'}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #eee;"><b>ভ্যারিয়েন্ট</b></td><td style="padding:8px;border:1px solid #eee;color:#da3633;"><b>${variantLabel}</b></td></tr>
+            <tr><td style="padding:8px;border:1px solid #eee;"><b>মোট স্টক</b></td><td style="padding:8px;border:1px solid #eee;">${product.stockQuantity||0}</td></tr>
+            ${orderNum ? `<tr><td style="padding:8px;border:1px solid #eee;"><b>ট্রিগার অর্ডার</b></td><td style="padding:8px;border:1px solid #eee;">${orderNum}</td></tr>` : ''}
+          </table>
+          <p style="margin:16px 0 0;color:#555;font-size:13px;">দ্রুত স্টক রিফিল করুন যাতে গ্রাহক অর্ডার দিতে পারেন।</p>
+        </div>
+        <div style="padding:10px 18px;background:#f7f7f7;color:#888;font-size:12px;">— gramerasolmoja.shop · admin alert</div>
+      </div>`;
+    await mailTransporter.sendMail({
+      from: `"আসল গ্রামের মজা — Stock Alert" <${process.env.GMAIL_USER}>`,
+      to, subject, html, replyTo: process.env.GMAIL_USER,
+    });
+    console.log(`📧 স্টক-আউট মেইল পাঠানো হয়েছে: ${product.nm} / ${variantLabel}`);
+  } catch (err) {
+    console.error('❌ স্টক-আউট মেইল ব্যর্থ:', err.message);
+  }
+}
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -1006,42 +1043,13 @@ app.post('/api/orders', async (req, res) => {
     });
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // অর্ডারের পর প্রতিটি পণ্যের স্টক কমাও
+    // ⚠️ স্টক এখানে কমানো হয় না — শুধু "delivered" status-এ কমবে
+    // (PATCH /api/orders/:id/status handler দেখুন)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    for (const item of enrichedItems) {
-      if (!item.productId) continue;
-      try {
-        const product = await Product.findById(item.productId);
-        if (!product) continue;
-        const qty = item.qty || 1;
-
-        // variant-এর stock কমাও
-        if (item.varLabel && product.variants?.length) {
-          const vIdx = product.variants.findIndex(v => v.lbl === item.varLabel);
-          if (vIdx !== -1) {
-            const newVarStock = (product.variants[vIdx].stock || 0) - qty;
-            product.variants[vIdx].stock = Math.max(0, newVarStock);
-          }
-        }
-
-        // মোট stockQuantity কমাও
-        const newTotal = (product.stockQuantity || 0) - qty;
-        product.stockQuantity = Math.max(0, newTotal);
-
-        // স্টক শেষ হলে স্বয়ংক্রিয়ভাবে stockOut = true
-        if (product.stockQuantity <= 0) {
-          product.stockOut = true;
-        }
-
-        product.updatedAt = new Date();
-        await product.save();
-      } catch (stockErr) {
-        console.error(`Stock update failed for ${item.productId}:`, stockErr.message);
-      }
-    }
 
     // 📧 অর্ডার নোটিফিকেশন মেইল পাঠাও (response block করো না)
     sendOrderEmail(order).catch(e => console.error('mail err:', e.message));
+
 
     res.status(201).json(order);
   } catch (err) {
@@ -1100,20 +1108,127 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
     const { status, note, revenueAmount } = req.body;
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ error: 'Order not found' });
+
+    const prevStatus = order.status;
     order.status = status;
     order.statusHistory.push({ status, note, time: new Date() });
     order.updatedAt = new Date();
     // delivered স্ট্যাটাসে revenueAmount পাঠানো হলে order.total আপডেট করুন
-    // এটি dashboard revenue গণনায় সঠিক amount দেখাবে
     if (status === 'delivered' && revenueAmount !== undefined && revenueAmount !== null) {
       order.total = Number(revenueAmount);
     }
     await order.save();
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // 📦 স্টক ম্যানেজমেন্ট লজিক
+    //   - delivered: প্রথমবার delivered হলে স্টক কমাবে + variant=0 হলে ইমেইল
+    //   - cancelled: আগে delivered ছিল হলে স্টক ফেরত দেবে
+    //   (একই অর্ডার একাধিকবার delivered হলেও double-deduct এড়াতে prevStatus চেক)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    try {
+      // CASE 1: delivered এ পরিবর্তন (আগে delivered ছিল না)
+      if (status === 'delivered' && prevStatus !== 'delivered') {
+        for (const item of (order.items || [])) {
+          if (!item.productId) continue;
+          try {
+            const product = await Product.findById(item.productId);
+            if (!product) continue;
+            const qty = item.qty || 1;
+            const stockBefore = product.stockQuantity || 0;
+
+            // variant stock কমাও + variant=0 হলে ইমেইল
+            let triggeredVariantOut = null;
+            if (item.varLabel && product.variants?.length) {
+              const vIdx = product.variants.findIndex(v => v.lbl === item.varLabel);
+              if (vIdx !== -1) {
+                const beforeV = product.variants[vIdx].stock || 0;
+                const afterV = Math.max(0, beforeV - qty);
+                product.variants[vIdx].stock = afterV;
+                if (beforeV > 0 && afterV === 0) {
+                  triggeredVariantOut = item.varLabel;
+                }
+              }
+            }
+
+            // মোট stockQuantity কমাও
+            product.stockQuantity = Math.max(0, stockBefore - qty);
+            if (product.stockQuantity <= 0) product.stockOut = true;
+            product.updatedAt = new Date();
+            await product.save();
+
+            // স্টক লগ
+            try {
+              await StockLog.create({
+                productId: product._id,
+                productName: product.nm,
+                type: 'sale',
+                qty,
+                stockBefore,
+                stockAfter: product.stockQuantity,
+                note: `Order ${order.orderNum} delivered${item.varLabel ? ' — ' + item.varLabel : ''}`,
+                createdBy: req.admin?.username || 'system',
+              });
+            } catch {}
+
+            // স্টক-আউট ইমেইল (variant শূন্য হলে)
+            if (triggeredVariantOut) {
+              sendStockOutEmail(product, triggeredVariantOut, order.orderNum)
+                .catch(e => console.error('stock-out mail err:', e.message));
+            }
+          } catch (stockErr) {
+            console.error(`Stock decrement failed for ${item.productId}:`, stockErr.message);
+          }
+        }
+      }
+
+      // CASE 2: delivered থেকে cancelled — স্টক ফেরত দাও
+      if (status === 'cancelled' && prevStatus === 'delivered') {
+        for (const item of (order.items || [])) {
+          if (!item.productId) continue;
+          try {
+            const product = await Product.findById(item.productId);
+            if (!product) continue;
+            const qty = item.qty || 1;
+            const stockBefore = product.stockQuantity || 0;
+
+            if (item.varLabel && product.variants?.length) {
+              const vIdx = product.variants.findIndex(v => v.lbl === item.varLabel);
+              if (vIdx !== -1) {
+                product.variants[vIdx].stock = (product.variants[vIdx].stock || 0) + qty;
+              }
+            }
+            product.stockQuantity = stockBefore + qty;
+            if (product.stockQuantity > 0) product.stockOut = false;
+            product.updatedAt = new Date();
+            await product.save();
+
+            try {
+              await StockLog.create({
+                productId: product._id,
+                productName: product.nm,
+                type: 'purchase',
+                qty,
+                stockBefore,
+                stockAfter: product.stockQuantity,
+                note: `Order ${order.orderNum} cancelled — restored${item.varLabel ? ' — ' + item.varLabel : ''}`,
+                createdBy: req.admin?.username || 'system',
+              });
+            } catch {}
+          } catch (restoreErr) {
+            console.error(`Stock restore failed for ${item.productId}:`, restoreErr.message);
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Stock side-effect error:', e.message);
+    }
+
     res.json(order);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 app.get('/api/hero', async (req, res) => {
   try {

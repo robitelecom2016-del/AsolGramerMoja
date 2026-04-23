@@ -2108,7 +2108,11 @@ function buildSideBanners() {
     { title:'পরিবারকে দিন<br>সেরা পুষ্টি', label:'১০০% অর্গানিক', price:'৩৯০', img:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&auto=format&fit=crop&q=80', overlay:'rgba(100,60,0,0.5)', labelColor:'#ffd080', btnText:'কিনুন', btnBg:'', link:'' },
     { title:'সরিষার তৈল<br>ও বোরহানী', label:'সতেজ ও তাজা', price:'১৫০', img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&auto=format&fit=crop&q=80', overlay:'rgba(120,20,20,0.5)', labelColor:'#ffb0a0', btnText:'কিনুন', btnBg:'#c0392b', link:'' },
   ];
-  const banners = sideBanners.length >= 4 ? sideBanners.slice(0,4) : defaults;
+  // DB থেকে যতগুলো পাওয়া যাবে ততগুলো ব্যবহার করো, বাকিগুলো default দিয়ে পূরণ করো
+  const banners = [];
+  for (let i = 0; i < 4; i++) {
+    banners.push(sideBanners[i] || defaults[i]);
+  }
   function renderBanner(b) {
     const imgUrl = b.img || '';
     const ov = b.overlay || 'rgba(0,0,0,0.5)';
