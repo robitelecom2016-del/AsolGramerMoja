@@ -1205,89 +1205,91 @@ textarea.form-control { resize:vertical; min-height:80px; }
   </div>
 </div>
 
-<!-- ━━━━━━━━ স্টক এডিট মডাল ━━━━━━━━ -->
+<!-- ━━━━━━━━ স্টক এডিট মডাল (সংক্ষিপ্ত) ━━━━━━━━ -->
 <div class="modal-ov" id="stockEditModal">
-  <div class="modal" style="max-width:780px">
+  <div class="modal" style="max-width:680px">
     <div class="modal-hd" style="background:linear-gradient(135deg,rgba(46,160,67,.15),rgba(31,111,235,.1))">
       <h2 style="display:flex;align-items:center;gap:10px;font-size:1rem">
-        <i class="fa-solid fa-pen-to-square" style="color:var(--green3)"></i>
-        <span>স্টক এডিট — <span id="seProductName" style="color:var(--green3)"></span></span>
+        <i class="fa-solid fa-boxes-stacked" style="color:var(--green3)"></i>
+        <span>স্টক — <span id="seProductName" style="color:var(--green3)"></span></span>
       </h2>
       <button class="modal-cls" onclick="closeModal('stockEditModal')"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="seProductId">
-
-      <!-- মূল ফিল্ড -->
-      <div class="form-row">
-        <div class="form-group2">
-          <label>📦 মোট স্টক পরিমাণ <span style="font-size:.65rem;color:var(--blue2);font-weight:600">(অটো)</span></label>
-          <input type="number" class="form-control" id="seStockQty" min="0" readonly style="border-color:rgba(59,130,246,.4);font-weight:700;font-size:1rem;background:rgba(59,130,246,.08);cursor:not-allowed">
-          <div class="form-hint" style="color:var(--blue2)">নিচের ভ্যারিয়েন্ট স্টকের যোগফল | পরিবর্তন: <span id="seDelta" style="font-weight:700">0</span></div>
-        </div>
-        <div class="form-group2">
-          <label>📝 পরিবর্তনের কারণ (ঐচ্ছিক)</label>
-          <input type="text" class="form-control" id="seReason" placeholder="যেমন: নতুন চালান এসেছে / নষ্ট হয়েছে">
-        </div>
-      </div>
-
-      <!-- হিডেন: লিগেসি কম্প্যাটিবিলিটি (প্রথম ভ্যারিয়েন্টের সাথে সিঙ্ক) -->
       <input type="hidden" id="seBuyPrice">
       <input type="hidden" id="seSellPrice">
 
-      <!-- লাভ ও আর্থিক সারাংশ -->
-      <div style="background:linear-gradient(135deg,rgba(46,160,67,.12),rgba(139,92,246,.08));border:1px solid rgba(46,160,67,.3);border-radius:12px;padding:12px;margin-bottom:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">
-          <div style="font-size:.78rem;font-weight:700;color:var(--txt2);display:flex;align-items:center;gap:6px">
-            <i class="fa-solid fa-chart-pie" style="color:var(--purple)"></i> সমস্ত ভ্যারিয়েন্টের সম্মিলিত হিসাব
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--green);border-radius:8px;padding:5px 10px">
-            <span style="font-size:.7rem;color:var(--txt3);font-weight:600">নিট লাভ:</span>
-            <span id="seTotalProfit" style="font-size:1.05rem;font-weight:800;color:var(--green3)">৳0</span>
-          </div>
+      <!-- সারাংশ বার -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:14px">
+        <div style="background:rgba(31,111,235,.08);border:1px solid rgba(31,111,235,.25);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:.65rem;color:var(--txt3);font-weight:700;margin-bottom:3px">📦 মোট স্টক</div>
+          <div id="seStockQty" style="font-size:1.2rem;font-weight:800;color:var(--blue2)">0</div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px">
-          <div style="background:var(--bg2);border:1px solid rgba(31,111,235,.3);border-radius:8px;padding:8px;text-align:center">
-            <div style="font-size:.62rem;color:var(--txt3);font-weight:600;margin-bottom:3px"><i class="fa-solid fa-coins" style="color:var(--blue2)"></i> মোট বিনিয়োগ</div>
-            <div id="seTotalInvest" style="font-size:.9rem;font-weight:800;color:var(--blue2)">৳0</div>
-          </div>
-          <div style="background:var(--bg2);border:1px solid rgba(46,160,67,.3);border-radius:8px;padding:8px;text-align:center">
-            <div style="font-size:.62rem;color:var(--txt3);font-weight:600;margin-bottom:3px"><i class="fa-solid fa-money-bill-trend-up" style="color:var(--green3)"></i> সম্ভাব্য রেভিনিউ</div>
-            <div id="seTotalRevenue" style="font-size:.9rem;font-weight:800;color:var(--green3)">৳0</div>
-          </div>
-          <div style="background:var(--bg2);border:1px solid rgba(218,54,51,.3);border-radius:8px;padding:8px;text-align:center">
-            <div style="font-size:.62rem;color:var(--txt3);font-weight:600;margin-bottom:3px"><i class="fa-solid fa-truck" style="color:var(--red2)"></i> মোট খরচ</div>
-            <div id="seTotalCost" style="font-size:.9rem;font-weight:800;color:var(--red2)">৳0</div>
-          </div>
-          <div style="background:var(--bg2);border:1px solid rgba(137,87,229,.3);border-radius:8px;padding:8px;text-align:center">
-            <div style="font-size:.62rem;color:var(--txt3);font-weight:600;margin-bottom:3px"><i class="fa-solid fa-percent" style="color:var(--purple)"></i> মোট ROI</div>
-            <div id="seTotalROI" style="font-size:.9rem;font-weight:800;color:var(--purple)">0%</div>
-          </div>
+        <div style="background:rgba(46,160,67,.08);border:1px solid rgba(46,160,67,.25);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:.65rem;color:var(--txt3);font-weight:700;margin-bottom:3px">🛒 বিক্রি হয়েছে</div>
+          <div id="seTotalSold" style="font-size:1.2rem;font-weight:800;color:var(--green3)">0</div>
+        </div>
+        <div style="background:rgba(232,102,10,.08);border:1px solid rgba(232,102,10,.25);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:.65rem;color:var(--txt3);font-weight:700;margin-bottom:3px">📊 অবশিষ্ট</div>
+          <div id="seTotalRemaining" style="font-size:1.2rem;font-weight:800;color:var(--orange2)">0</div>
+        </div>
+        <div style="background:rgba(46,160,67,.08);border:1px solid rgba(46,160,67,.25);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:.65rem;color:var(--txt3);font-weight:700;margin-bottom:3px">💰 মোট লাভ</div>
+          <div id="seTotalProfit" style="font-size:1.2rem;font-weight:800;color:var(--green3)">৳0</div>
         </div>
       </div>
 
-      <!-- ভ্যারিয়েন্ট-ভিত্তিক স্টক ও মূল্য (মূল সেকশন) -->
-      <div style="margin-top:12px">
-        <p style="font-size:.82rem;font-weight:700;color:var(--txt);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:2px solid var(--purple)">
-          <i class="fa-solid fa-layer-group" style="color:var(--purple);font-size:1rem"></i>
-          ভ্যারিয়েন্ট-ভিত্তিক স্টক ও মূল্য ব্যবস্থাপনা
-          <span style="margin-left:auto;font-size:.65rem;background:rgba(137,87,229,.15);color:var(--purple);padding:2px 8px;border-radius:10px;letter-spacing:0">প্রতিটি কার্ডে বিস্তারিত</span>
-        </p>
-        <div id="seVariantsList" style="display:flex;flex-direction:column;gap:14px"></div>
-      </div>
+      <!-- ভ্যারিয়েন্ট লিস্ট -->
+      <div id="seVariantsList" style="display:flex;flex-direction:column;gap:10px"></div>
 
       <!-- সাম্প্রতিক লগ -->
-      <div style="margin-top:14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px">
-        <p style="font-size:.72rem;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
-          <i class="fa-solid fa-clock-rotate-left" style="color:var(--blue2);margin-right:6px"></i> সাম্প্রতিক স্টক পরিবর্তন (লোকাল লগ)
+      <div style="margin-top:14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px">
+        <p style="font-size:.72rem;font-weight:700;color:var(--txt2);margin-bottom:6px">
+          <i class="fa-solid fa-clock-rotate-left" style="color:var(--blue2);margin-right:5px"></i> সাম্প্রতিক পরিবর্তন
         </p>
-        <div id="seLogList" style="max-height:140px;overflow:auto;font-size:.78rem"></div>
+        <div id="seLogList" style="max-height:120px;overflow:auto;font-size:.78rem"></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('stockEditModal')">বাতিল</button>
+      <button class="btn-secondary" onclick="closeModal('stockEditModal')">বন্ধ</button>
       <button class="btn-primary" id="seSaveBtn" onclick="saveStockEdit()">
-        <i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ করুন
+        <i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- নতুন চালান পপআপ -->
+<div class="modal-ov" id="chalanModal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-hd" style="background:linear-gradient(135deg,rgba(46,160,67,.15),rgba(31,111,235,.1))">
+      <h2 style="font-size:.95rem;display:flex;align-items:center;gap:8px">
+        <i class="fa-solid fa-truck-ramp-box" style="color:var(--green3)"></i>
+        নতুন চালান যোগ
+      </h2>
+      <button class="modal-cls" onclick="closeChalanModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="chalanVidx">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:12px;font-size:.82rem;color:var(--txt2)">
+        <i class="fa-solid fa-layer-group" style="color:var(--purple);margin-right:5px"></i>
+        ভ্যারিয়েন্ট: <strong id="chalanVarName" style="color:var(--txt)">—</strong>
+      </div>
+      <div class="form-group2" style="margin-bottom:12px">
+        <label style="font-size:.8rem;font-weight:700">📦 কত পিস এসেছে?</label>
+        <input type="number" class="form-control" id="chalanQty" min="1" placeholder="যেমন: 50" style="font-size:1.1rem;font-weight:700;text-align:center">
+      </div>
+      <div class="form-group2" style="margin-bottom:12px">
+        <label style="font-size:.8rem;font-weight:700">🚚 আনতে মোট খরচ (ঐচ্ছিক)</label>
+        <input type="number" class="form-control" id="chalanCost" min="0" step="0.01" placeholder="যেমন: ১৫০" style="font-weight:600">
+        <div class="form-hint" style="color:var(--txt3)">পরিবহন/যাতায়াত খরচ — ক্রয়মূল্যের সাথে যোগ হবে</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeChalanModal()">বাতিল</button>
+      <button class="btn-primary" onclick="applyChalanToVariant()">
+        <i class="fa-solid fa-plus"></i> স্টকে যোগ করুন
       </button>
     </div>
   </div>
@@ -2503,208 +2505,90 @@ function _sePct(n) {
 }
 
 function _seStockBadge(stock) {
-  if (stock <= 0) return '<span style="background:rgba(218,54,51,.18);color:var(--red2);border:1px solid rgba(218,54,51,.4);font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:10px"><i class="fa-solid fa-circle-xmark"></i> স্টক আউট</span>';
-  if (stock < 5) return '<span style="background:rgba(232,102,10,.18);color:var(--orange2);border:1px solid rgba(232,102,10,.4);font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:10px"><i class="fa-solid fa-triangle-exclamation"></i> কম স্টক</span>';
-  if (stock < 20) return '<span style="background:rgba(31,111,235,.18);color:var(--blue2);border:1px solid rgba(31,111,235,.4);font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:10px"><i class="fa-solid fa-box"></i> মাঝারি</span>';
-  return '<span style="background:rgba(46,160,67,.18);color:var(--green3);border:1px solid rgba(46,160,67,.4);font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:10px"><i class="fa-solid fa-circle-check"></i> পর্যাপ্ত</span>';
+  if (stock <= 0) return '<span style="background:rgba(218,54,51,.18);color:var(--red2);border:1px solid rgba(218,54,51,.4);font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:10px"><i class="fa-solid fa-circle-xmark"></i> স্টক আউট</span>';
+  if (stock < 5) return '<span style="background:rgba(232,102,10,.18);color:var(--orange2);border:1px solid rgba(232,102,10,.4);font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:10px"><i class="fa-solid fa-triangle-exclamation"></i> কম</span>';
+  return '<span style="background:rgba(46,160,67,.18);color:var(--green3);border:1px solid rgba(46,160,67,.4);font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:10px"><i class="fa-solid fa-circle-check"></i> পর্যাপ্ত</span>';
 }
 
 function _seRecalc() {
   const rows = document.querySelectorAll('#seVariantsList [data-vidx]');
-  let totalStock = 0, totalProfit = 0, totalRevenue = 0, totalCost = 0, totalInvest = 0;
+  let totalStock = 0, totalProfit = 0;
+  const prod = _seCurrentProduct;
+  const soldQty = prod ? (prod._sold || 0) : 0;
+
   rows.forEach(row => {
     const stock = parseFloat(row.querySelector('[data-sef="stock"]')?.value) || 0;
     const bp = parseFloat(row.querySelector('[data-sef="bp"]')?.value) || 0;
     const p = parseFloat(row.querySelector('[data-sef="p"]')?.value) || 0;
-    const tCost = parseFloat(row.querySelector('[data-sef="cost"]')?.value) || 0;
-    const oCost = parseFloat(row.querySelector('[data-sef="ocost"]')?.value) || 0;
-    const totalEx = tCost + oCost;
-
-    const perUnit = p - bp;
-    const margin = p > 0 ? (perUnit / p) * 100 : 0;
-    const grossProfit = perUnit * stock;
-    const netProfit = grossProfit - totalEx;
-    const invest = bp * stock + totalEx;
-    const roi = invest > 0 ? (netProfit / invest) * 100 : 0;
-    const breakEven = perUnit > 0 ? Math.ceil(totalEx / perUnit) : 0;
-
+    const cost = parseFloat(row.querySelector('[data-sef="cost"]')?.value) || 0;
     totalStock += stock;
-    totalProfit += netProfit;
-    totalRevenue += p * stock;
-    totalCost += totalEx;
-    totalInvest += invest;
+    const profit = (p - bp) * stock - cost;
+    totalProfit += profit;
 
-    // Update badges & metrics
     const badgeEl = row.querySelector('[data-sef="badge"]');
     if (badgeEl) badgeEl.innerHTML = _seStockBadge(stock);
-
-    const setTxt = (sel, val, color) => {
-      const e = row.querySelector(sel);
-      if (e) { e.textContent = val; if (color) e.style.color = color; }
-    };
-    setTxt('[data-sef="perunit"]', _seFmt(perUnit), perUnit >= 0 ? 'var(--green3)' : 'var(--red2)');
-    setTxt('[data-sef="margin"]', _sePct(margin), margin >= 0 ? 'var(--green3)' : 'var(--red2)');
-    setTxt('[data-sef="gross"]', _seFmt(grossProfit), grossProfit >= 0 ? 'var(--green3)' : 'var(--red2)');
-    setTxt('[data-sef="profit"]', _seFmt(netProfit), netProfit >= 0 ? 'var(--green3)' : 'var(--red2)');
-    setTxt('[data-sef="roi"]', _sePct(roi), roi >= 0 ? 'var(--green3)' : 'var(--red2)');
-    setTxt('[data-sef="be"]', breakEven > 0 ? breakEven + ' পিস' : '—', 'var(--orange2)');
-    setTxt('[data-sef="invest"]', _seFmt(invest), 'var(--blue2)');
-    setTxt('[data-sef="totalex"]', _seFmt(totalEx), 'var(--red2)');
+    const profitEl = row.querySelector('[data-sef="profit"]');
+    if (profitEl) { profitEl.textContent = _seFmt(profit); profitEl.style.color = profit >= 0 ? 'var(--green3)' : 'var(--red2)'; }
   });
 
-  const stockInput = document.getElementById('seStockQty');
-  if (stockInput) stockInput.value = totalStock;
+  const remaining = Math.max(totalStock - soldQty, 0);
+  document.getElementById('seStockQty').textContent = totalStock;
+  document.getElementById('seTotalSold').textContent = soldQty;
+  document.getElementById('seTotalRemaining').textContent = remaining;
+  document.getElementById('seTotalRemaining').style.color = remaining <= 0 ? 'var(--red2)' : remaining <= 5 ? 'var(--yellow2)' : 'var(--orange2)';
 
-  const setSum = (id, val, isProfit) => {
-    const e = document.getElementById(id);
-    if (!e) return;
-    e.textContent = _seFmt(val);
-    if (isProfit) e.style.color = val >= 0 ? 'var(--green3)' : 'var(--red2)';
-  };
-  setSum('seTotalProfit', totalProfit, true);
-  setSum('seTotalRevenue', totalRevenue);
-  setSum('seTotalCost', totalCost);
-  setSum('seTotalInvest', totalInvest);
-  const roiEl = document.getElementById('seTotalROI');
-  if (roiEl) {
-    const tRoi = totalInvest > 0 ? (totalProfit / totalInvest) * 100 : 0;
-    roiEl.textContent = _sePct(tRoi);
-    roiEl.style.color = tRoi >= 0 ? 'var(--green3)' : 'var(--red2)';
-  }
-  _seUpdateDelta();
+  const pe = document.getElementById('seTotalProfit');
+  pe.textContent = _seFmt(totalProfit);
+  pe.style.color = totalProfit >= 0 ? 'var(--green3)' : 'var(--red2)';
 }
-
-function _seAdjust(btn, field, amount) {
-  const row = btn.closest('[data-vidx]');
-  if (!row) return;
-  const inp = row.querySelector(`[data-sef="${field}"]`);
-  if (!inp) return;
-  const cur = parseFloat(inp.value) || 0;
-  const next = Math.max(0, cur + amount);
-  inp.value = next;
-  inp.dispatchEvent(new Event('input', { bubbles: true }));
-  // flash effect
-  inp.style.transition = 'background .3s';
-  inp.style.background = amount > 0 ? 'rgba(46,160,67,.15)' : 'rgba(218,54,51,.15)';
-  setTimeout(() => { inp.style.background = ''; }, 400);
-}
-window._seAdjust = _seAdjust;
 
 function _seRenderVariants(variants) {
   const el = document.getElementById('seVariantsList');
   if (!variants || !variants.length) {
-    el.innerHTML = '<div style="color:var(--txt3);font-size:.85rem;padding:20px;text-align:center;background:var(--bg3);border:1px dashed var(--border);border-radius:10px"><i class="fa-solid fa-box-open" style="font-size:1.5rem;display:block;margin-bottom:8px;opacity:.5"></i> কোনো ভ্যারিয়েন্ট নেই</div>';
+    el.innerHTML = '<div style="color:var(--txt3);font-size:.85rem;padding:16px;text-align:center;background:var(--bg3);border:1px dashed var(--border);border-radius:10px"><i class="fa-solid fa-box-open" style="font-size:1.2rem;display:block;margin-bottom:6px;opacity:.5"></i>কোনো ভ্যারিয়েন্ট নেই</div>';
     return;
   }
 
   el.innerHTML = variants.map((v, i) => {
-    const costDate = v.costUpdatedAt ? _seFmtDate(v.costUpdatedAt) : '';
     const stock = v.stock || 0;
     return `
-    <div data-vidx="${i}" style="background:linear-gradient(180deg,var(--bg3),var(--bg2));border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15)">
-
-      <!-- Header -->
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:linear-gradient(90deg,rgba(137,87,229,.12),rgba(31,111,235,.06));border-bottom:1px solid var(--border);flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <span style="background:var(--purple);color:#fff;font-size:.7rem;font-weight:800;padding:3px 9px;border-radius:6px">#${i+1}</span>
-          <span style="font-weight:700;color:var(--txt);font-size:.95rem">${v.lbl || 'ভ্যারিয়েন্ট ' + (i+1)}</span>
+    <div data-vidx="${i}" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px">
+      <!-- হেডার -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="background:var(--purple);color:#fff;font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:5px">#${i+1}</span>
+          <span style="font-weight:700;font-size:.9rem;color:var(--txt)">${v.lbl || 'ভ্যারিয়েন্ট ' + (i+1)}</span>
           <span data-sef="badge">${_seStockBadge(stock)}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--txt3);font-weight:600">
-          <i class="fa-solid fa-coins" style="color:var(--orange2)"></i>
-          বিনিয়োগ: <span data-sef="invest" style="color:var(--blue2);font-weight:800">৳0</span>
+        <button type="button" onclick="openChalanModal(${i},'${(v.lbl||'').replace(/'/g,"\\'")}')" style="background:rgba(46,160,67,.12);color:var(--green3);border:1px solid rgba(46,160,67,.35);border-radius:7px;padding:5px 12px;font-size:.75rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;transition:all .2s" onmouseover="this.style.background='rgba(46,160,67,.22)'" onmouseout="this.style.background='rgba(46,160,67,.12)'">
+          <i class="fa-solid fa-truck-ramp-box"></i> + নতুন চালান
+        </button>
+      </div>
+
+      <!-- ফিল্ড গ্রিড -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px">
+        <div>
+          <label style="font-size:.65rem;font-weight:700;color:var(--blue2);display:block;margin-bottom:3px">📦 স্টক</label>
+          <input type="number" class="form-control" value="${stock}" min="0" data-sef="stock" style="font-weight:700;font-size:.95rem;text-align:center;border-color:rgba(31,111,235,.35)">
+        </div>
+        <div>
+          <label style="font-size:.65rem;font-weight:700;color:var(--orange2);display:block;margin-bottom:3px">🏷️ ক্রয় মূল্য</label>
+          <input type="number" class="form-control" value="${v.bp || ''}" min="0" step="0.01" data-sef="bp" placeholder="০" style="font-weight:600;border-color:rgba(232,102,10,.35)">
+        </div>
+        <div>
+          <label style="font-size:.65rem;font-weight:700;color:var(--green3);display:block;margin-bottom:3px">💵 বিক্রয় মূল্য</label>
+          <input type="number" class="form-control" value="${v.p || ''}" min="0" step="0.01" data-sef="p" placeholder="০" style="font-weight:600;border-color:rgba(46,160,67,.35)">
+        </div>
+        <div>
+          <label style="font-size:.65rem;font-weight:700;color:var(--red2);display:block;margin-bottom:3px">🚚 আনার খরচ</label>
+          <input type="number" class="form-control" value="${v.extraCost || ''}" min="0" step="0.01" data-sef="cost" data-orig-cost="${v.extraCost || 0}" placeholder="০" style="font-weight:600;border-color:rgba(218,54,51,.35)">
         </div>
       </div>
 
-      <!-- Body -->
-      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:12px">
-
-        <!-- Stock with quick adjust -->
-        <div style="background:rgba(31,111,235,.06);border:1px solid rgba(31,111,235,.2);border-radius:10px;padding:10px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-            <label style="font-size:.72rem;font-weight:700;color:var(--blue2);display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:.4px">
-              <i class="fa-solid fa-cubes-stacked"></i> স্টক পরিমাণ
-            </label>
-            <div style="display:flex;gap:3px">
-              <button type="button" onclick="_seAdjust(this,'stock',-10)" style="background:rgba(218,54,51,.15);color:var(--red2);border:1px solid rgba(218,54,51,.3);border-radius:5px;padding:2px 7px;font-size:.68rem;font-weight:700;cursor:pointer">−10</button>
-              <button type="button" onclick="_seAdjust(this,'stock',-1)" style="background:rgba(218,54,51,.15);color:var(--red2);border:1px solid rgba(218,54,51,.3);border-radius:5px;padding:2px 7px;font-size:.68rem;font-weight:700;cursor:pointer">−1</button>
-              <button type="button" onclick="_seAdjust(this,'stock',1)" style="background:rgba(46,160,67,.15);color:var(--green3);border:1px solid rgba(46,160,67,.3);border-radius:5px;padding:2px 7px;font-size:.68rem;font-weight:700;cursor:pointer">+1</button>
-              <button type="button" onclick="_seAdjust(this,'stock',10)" style="background:rgba(46,160,67,.15);color:var(--green3);border:1px solid rgba(46,160,67,.3);border-radius:5px;padding:2px 7px;font-size:.68rem;font-weight:700;cursor:pointer">+10</button>
-              <button type="button" onclick="_seAdjust(this,'stock',50)" style="background:rgba(46,160,67,.2);color:var(--green3);border:1px solid rgba(46,160,67,.4);border-radius:5px;padding:2px 7px;font-size:.68rem;font-weight:700;cursor:pointer">+50</button>
-            </div>
-          </div>
-          <input type="number" class="form-control" placeholder="স্টক" value="${stock}" min="0" data-sef="stock" style="border-color:rgba(31,111,235,.4);font-weight:700;font-size:1rem;text-align:center">
-        </div>
-
-        <!-- Price grid: Buy, Sell, Per-unit profit, Margin% -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
-          <div style="background:rgba(232,102,10,.06);border:1px solid rgba(232,102,10,.25);border-radius:8px;padding:8px">
-            <label style="font-size:.68rem;font-weight:700;color:var(--orange2);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px">
-              <i class="fa-solid fa-tag"></i> ক্রয় মূল্য (প্রতি পিস)
-            </label>
-            <input type="number" class="form-control" placeholder="0.00" value="${v.bp || ''}" min="0" step="0.01" data-sef="bp" style="border-color:rgba(232,102,10,.4);font-weight:700">
-          </div>
-          <div style="background:rgba(46,160,67,.06);border:1px solid rgba(46,160,67,.25);border-radius:8px;padding:8px">
-            <label style="font-size:.68rem;font-weight:700;color:var(--green3);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px">
-              <i class="fa-solid fa-money-bill"></i> বিক্রয় মূল্য (প্রতি পিস)
-            </label>
-            <input type="number" class="form-control" placeholder="0.00" value="${v.p || ''}" min="0" step="0.01" data-sef="p" style="border-color:rgba(46,160,67,.4);font-weight:700">
-          </div>
-          <div style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.3);border-radius:8px;padding:8px;display:flex;flex-direction:column;justify-content:center">
-            <span style="font-size:.65rem;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">
-              <i class="fa-solid fa-coins"></i> প্রতি পিসে লাভ
-            </span>
-            <span data-sef="perunit" style="font-size:1rem;font-weight:800;color:var(--green3)">৳0</span>
-            <span style="font-size:.65rem;color:var(--txt3);margin-top:2px">মার্জিন: <span data-sef="margin" style="font-weight:700;color:var(--green3)">0%</span></span>
-          </div>
-        </div>
-
-        <!-- Costs: Transport + Other -->
-        <div style="background:rgba(218,54,51,.05);border:1px solid rgba(218,54,51,.2);border-radius:10px;padding:10px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
-            <label style="font-size:.72rem;font-weight:700;color:var(--red2);display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:.4px">
-              <i class="fa-solid fa-truck-fast"></i> স্টক আনার খরচ
-            </label>
-            <span style="font-size:.7rem;color:var(--txt3);font-weight:600">মোট খরচ: <span data-sef="totalex" style="color:var(--red2);font-weight:800">৳0</span></span>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <div>
-              <span style="font-size:.62rem;color:var(--txt3);font-weight:600;display:block;margin-bottom:2px;padding-left:2px">🚚 যাতায়াত খরচ</span>
-              <input type="number" class="form-control" placeholder="0" value="${v.extraCost || ''}" min="0" step="0.01" data-sef="cost" data-orig-cost="${v.extraCost || 0}" style="border-color:rgba(218,54,51,.4);font-size:.82rem">
-            </div>
-            <div>
-              <span style="font-size:.62rem;color:var(--txt3);font-weight:600;display:block;margin-bottom:2px;padding-left:2px">📦 অন্যান্য খরচ</span>
-              <input type="number" class="form-control" placeholder="0" value="${v.otherCost || ''}" min="0" step="0.01" data-sef="ocost" data-orig-ocost="${v.otherCost || 0}" style="border-color:rgba(218,54,51,.4);font-size:.82rem">
-            </div>
-          </div>
-          <div data-sef="costdate" style="font-size:.62rem;color:var(--txt3);margin-top:6px;padding-left:2px;font-weight:600">${costDate ? '🕒 সর্বশেষ আপডেট: ' + costDate : '<span style="opacity:.6">এখনো আপডেট হয়নি</span>'}</div>
-        </div>
-
-        <!-- Profit summary metrics -->
-        <div style="background:linear-gradient(135deg,rgba(46,160,67,.1),rgba(139,92,246,.08));border:1px solid rgba(46,160,67,.3);border-radius:10px;padding:10px">
-          <div style="font-size:.7rem;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;display:flex;align-items:center;gap:5px">
-            <i class="fa-solid fa-chart-line" style="color:var(--green3)"></i> এই ভ্যারিয়েন্টের লাভ বিশ্লেষণ
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px">
-            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:7px;text-align:center">
-              <div style="font-size:.6rem;color:var(--txt3);font-weight:600;margin-bottom:2px">মোট লাভ (গ্রস)</div>
-              <div data-sef="gross" style="font-size:.85rem;font-weight:800;color:var(--green3)">৳0</div>
-            </div>
-            <div style="background:var(--bg2);border:1px solid var(--green);border-radius:7px;padding:7px;text-align:center">
-              <div style="font-size:.6rem;color:var(--txt3);font-weight:600;margin-bottom:2px">নিট লাভ (খরচ বাদে)</div>
-              <div data-sef="profit" style="font-size:.95rem;font-weight:800;color:var(--green3)">৳0</div>
-            </div>
-            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:7px;text-align:center">
-              <div style="font-size:.6rem;color:var(--txt3);font-weight:600;margin-bottom:2px">ROI %</div>
-              <div data-sef="roi" style="font-size:.85rem;font-weight:800;color:var(--green3)">0%</div>
-            </div>
-            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:7px;text-align:center" title="খরচ পুষাতে কতটি বিক্রি লাগবে">
-              <div style="font-size:.6rem;color:var(--txt3);font-weight:600;margin-bottom:2px">ব্রেক-ইভেন</div>
-              <div data-sef="be" style="font-size:.85rem;font-weight:800;color:var(--orange2)">—</div>
-            </div>
-          </div>
-        </div>
-
+      <!-- লাভ -->
+      <div style="margin-top:8px;display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(46,160,67,.06);border:1px solid rgba(46,160,67,.2);border-radius:7px">
+        <span style="font-size:.72rem;font-weight:700;color:var(--txt2)">💰 লাভ:</span>
+        <span data-sef="profit" style="font-size:.9rem;font-weight:800;color:var(--green3)">৳0</span>
       </div>
     </div>`;
   }).join('');
@@ -2715,13 +2599,36 @@ function _seRenderVariants(variants) {
   _seRecalc();
 }
 
-function _seUpdateDelta() {
-  const cur = parseInt(document.getElementById('seStockQty').value) || 0;
-  const delta = cur - _seOriginalStock;
-  const el = document.getElementById('seDelta');
-  if (!el) return;
-  el.textContent = (delta > 0 ? '+' : '') + delta;
-  el.style.color = delta > 0 ? 'var(--green3)' : delta < 0 ? 'var(--red2)' : 'var(--txt2)';
+function _seUpdateDelta() {}
+
+// ━━ নতুন চালান পপআপ ━━
+function openChalanModal(vidx, varName) {
+  document.getElementById('chalanVidx').value = vidx;
+  document.getElementById('chalanVarName').textContent = varName || 'ভ্যারিয়েন্ট ' + (vidx+1);
+  document.getElementById('chalanQty').value = '';
+  document.getElementById('chalanCost').value = '';
+  document.getElementById('chalanModal').classList.add('active');
+}
+function closeChalanModal() {
+  document.getElementById('chalanModal').classList.remove('active');
+}
+function applyChalanToVariant() {
+  const vidx = parseInt(document.getElementById('chalanVidx').value);
+  const qty = parseInt(document.getElementById('chalanQty').value) || 0;
+  const cost = parseFloat(document.getElementById('chalanCost').value) || 0;
+  if (qty <= 0) { toast('পরিমাণ দিন', 'error'); return; }
+
+  const row = document.querySelector(`#seVariantsList [data-vidx="${vidx}"]`);
+  if (!row) { toast('ভ্যারিয়েন্ট পাওয়া যায়নি', 'error'); return; }
+
+  const stockInp = row.querySelector('[data-sef="stock"]');
+  const costInp = row.querySelector('[data-sef="cost"]');
+  if (stockInp) stockInp.value = (parseInt(stockInp.value) || 0) + qty;
+  if (costInp && cost > 0) costInp.value = (parseFloat(costInp.value) || 0) + cost;
+
+  _seRecalc();
+  closeChalanModal();
+  toast(`+${qty} পিস যোগ হয়েছে ✅`, 'success');
 }
 
 async function openStockEditModal(productId) {
@@ -2738,19 +2645,11 @@ async function openStockEditModal(productId) {
 
     document.getElementById('seProductName').textContent = prod.nm || '';
     document.getElementById('seProductId').value = prod._id;
-    document.getElementById('seStockQty').value = _seOriginalStock;
-    document.getElementById('seReason').value = '';
     document.getElementById('seBuyPrice').value = prod.variants?.[0]?.bp || '';
     document.getElementById('seSellPrice').value = prod.variants?.[0]?.p || '';
 
     _seRenderVariants(prod.variants || []);
     _seRenderLogs(prod._id);
-    _seUpdateDelta();
-
-    // delta listener
-    const qtyEl = document.getElementById('seStockQty');
-    qtyEl.oninput = _seUpdateDelta;
-
     openModal('stockEditModal');
   } catch (err) {
     toast('লোড ব্যর্থ: ' + err.message, 'error');
@@ -2763,45 +2662,38 @@ async function saveStockEdit() {
   const prod = _seCurrentProduct;
   if (!prod) { toast('পণ্য নেই', 'error'); return; }
 
-  const newStock = parseInt(document.getElementById('seStockQty').value) || 0;
-  const newBuy = parseFloat(document.getElementById('seBuyPrice').value);
-  const newSell = parseFloat(document.getElementById('seSellPrice').value);
-  const reason = document.getElementById('seReason').value.trim();
-
-  // ভ্যারিয়েন্ট সংগ্রহ
   const variantRows = document.querySelectorAll('#seVariantsList [data-vidx]');
+  let newStock = 0;
   const updatedVariants = (prod.variants || []).map((v, i) => {
     const row = variantRows[i];
     if (!row) return v;
-    const stockEl = row.querySelector('[data-sef="stock"]');
-    const bpEl = row.querySelector('[data-sef="bp"]');
-    const pEl = row.querySelector('[data-sef="p"]');
+    const stock = parseInt(row.querySelector('[data-sef="stock"]')?.value) || 0;
+    const bp = row.querySelector('[data-sef="bp"]');
+    const p = row.querySelector('[data-sef="p"]');
     const costEl = row.querySelector('[data-sef="cost"]');
-    const ocostEl = row.querySelector('[data-sef="ocost"]');
     const newCost = costEl?.value !== '' ? parseFloat(costEl.value) : 0;
     const origCost = parseFloat(costEl?.dataset.origCost) || 0;
-    const newOCost = ocostEl?.value !== '' ? parseFloat(ocostEl.value) : 0;
-    const origOCost = parseFloat(ocostEl?.dataset.origOcost) || 0;
-    const costChanged = newCost !== origCost || newOCost !== origOCost;
+    const costChanged = newCost !== origCost;
+    newStock += stock;
     return {
       ...v,
-      stock: parseInt(stockEl?.value) || 0,
-      bp: bpEl?.value !== '' ? parseFloat(bpEl.value) : v.bp,
-      p: pEl?.value !== '' ? parseFloat(pEl.value) : v.p,
+      stock,
+      bp: bp?.value !== '' ? parseFloat(bp.value) : v.bp,
+      p: p?.value !== '' ? parseFloat(p.value) : v.p,
       extraCost: newCost,
-      otherCost: newOCost,
+      otherCost: v.otherCost || 0,
       costUpdatedAt: costChanged ? Date.now() : (v.costUpdatedAt || null)
     };
   });
 
-  // লিগেসি কম্প্যাটিবিলিটি — প্রথম ভ্যারিয়েন্টের মূল্য সিঙ্ক (যদি hidden ফিল্ডে থাকে)
   if (updatedVariants[0]) {
-    if (!isNaN(newBuy)) updatedVariants[0].bp = newBuy;
-    if (!isNaN(newSell)) updatedVariants[0].p = newSell;
+    const hBuy = parseFloat(document.getElementById('seBuyPrice').value);
+    const hSell = parseFloat(document.getElementById('seSellPrice').value);
+    if (!isNaN(hBuy)) updatedVariants[0].bp = hBuy;
+    if (!isNaN(hSell)) updatedVariants[0].p = hSell;
   }
 
   const payload = { ...prod, stockQuantity: newStock, variants: updatedVariants };
-  // অপ্রয়োজনীয় ফিল্ড সরিয়ে ফেলি
   delete payload._stock; delete payload._sold; delete payload._remaining;
   delete payload.createdAt; delete payload.updatedAt; delete payload.__v;
 
@@ -2809,28 +2701,25 @@ async function saveStockEdit() {
   btn.disabled = true;
   try {
     await api('PUT', '/api/products/' + prod._id, payload);
-
-    // লগ সেভ
     const delta = newStock - _seOriginalStock;
-    if (delta !== 0 || reason) {
+    if (delta !== 0) {
       _seSaveLog({
         productId: prod._id,
         productName: prod.nm,
         delta,
         from: _seOriginalStock,
         to: newStock,
-        reason,
+        reason: delta > 0 ? 'নতুন চালান' : 'স্টক কমেছে',
         at: Date.now()
       });
     }
-
     toast('স্টক আপডেট সফল ✅', 'success');
     closeModal('stockEditModal');
     loadStock();
   } catch (err) {
     toast('সংরক্ষণ ব্যর্থ: ' + err.message, 'error');
   } finally {
-    btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ করুন';
+    btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ';
     btn.disabled = false;
   }
 }
