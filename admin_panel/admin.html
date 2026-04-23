@@ -2504,6 +2504,41 @@ function _sePct(n) {
   return (v > 0 ? '+' : '') + v + '%';
 }
 
+// ━━ আনার খরচ লোকাল স্টোরেজ পার্সিস্ট্যান্স (ব্যাকএন্ড স্কিমা ফলব্যাক) ━━
+const _SE_COST_KEY = 'se_extra_costs_v1';
+function _seLoadCostMap() {
+  try { return JSON.parse(localStorage.getItem(_SE_COST_KEY) || '{}'); }
+  catch { return {}; }
+}
+function _seSaveCostMap(map) {
+  try { localStorage.setItem(_SE_COST_KEY, JSON.stringify(map)); } catch {}
+}
+function _seGetCost(productId, vidx) {
+  const map = _seLoadCostMap();
+  const v = map?.[productId]?.[vidx];
+  return (v === undefined || v === null) ? null : Number(v);
+}
+function _seSetCost(productId, vidx, cost) {
+  const map = _seLoadCostMap();
+  if (!map[productId]) map[productId] = {};
+  if (cost === null || cost === undefined || isNaN(cost)) {
+    delete map[productId][vidx];
+  } else {
+    map[productId][vidx] = Number(cost);
+  }
+  _seSaveCostMap(map);
+}
+function _seMergeCostsIntoVariants(productId, variants) {
+  if (!Array.isArray(variants)) return variants;
+  return variants.map((v, i) => {
+    const localCost = _seGetCost(productId, i);
+    if (localCost !== null && (v.extraCost === undefined || v.extraCost === null || v.extraCost === 0)) {
+      return { ...v, extraCost: localCost };
+    }
+    return v;
+  });
+}
+
 function _seStockBadge(stock) {
   if (stock <= 0) return '<span style="background:rgba(218,54,51,.18);color:var(--red2);border:1px solid rgba(218,54,51,.4);font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:10px"><i class="fa-solid fa-circle-xmark"></i> স্টক আউট</span>';
   if (stock < 5) return '<span style="background:rgba(232,102,10,.18);color:var(--orange2);border:1px solid rgba(232,102,10,.4);font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:10px"><i class="fa-solid fa-triangle-exclamation"></i> কম</span>';
@@ -2648,7 +2683,7 @@ async function openStockEditModal(productId) {
     document.getElementById('seBuyPrice').value = prod.variants?.[0]?.bp || '';
     document.getElementById('seSellPrice').value = prod.variants?.[0]?.p || '';
 
-    _seRenderVariants(prod.variants || []);
+    _seRenderVariants(_seMergeCostsIntoVariants(prod._id, prod.variants || []));
     _seRenderLogs(prod._id);
     openModal('stockEditModal');
   } catch (err) {
@@ -2692,6 +2727,11 @@ async function saveStockEdit() {
     if (!isNaN(hBuy)) updatedVariants[0].bp = hBuy;
     if (!isNaN(hSell)) updatedVariants[0].p = hSell;
   }
+
+  // ✅ "আনার খরচ" সবসময় লোকাল স্টোরেজে সংরক্ষণ — ব্যাকএন্ড ফিল্ড বাদ দিলেও থাকবে
+  updatedVariants.forEach((v, i) => {
+    _seSetCost(prod._id, i, v.extraCost || 0);
+  });
 
   const payload = { ...prod, stockQuantity: newStock, variants: updatedVariants };
   delete payload._stock; delete payload._sold; delete payload._remaining;
