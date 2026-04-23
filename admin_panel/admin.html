@@ -1218,33 +1218,25 @@ textarea.form-control { resize:vertical; min-height:80px; }
     <div class="modal-body">
       <input type="hidden" id="seProductId">
 
-      <!-- কুইক অ্যাডজাস্ট -->
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">
-        <p style="font-size:.72rem;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">
-          <i class="fa-solid fa-bolt" style="color:var(--yellow2);margin-right:6px"></i> কুইক স্টক অ্যাডজাস্ট
-        </p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-          <button type="button" class="btn-secondary" onclick="seAdjust(-10)" style="background:rgba(218,54,51,.12);border-color:var(--red);color:var(--red2)">−10</button>
-          <button type="button" class="btn-secondary" onclick="seAdjust(-5)" style="background:rgba(218,54,51,.12);border-color:var(--red);color:var(--red2)">−5</button>
-          <button type="button" class="btn-secondary" onclick="seAdjust(-1)" style="background:rgba(218,54,51,.12);border-color:var(--red);color:var(--red2)">−1</button>
-          <button type="button" class="btn-secondary" onclick="seAdjust(1)" style="background:rgba(46,160,67,.12);border-color:var(--green);color:var(--green3)">+1</button>
-          <button type="button" class="btn-secondary" onclick="seAdjust(5)" style="background:rgba(46,160,67,.12);border-color:var(--green);color:var(--green3)">+5</button>
-          <button type="button" class="btn-secondary" onclick="seAdjust(10)" style="background:rgba(46,160,67,.12);border-color:var(--green);color:var(--green3)">+10</button>
-          <button type="button" class="btn-secondary" onclick="seAdjust(50)" style="background:rgba(46,160,67,.12);border-color:var(--green);color:var(--green3)">+50</button>
-        </div>
-      </div>
-
       <!-- মূল ফিল্ড -->
       <div class="form-row">
         <div class="form-group2">
-          <label>📦 মোট স্টক পরিমাণ</label>
-          <input type="number" class="form-control" id="seStockQty" min="0" style="border-color:rgba(59,130,246,.4);font-weight:700;font-size:1rem">
-          <div class="form-hint" style="color:var(--blue2)">পরিবর্তন: <span id="seDelta" style="font-weight:700">0</span></div>
+          <label>📦 মোট স্টক পরিমাণ <span style="font-size:.65rem;color:var(--blue2);font-weight:600">(অটো)</span></label>
+          <input type="number" class="form-control" id="seStockQty" min="0" readonly style="border-color:rgba(59,130,246,.4);font-weight:700;font-size:1rem;background:rgba(59,130,246,.08);cursor:not-allowed">
+          <div class="form-hint" style="color:var(--blue2)">নিচের ভ্যারিয়েন্ট স্টকের যোগফল | পরিবর্তন: <span id="seDelta" style="font-weight:700">0</span></div>
         </div>
         <div class="form-group2">
           <label>📝 পরিবর্তনের কারণ (ঐচ্ছিক)</label>
           <input type="text" class="form-control" id="seReason" placeholder="যেমন: নতুন চালান এসেছে / নষ্ট হয়েছে">
         </div>
+      </div>
+
+      <!-- লাভ সারাংশ -->
+      <div style="background:linear-gradient(135deg,rgba(46,160,67,.12),rgba(31,111,235,.08));border:1px solid var(--green);border-radius:10px;padding:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div style="font-size:.78rem;font-weight:700;color:var(--txt2)">
+          <i class="fa-solid fa-sack-dollar" style="color:var(--green3);margin-right:6px"></i> মোট সম্ভাব্য লাভ (খরচ বাদে)
+        </div>
+        <div id="seTotalProfit" style="font-size:1.1rem;font-weight:800;color:var(--green3)">৳0</div>
       </div>
 
       <div class="form-row">
@@ -2477,6 +2469,44 @@ function _seRenderLogs(productId) {
   }).join('');
 }
 
+function _seFmt(n) {
+  return '৳' + (Math.round((n || 0) * 100) / 100).toLocaleString('bn-BD');
+}
+
+function _seFmtDate(ts) {
+  if (!ts) return '';
+  try { return new Date(ts).toLocaleString('bn-BD', { dateStyle:'short', timeStyle:'short' }); }
+  catch { return ''; }
+}
+
+function _seRecalc() {
+  const rows = document.querySelectorAll('#seVariantsList [data-vidx]');
+  let totalStock = 0;
+  let totalProfit = 0;
+  rows.forEach(row => {
+    const stock = parseFloat(row.querySelector('[data-sef="stock"]')?.value) || 0;
+    const bp = parseFloat(row.querySelector('[data-sef="bp"]')?.value) || 0;
+    const p = parseFloat(row.querySelector('[data-sef="p"]')?.value) || 0;
+    const cost = parseFloat(row.querySelector('[data-sef="cost"]')?.value) || 0;
+    const profit = (p - bp) * stock - cost;
+    totalStock += stock;
+    totalProfit += profit;
+    const profitEl = row.querySelector('[data-sef="profit"]');
+    if (profitEl) {
+      profitEl.textContent = _seFmt(profit);
+      profitEl.style.color = profit >= 0 ? 'var(--green3)' : 'var(--red2)';
+    }
+  });
+  const stockInput = document.getElementById('seStockQty');
+  if (stockInput) stockInput.value = totalStock;
+  const profitTotalEl = document.getElementById('seTotalProfit');
+  if (profitTotalEl) {
+    profitTotalEl.textContent = _seFmt(totalProfit);
+    profitTotalEl.style.color = totalProfit >= 0 ? 'var(--green3)' : 'var(--red2)';
+  }
+  _seUpdateDelta();
+}
+
 function _seRenderVariants(variants) {
   const el = document.getElementById('seVariantsList');
   if (!variants || !variants.length) {
@@ -2484,44 +2514,56 @@ function _seRenderVariants(variants) {
     return;
   }
   const headerHTML = `
-    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:0 8px;font-size:.7rem;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">
+    <div style="display:grid;grid-template-columns:1.2fr .8fr .9fr .9fr .9fr .9fr;gap:6px;align-items:center;padding:0 8px;font-size:.68rem;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">
       <div>ভ্যারিয়েন্ট</div>
       <div style="color:var(--blue2);text-align:center"><i class="fa-solid fa-cubes-stacked"></i> স্টক</div>
       <div style="color:var(--orange);text-align:center"><i class="fa-solid fa-tag"></i> ক্রয় মূল্য</div>
       <div style="color:var(--green3);text-align:center"><i class="fa-solid fa-money-bill"></i> বিক্রয় মূল্য</div>
+      <div style="color:var(--red2);text-align:center"><i class="fa-solid fa-truck"></i> খরচ</div>
+      <div style="color:var(--purple);text-align:center"><i class="fa-solid fa-chart-line"></i> লাভ</div>
     </div>`;
-  el.innerHTML = headerHTML + variants.map((v, i) => `
-    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:6px;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px" data-vidx="${i}">
-      <div style="font-weight:600;color:var(--txt);font-size:.85rem;padding:0 4px">${v.lbl || 'ভ্যারিয়েন্ট ' + (i+1)}</div>
+  el.innerHTML = headerHTML + variants.map((v, i) => {
+    const costDate = v.costUpdatedAt ? _seFmtDate(v.costUpdatedAt) : '';
+    return `
+    <div style="display:grid;grid-template-columns:1.2fr .8fr .9fr .9fr .9fr .9fr;gap:6px;align-items:start;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px" data-vidx="${i}">
+      <div style="font-weight:600;color:var(--txt);font-size:.85rem;padding:6px 4px 0">${v.lbl || 'ভ্যারিয়েন্ট ' + (i+1)}</div>
       <div style="display:flex;flex-direction:column;gap:2px">
-        <span style="font-size:.65rem;color:var(--txt3);font-weight:600;padding-left:2px">স্টক</span>
+        <span style="font-size:.62rem;color:var(--txt3);font-weight:600;padding-left:2px">স্টক</span>
         <input type="number" class="form-control" placeholder="স্টক" value="${v.stock || 0}" min="0" data-sef="stock" style="border-color:rgba(59,130,246,.4);font-size:.82rem" title="স্টক">
       </div>
       <div style="display:flex;flex-direction:column;gap:2px">
-        <span style="font-size:.65rem;color:var(--txt3);font-weight:600;padding-left:2px">ক্রয় মূল্য</span>
+        <span style="font-size:.62rem;color:var(--txt3);font-weight:600;padding-left:2px">ক্রয় মূল্য</span>
         <input type="number" class="form-control" placeholder="ক্রয়" value="${v.bp || ''}" min="0" step="0.01" data-sef="bp" style="border-color:rgba(232,102,10,.4);font-size:.82rem" title="ক্রয় মূল্য">
       </div>
       <div style="display:flex;flex-direction:column;gap:2px">
-        <span style="font-size:.65rem;color:var(--txt3);font-weight:600;padding-left:2px">বিক্রয় মূল্য</span>
+        <span style="font-size:.62rem;color:var(--txt3);font-weight:600;padding-left:2px">বিক্রয় মূল্য</span>
         <input type="number" class="form-control" placeholder="বিক্রয়" value="${v.p || ''}" min="0" step="0.01" data-sef="p" style="border-color:rgba(46,160,67,.4);font-size:.82rem" title="বিক্রয় মূল্য">
       </div>
-    </div>
-  `).join('');
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <span style="font-size:.62rem;color:var(--txt3);font-weight:600;padding-left:2px">খরচ (যাতায়াত)</span>
+        <input type="number" class="form-control" placeholder="খরচ" value="${v.extraCost || ''}" min="0" step="0.01" data-sef="cost" data-orig-cost="${v.extraCost || 0}" style="border-color:rgba(218,54,51,.4);font-size:.82rem" title="স্টকে পণ্য আনতে যাতায়াত/অন্যান্য খরচ">
+        <span data-sef="costdate" style="font-size:.6rem;color:var(--txt3);padding-left:2px">${costDate ? '🕒 ' + costDate : ''}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center;background:rgba(139,92,246,.08);border-radius:6px;padding:6px 4px;min-height:42px">
+        <span style="font-size:.62rem;color:var(--txt3);font-weight:600">লাভ</span>
+        <span data-sef="profit" style="font-size:.85rem;font-weight:800;color:var(--green3)">৳0</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.querySelectorAll('input[data-sef]').forEach(inp => {
+    inp.addEventListener('input', _seRecalc);
+  });
+  _seRecalc();
 }
 
 function _seUpdateDelta() {
   const cur = parseInt(document.getElementById('seStockQty').value) || 0;
   const delta = cur - _seOriginalStock;
   const el = document.getElementById('seDelta');
+  if (!el) return;
   el.textContent = (delta > 0 ? '+' : '') + delta;
   el.style.color = delta > 0 ? 'var(--green3)' : delta < 0 ? 'var(--red2)' : 'var(--txt2)';
-}
-
-function seAdjust(amount) {
-  const input = document.getElementById('seStockQty');
-  const newVal = Math.max(0, (parseInt(input.value) || 0) + amount);
-  input.value = newVal;
-  _seUpdateDelta();
 }
 
 async function openStockEditModal(productId) {
@@ -2576,11 +2618,17 @@ async function saveStockEdit() {
     const stockEl = row.querySelector('[data-sef="stock"]');
     const bpEl = row.querySelector('[data-sef="bp"]');
     const pEl = row.querySelector('[data-sef="p"]');
+    const costEl = row.querySelector('[data-sef="cost"]');
+    const newCost = costEl?.value !== '' ? parseFloat(costEl.value) : 0;
+    const origCost = parseFloat(costEl?.dataset.origCost) || 0;
+    const costChanged = newCost !== origCost;
     return {
       ...v,
       stock: parseInt(stockEl?.value) || 0,
       bp: bpEl?.value !== '' ? parseFloat(bpEl.value) : v.bp,
-      p: pEl?.value !== '' ? parseFloat(pEl.value) : v.p
+      p: pEl?.value !== '' ? parseFloat(pEl.value) : v.p,
+      extraCost: newCost,
+      costUpdatedAt: costChanged ? Date.now() : (v.costUpdatedAt || null)
     };
   });
 
