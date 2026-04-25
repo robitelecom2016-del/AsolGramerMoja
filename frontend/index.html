@@ -1681,13 +1681,11 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
       </div>
     </div>
   </div>
-  <section class="why-sec" id="sec-about">
+  <section class="why-sec" id="sec-about" style="display:none">
     <div class="why-in">
-      <div class="why-ttl">কেন আমাদের পণ্য কিনবেন?</div>
-      <div class="why-grid">
-        <div class="why-card"><span class="why-ic">🌿</span><h3>বিশুদ্ধ</h3><p>কোনো কৃত্রিম রং বা প্রিজারভেটিভ ছাড়া, সরাসরি গ্রামের কৃষক থেকে সংগৃহীত।</p></div>
-        <div class="why-card"><span class="why-ic">🏅</span><h3>গুণগত মান</h3><p>প্রতিটি পণ্য কঠোর মানের মধ্য দিয়ে পরীক্ষিত এবং আপনার কাছে পৌঁছানো হয়।</p></div>
-        <div class="why-card"><span class="why-ic">🚚</span><h3>দ্রুত ডেলিভারি</h3><p>সারাদেশে দ্রুত ও নিরাপদ ডেলিভারি। অর্ডার করুন এবং ঘরে বসে পান।</p></div>
+      <div class="why-ttl" id="whyChooseTitle">কেন আমাদের পণ্য কিনবেন?</div>
+      <div class="why-grid" id="whyChooseGrid">
+        <!-- কার্ডগুলো admin panel থেকে dynamic load হবে -->
       </div>
     </div>
   </section>
@@ -2014,16 +2012,19 @@ function addProductStructuredData(product) {
 }
 async function loadAllData() {
   try {
-    const [prodsRes, catsRes, heroRes] = await Promise.all([
+    const [prodsRes, catsRes, heroRes, settingsRes] = await Promise.all([
       api('/api/products?active=true&limit=200'),
       api('/api/categories'),
       api('/api/hero'),
+      api('/api/public/settings').catch(() => ({})),
     ]);
     prods = prodsRes.products || [];
     cats = catsRes || [];
     heroSlides = heroRes || [];
+    settings = settingsRes || {};
     dataLoaded = true;
     buildUI();
+    buildWhyChooseSection();
     loadAboutPageContent().catch(()=>{});
     loadContactPageContent().catch(()=>{});
   } catch (err) {
@@ -2031,6 +2032,26 @@ async function loadAllData() {
     document.getElementById('slider-best').innerHTML = `<div style="padding:30px;text-align:center;color:#aaa;width:100%"><i class="fa-solid fa-wifi" style="font-size:1.5rem;display:block;margin-bottom:8px"></i>পণ্য লোড হয়নি। পেজ রিলোড করুন。<br><button class="retry-btn" onclick="location.reload()">পুনরায় লোড করুন</button></div>`;
     document.getElementById('allGrid').innerHTML = '';
   }
+}
+
+// "কেন আমাদের পণ্য কিনবেন?" সেকশন admin থেকে render
+function buildWhyChooseSection() {
+  const sec  = document.getElementById('sec-about');
+  const ttl  = document.getElementById('whyChooseTitle');
+  const grid = document.getElementById('whyChooseGrid');
+  if (!sec || !ttl || !grid) return;
+  const wc = (settings && settings.whyChooseUs) || {};
+  const defaultCards = [
+    { ic:'🌿', h:'বিশুদ্ধ', p:'কোনো কৃত্রিম রং বা প্রিজারভেটিভ ছাড়া, সরাসরি গ্রামের কৃষক থেকে সংগৃহীত।' },
+    { ic:'🏅', h:'গুণগত মান', p:'প্রতিটি পণ্য কঠোর মানের মধ্য দিয়ে পরীক্ষিত এবং আপনার কাছে পৌঁছানো হয়।' },
+    { ic:'🚚', h:'দ্রুত ডেলিভারি', p:'সারাদেশে দ্রুত ও নিরাপদ ডেলিভারি। অর্ডার করুন এবং ঘরে বসে পান।' },
+  ];
+  if (wc.active === false) { sec.style.display = 'none'; return; }
+  const cards = (Array.isArray(wc.cards) && wc.cards.length) ? wc.cards : defaultCards;
+  ttl.textContent = wc.title || 'কেন আমাদের পণ্য কিনবেন?';
+  const esc = s => String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  grid.innerHTML = cards.map(c => `<div class="why-card"><span class="why-ic">${esc(c.ic)}</span><h3>${esc(c.h)}</h3><p>${esc(c.p)}</p></div>`).join('');
+  sec.style.display = '';
 }
 function buildUI() {
   buildCatBar();

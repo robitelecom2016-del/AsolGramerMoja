@@ -614,6 +614,9 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="nav-item" onclick="navTo('contact')" data-page="contact">
         <i class="fa-solid fa-phone-volume"></i> যোগাযোগ পেজ
       </div>
+      <div class="nav-item" onclick="navTo('whychoose')" data-page="whychoose">
+        <i class="fa-solid fa-star"></i> কেন আমাদের পণ্য
+      </div>
       <div class="nav-section-label">সিস্টেম</div>
       <div class="nav-item" onclick="navTo('settings')" data-page="settings">
         <i class="fa-solid fa-gear"></i> সেটিংস
@@ -1018,6 +1021,40 @@ textarea.form-control { resize:vertical; min-height:80px; }
         </div>
         <div class="card-body">
           <div id="faqList" style="display:flex;flex-direction:column;gap:10px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ━━━ "কেন আমাদের পণ্য কিনবেন?" সেকশন ━━━ -->
+    <div class="page-view" id="page-whychoose">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-star" style="color:var(--yellow2)"></i> "কেন আমাদের পণ্য কিনবেন?" সেকশন</h3>
+          <button class="btn-primary btn-sm" onclick="saveWhyChoosePage()">
+            <i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="form-group2">
+            <label>সেকশনের শিরোনাম</label>
+            <input type="text" class="form-control" id="wcTitle" placeholder="কেন আমাদের পণ্য কিনবেন?">
+          </div>
+          <div class="form-group2">
+            <label>সেকশন সক্রিয় (ফ্রন্টএন্ডে দেখাবে?)</label>
+            <label class="toggle-switch" onclick="togglePageField('wcActive')">
+              <div class="toggle-track on" id="wcActiveTrack"><div class="toggle-thumb"></div></div>
+              <span id="wcActiveLbl">হ্যাঁ</span>
+            </label>
+            <input type="hidden" id="wcActive" value="true">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px">
+            <label style="margin:0;font-weight:700">কার্ড সমূহ (সর্বোচ্চ ৬টি)</label>
+            <button class="btn-secondary btn-sm" type="button" onclick="addWhyCard()">
+              <i class="fa-solid fa-plus"></i> কার্ড যোগ
+            </button>
+          </div>
+          <div id="whyCardsList" style="display:grid;gap:12px"></div>
+          <div class="form-hint" style="margin-top:10px">💡 ইমোজি ব্যবহার করুন আইকন হিসেবে (যেমন: 🌿 🏅 🚚 ✅ 💯 🏆)</div>
         </div>
       </div>
     </div>
@@ -1761,6 +1798,7 @@ function navTo(page) {
     hero:['হিরো স্লাইড','হোমপেজের ব্যানার স্লাইডার পরিচালনা করুন'],
     about:['আমাদের সম্পর্কে','পেজ কনটেন্ট পরিচালনা করুন'],
     contact:['যোগাযোগ পেজ','যোগাযোগ তথ্য পরিচালনা করুন'],
+    whychoose:['কেন আমাদের পণ্য','হোমপেজের "কেন কিনবেন" সেকশন পরিচালনা করুন'],
     settings:['সেটিংস','স্টোর কনফিগারেশন'],
     'website-cost':['ওয়েবসাইট খরচ','ওয়েবসাইট তৈরি ও আপডেটের সম্পূর্ণ খরচের হিসাব'],
   };
@@ -1776,6 +1814,7 @@ function navTo(page) {
   if (page === 'hero') loadHero();
   if (page === 'about') loadAboutPage();
   if (page === 'contact') loadContactPage();
+  if (page === 'whychoose') loadWhyChoosePage();
   if (page === 'settings') loadSettings();
   if (page === 'website-cost') loadWebsiteCost();
 }
@@ -3639,6 +3678,83 @@ async function saveContactPage() {
     await api('PUT','/api/settings',{contactPage});
     toast('"যোগাযোগ" পেজ সংরক্ষিত হয়েছে','success');
   } catch(err) { toast('ব্যর্থ: '+err.message,'error'); }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// "কেন আমাদের পণ্য কিনবেন?" সেকশন - load/save
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const DEFAULT_WHY_CARDS = [
+  { ic:'🌿', h:'বিশুদ্ধ', p:'কোনো কৃত্রিম রং বা প্রিজারভেটিভ ছাড়া, সরাসরি গ্রামের কৃষক থেকে সংগৃহীত।' },
+  { ic:'🏅', h:'গুণগত মান', p:'প্রতিটি পণ্য কঠোর মানের মধ্য দিয়ে পরীক্ষিত এবং আপনার কাছে পৌঁছানো হয়।' },
+  { ic:'🚚', h:'দ্রুত ডেলিভারি', p:'সারাদেশে দ্রুত ও নিরাপদ ডেলিভারি। অর্ডার করুন এবং ঘরে বসে পান।' },
+];
+
+async function loadWhyChoosePage() {
+  try {
+    const s = await api('GET','/api/settings');
+    const wc = s.whyChooseUs || {};
+    document.getElementById('wcTitle').value = wc.title || 'কেন আমাদের পণ্য কিনবেন?';
+    const isActive = wc.active !== false;
+    document.getElementById('wcActive').value = String(isActive);
+    document.getElementById('wcActiveTrack').className = 'toggle-track ' + (isActive ? 'on' : '');
+    document.getElementById('wcActiveLbl').textContent = isActive ? 'হ্যাঁ' : 'না';
+    renderWhyCards(Array.isArray(wc.cards) && wc.cards.length ? wc.cards : DEFAULT_WHY_CARDS);
+  } catch (err) { toast('লোড ব্যর্থ: '+err.message, 'error'); }
+}
+
+function renderWhyCards(cards) {
+  const list = document.getElementById('whyCardsList');
+  list.innerHTML = cards.map((c, i) => whyCardHtml(c, i)).join('');
+}
+
+function whyCardHtml(c, i) {
+  return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px" id="wc-${i}">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <span style="font-size:.72rem;color:var(--txt3);font-weight:700;width:30px">#${i+1}</span>
+      <input type="text" class="form-control" value="${(c.ic||'').replace(/"/g,'&quot;')}" placeholder="🌿" maxlength="4" id="wcIc-${i}" style="max-width:80px;text-align:center;font-size:1.2rem">
+      <input type="text" class="form-control" value="${(c.h||'').replace(/"/g,'&quot;')}" placeholder="শিরোনাম (যেমন: বিশুদ্ধ)" id="wcH-${i}" style="font-size:.86rem">
+      <button class="icon-btn del" onclick="removeWhyCard(${i})" title="মুছুন"><i class="fa-solid fa-minus"></i></button>
+    </div>
+    <textarea class="form-control" rows="2" placeholder="বিবরণ লিখুন..." id="wcP-${i}" style="font-size:.84rem">${c.p||''}</textarea>
+  </div>`;
+}
+
+function addWhyCard() {
+  const cards = getWhyCards();
+  if (cards.length >= 6) { toast('সর্বোচ্চ ৬টি কার্ড যোগ করা যাবে', 'error'); return; }
+  cards.push({ ic:'✅', h:'', p:'' });
+  renderWhyCards(cards);
+}
+
+function removeWhyCard(idx) {
+  const cards = getWhyCards();
+  cards.splice(idx, 1);
+  renderWhyCards(cards);
+}
+
+function getWhyCards() {
+  const list = document.getElementById('whyCardsList');
+  if (!list) return [];
+  const result = [];
+  for (let i = 0; i < list.children.length; i++) {
+    const ic = document.getElementById('wcIc-'+i)?.value?.trim() || '';
+    const h  = document.getElementById('wcH-'+i)?.value?.trim() || '';
+    const p  = document.getElementById('wcP-'+i)?.value?.trim() || '';
+    if (h || p || ic) result.push({ ic, h, p });
+  }
+  return result;
+}
+
+async function saveWhyChoosePage() {
+  try {
+    const whyChooseUs = {
+      title: document.getElementById('wcTitle').value.trim() || 'কেন আমাদের পণ্য কিনবেন?',
+      active: document.getElementById('wcActive').value === 'true',
+      cards: getWhyCards(),
+    };
+    await api('PUT','/api/settings',{ whyChooseUs });
+    toast('"কেন আমাদের পণ্য কিনবেন?" সেকশন সংরক্ষিত হয়েছে', 'success');
+  } catch (err) { toast('ব্যর্থ: '+err.message, 'error'); }
 }
 
 function togglePageField(id) {
