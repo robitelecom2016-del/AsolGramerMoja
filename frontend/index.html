@@ -2023,6 +2023,7 @@ async function loadAllData() {
     heroSlides = heroRes || [];
     settings = settingsRes || {};
     dataLoaded = true;
+    applySiteSettings();
     buildUI();
     buildWhyChooseSection();
     loadAboutPageContent().catch(()=>{});
@@ -2153,6 +2154,108 @@ function buildSideBanners() {
   }
   document.getElementById('heroSideCol1').innerHTML = renderBanner(banners[0]) + renderBanner(banners[1]);
   document.getElementById('heroSideCol2').innerHTML = renderBanner(banners[2]) + renderBanner(banners[3]);
+}
+
+// ━━━ অ্যাডমিন থেকে আসা SEO/Footer/Branding/Tracking সেটিংস সাইটে প্রয়োগ ━━━
+function applySiteSettings() {
+  if (!settings) return;
+  const s = settings;
+
+  // ── SEO meta tags ──
+  if (s.seoSiteTitle) document.title = s.seoSiteTitle;
+  const setMeta = (selector, attr, value) => {
+    if (!value) return;
+    let el = document.querySelector(selector);
+    if (!el) {
+      el = document.createElement('meta');
+      const [k, v] = selector.replace(/[\[\]"]/g,'').split('=');
+      el.setAttribute(k, v);
+      document.head.appendChild(el);
+    }
+    el.setAttribute(attr, value);
+  };
+  setMeta('meta[name="description"]', 'content', s.seoMetaDescription);
+  setMeta('meta[name="keywords"]', 'content', s.seoMetaKeywords);
+  setMeta('meta[name="author"]', 'content', s.seoAuthor);
+  setMeta('meta[property="og:title"]', 'content', s.seoOgTitle || s.seoSiteTitle);
+  setMeta('meta[property="og:description"]', 'content', s.seoOgDescription || s.seoMetaDescription);
+  setMeta('meta[property="og:image"]', 'content', s.seoOgImage);
+  setMeta('meta[property="og:url"]', 'content', s.seoCanonicalUrl);
+  setMeta('meta[name="twitter:title"]', 'content', s.seoOgTitle || s.seoSiteTitle);
+  setMeta('meta[name="twitter:description"]', 'content', s.seoOgDescription || s.seoMetaDescription);
+  setMeta('meta[name="twitter:image"]', 'content', s.seoOgImage);
+  if (s.seoCanonicalUrl) {
+    let canon = document.querySelector('link[rel="canonical"]');
+    if (!canon) { canon = document.createElement('link'); canon.rel='canonical'; document.head.appendChild(canon); }
+    canon.href = s.seoCanonicalUrl;
+  }
+  if (s.gscVerify) {
+    let gv = document.querySelector('meta[name="google-site-verification"]');
+    if (!gv) { gv = document.createElement('meta'); gv.setAttribute('name','google-site-verification'); document.head.appendChild(gv); }
+    gv.setAttribute('content', s.gscVerify);
+  }
+
+  // ── Favicon ──
+  if (s.faviconUrl) {
+    let fav = document.querySelector('link[rel="icon"]');
+    if (!fav) { fav = document.createElement('link'); fav.rel='icon'; document.head.appendChild(fav); }
+    fav.href = s.faviconUrl;
+  }
+
+  // ── Logo (if any .logo-icon img / footer-logo img exists) ──
+  if (s.siteLogoUrl) {
+    document.querySelectorAll('.footer-logo img, .logo img, .logo-icon img').forEach(im => { im.src = s.siteLogoUrl; });
+  }
+
+  // ── Footer text ──
+  const footerDescEl = document.getElementById('footerDesc');
+  if (footerDescEl && s.footerDesc) footerDescEl.textContent = s.footerDesc;
+  const helpPhoneEl = document.getElementById('footerHelpPhone');
+  if (helpPhoneEl && (s.footerHelpPhone || s.storePhone)) helpPhoneEl.textContent = s.footerHelpPhone || s.storePhone;
+  const copyEl = document.getElementById('footerCopyright');
+  if (copyEl && s.copyrightText) copyEl.innerHTML = s.copyrightText;
+  const phoneEl = document.getElementById('footerPhone');
+  if (phoneEl && s.storePhone) phoneEl.innerHTML = `<i class="fa-solid fa-phone"></i> ${s.storePhone}`;
+
+  // ── Social links ──
+  const fbA = document.getElementById('fbLink');
+  if (fbA && s.fbUrl) fbA.href = s.fbUrl;
+  const igA = document.getElementById('igLink');
+  if (igA && s.igUrl) igA.href = s.igUrl;
+  const waA = document.getElementById('waLink');
+  if (waA && (s.waPhone || s.storePhone)) {
+    const wp = (s.waPhone || s.storePhone || '').replace(/[^0-9]/g,'');
+    waA.href = wp ? `https://wa.me/${wp}` : '#';
+  }
+
+  // ── Google Analytics (gtag) — যদি admin থেকে নতুন ID দেওয়া হয় ──
+  if (s.gtagId && !window._gtagInjected) {
+    window._gtagInjected = true;
+    const sc = document.createElement('script');
+    sc.async = true;
+    sc.src = `https://www.googletagmanager.com/gtag/js?id=${s.gtagId}`;
+    document.head.appendChild(sc);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function(){ dataLayer.push(arguments); };
+    gtag('js', new Date());
+    gtag('config', s.gtagId);
+  }
+
+  // ── Facebook Pixel — যদি admin থেকে নতুন ID দেওয়া হয় ──
+  if (s.fbPixelId && !window._fbqInjected) {
+    window._fbqInjected = true;
+    !function(f,b,e,v,n,t,s2){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s2=b.getElementsByTagName(e)[0];s2.parentNode.insertBefore(t,s2)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', s.fbPixelId);
+    fbq('track', 'PageView');
+  }
+
+  // ── Google Tag Manager ──
+  if (s.gtmId && !window._gtmInjected) {
+    window._gtmInjected = true;
+    (function(w,d,s2,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s2)[0],j=d.createElement(s2),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer',s.gtmId);
+  }
 }
 
 function buildFooter() {

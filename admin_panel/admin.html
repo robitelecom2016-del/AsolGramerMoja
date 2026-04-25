@@ -1065,6 +1065,84 @@ textarea.form-control { resize:vertical; min-height:80px; }
           <button class="btn-primary" onclick="saveDeliverySettings()"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ করুন</button>
         </div>
       </div>
+      <!-- ━━━ SEO ও মেটা ট্যাগ সেকশন ━━━ -->
+      <div class="settings-section">
+        <div class="settings-section-hd"><i class="fa-solid fa-magnifying-glass-chart" style="color:var(--blue)"></i><h3>SEO ও মেটা ট্যাগ (Google/Facebook শেয়ার)</h3></div>
+        <div class="settings-body">
+          <div class="form-group2"><label>সাইট টাইটেল (Page Title)</label><input type="text" class="form-control" id="seoSiteTitle" placeholder="আসল গ্রামের মজা — বিশুদ্ধ গ্রামীণ পণ্য | gramerasolmoja.shop"></div>
+          <div class="form-group2"><label>মেটা ডেসক্রিপশন (Meta Description)</label><textarea class="form-control" id="seoMetaDescription" rows="2" placeholder="আসল গ্রামের মজা — বিশুদ্ধ গ্রামীণ পণ্য সরাসরি কৃষক থেকে..."></textarea><div class="form-hint">১৫০-১৬০ অক্ষরের মধ্যে রাখুন (Google রেজাল্টে দেখাবে)</div></div>
+          <div class="form-group2"><label>মেটা কীওয়ার্ড (Meta Keywords)</label><input type="text" class="form-control" id="seoMetaKeywords" placeholder="আসল গ্রামের মজা, গ্রামের মজা, gramerasolmoja..."></div>
+          <div class="form-row">
+            <div class="form-group2"><label>OG টাইটেল (Facebook Share Title)</label><input type="text" class="form-control" id="seoOgTitle" placeholder="আসল গ্রামের মজা — বিশুদ্ধ গ্রামীণ পণ্য"></div>
+            <div class="form-group2"><label>OG ইমেজ URL (Facebook Share Image)</label><input type="text" class="form-control" id="seoOgImage" placeholder="https://gramerasolmoja.shop/images/logo-g.png"></div>
+          </div>
+          <div class="form-group2"><label>OG ডেসক্রিপশন (Facebook Share Description)</label><textarea class="form-control" id="seoOgDescription" rows="2" placeholder="খাঁটি গ্রামীণ পণ্য সরাসরি কৃষক থেকে।"></textarea></div>
+          <div class="form-row">
+            <div class="form-group2"><label>Canonical URL</label><input type="text" class="form-control" id="seoCanonicalUrl" placeholder="https://gramerasolmoja.shop"></div>
+            <div class="form-group2"><label>লেখক / Author</label><input type="text" class="form-control" id="seoAuthor" placeholder="আসল গ্রামের মজা"></div>
+          </div>
+          <button class="btn-primary" onclick="saveSeoSettings()"><i class="fa-solid fa-floppy-disk"></i> SEO সংরক্ষণ করুন</button>
+        </div>
+      </div>
+
+      <!-- ━━━ ব্র্যান্ডিং (লোগো/ফেভিকন) সেকশন ━━━ -->
+      <div class="settings-section">
+        <div class="settings-section-hd"><i class="fa-solid fa-image" style="color:var(--orange)"></i><h3>ব্র্যান্ডিং — লোগো ও ফেভিকন</h3></div>
+        <div class="settings-body">
+          <div class="form-row">
+            <div class="form-group2">
+              <label>সাইট লোগো</label>
+              <label class="img-upload-area" for="siteLogoInput" style="display:block;cursor:pointer">
+                <i class="fa-solid fa-image"></i><p>লোগো আপলোড করুন</p>
+                <input type="file" id="siteLogoInput" accept="image/*" onchange="uploadBrandImage('logo',this)" onclick="this.value=''">
+              </label>
+              <div id="siteLogoPreview"></div>
+              <input type="hidden" id="siteLogoUrl">
+            </div>
+            <div class="form-group2">
+              <label>ফেভিকন (ব্রাউজার আইকন)</label>
+              <label class="img-upload-area" for="faviconInput" style="display:block;cursor:pointer">
+                <i class="fa-solid fa-icons"></i><p>ফেভিকন আপলোড করুন</p>
+                <input type="file" id="faviconInput" accept="image/*" onchange="uploadBrandImage('favicon',this)" onclick="this.value=''">
+              </label>
+              <div id="faviconPreview"></div>
+              <input type="hidden" id="faviconUrl">
+            </div>
+          </div>
+          <button class="btn-primary" onclick="saveBrandingSettings()"><i class="fa-solid fa-floppy-disk"></i> ব্র্যান্ডিং সংরক্ষণ করুন</button>
+        </div>
+      </div>
+
+      <!-- ━━━ ফুটার সেকশন ━━━ -->
+      <div class="settings-section">
+        <div class="settings-section-hd"><i class="fa-solid fa-window-maximize" style="color:var(--green)"></i><h3>ফুটার ও যোগাযোগ</h3></div>
+        <div class="settings-body">
+          <div class="form-group2"><label>ফুটার ডেসক্রিপশন (নিচের লেখা)</label><textarea class="form-control" id="footerDescInp" rows="4" placeholder="বিশুদ্ধ, প্রাকৃতিক ও খাঁটি গ্রামীণ পণ্য..."></textarea></div>
+          <div class="form-row">
+            <div class="form-group2"><label>হেল্পলাইন নম্বর</label><input type="text" class="form-control" id="footerHelpPhoneInp" placeholder="01XXXXXXXXX"></div>
+            <div class="form-group2"><label>হেল্পলাইন সময়</label><input type="text" class="form-control" id="footerHelpTimeInp" placeholder="শনি–বৃহস্পতি · সকাল ৯টা–রাত ৯টা"></div>
+          </div>
+          <div class="form-group2"><label>WhatsApp নম্বর (footer button)</label><input type="text" class="form-control" id="waPhoneInp" placeholder="8801712345678 (country code সহ, + ছাড়া)"></div>
+          <div class="form-group2"><label>কপিরাইট লেখা</label><input type="text" class="form-control" id="copyrightInp" placeholder="© 2024 আসল গ্রামের মজা — সর্বস্বত্ব সংরক্ষিত"></div>
+          <button class="btn-primary" onclick="saveFooterSettings()"><i class="fa-solid fa-floppy-disk"></i> ফুটার সংরক্ষণ করুন</button>
+        </div>
+      </div>
+
+      <!-- ━━━ ট্র্যাকিং / অ্যানালিটিক্স সেকশন ━━━ -->
+      <div class="settings-section">
+        <div class="settings-section-hd"><i class="fa-solid fa-chart-line" style="color:var(--purple)"></i><h3>ট্র্যাকিং কোড (Google Analytics, Facebook Pixel)</h3></div>
+        <div class="settings-body">
+          <div class="form-row">
+            <div class="form-group2"><label>Google Analytics ID (GA4)</label><input type="text" class="form-control" id="gtagIdInp" placeholder="G-F5MDVLE0LH"></div>
+            <div class="form-group2"><label>Facebook Pixel ID</label><input type="text" class="form-control" id="fbPixelIdInp" placeholder="1396042442297865"></div>
+          </div>
+          <div class="form-group2"><label>Google Tag Manager ID (ঐচ্ছিক)</label><input type="text" class="form-control" id="gtmIdInp" placeholder="GTM-XXXXXXX"></div>
+          <div class="form-group2"><label>Google Search Console যাচাইকরণ কোড (ঐচ্ছিক)</label><input type="text" class="form-control" id="gscVerifyInp" placeholder="meta tag content"></div>
+          <div class="form-hint">এই কোডগুলো সাইটে স্বয়ংক্রিয়ভাবে যুক্ত হবে — ফাইল এডিটের প্রয়োজন নেই।</div>
+          <button class="btn-primary" onclick="saveTrackingSettings()"><i class="fa-solid fa-floppy-disk"></i> ট্র্যাকিং সংরক্ষণ করুন</button>
+        </div>
+      </div>
+
       <div class="settings-section">
         <div class="settings-section-hd"><i class="fa-solid fa-lock" style="color:var(--purple)"></i><h3>পাসওয়ার্ড পরিবর্তন</h3></div>
         <div class="settings-body">
@@ -3665,7 +3743,111 @@ async function loadSettings() {
     document.getElementById('ctgOthersCharge').value=s.ctgOthersCharge||80;
     document.getElementById('apiUrlDisp').textContent=API;
     document.getElementById('apiUrlInp').value=API;
+
+    // ─── SEO ফিল্ড ───
+    document.getElementById('seoSiteTitle').value = s.seoSiteTitle || '';
+    document.getElementById('seoMetaDescription').value = s.seoMetaDescription || '';
+    document.getElementById('seoMetaKeywords').value = s.seoMetaKeywords || '';
+    document.getElementById('seoOgTitle').value = s.seoOgTitle || '';
+    document.getElementById('seoOgDescription').value = s.seoOgDescription || '';
+    document.getElementById('seoOgImage').value = s.seoOgImage || '';
+    document.getElementById('seoCanonicalUrl').value = s.seoCanonicalUrl || '';
+    document.getElementById('seoAuthor').value = s.seoAuthor || '';
+
+    // ─── Branding ফিল্ড ───
+    document.getElementById('siteLogoUrl').value = s.siteLogoUrl || '';
+    document.getElementById('faviconUrl').value = s.faviconUrl || '';
+    if (s.siteLogoUrl) document.getElementById('siteLogoPreview').innerHTML = `<div style="margin-top:8px"><img src="${s.siteLogoUrl}" style="max-height:60px;border-radius:6px;background:#fff;padding:4px"></div>`;
+    if (s.faviconUrl) document.getElementById('faviconPreview').innerHTML = `<div style="margin-top:8px"><img src="${s.faviconUrl}" style="max-height:48px;border-radius:6px;background:#fff;padding:4px"></div>`;
+
+    // ─── Footer ফিল্ড ───
+    document.getElementById('footerDescInp').value = s.footerDesc || '';
+    document.getElementById('footerHelpPhoneInp').value = s.footerHelpPhone || '';
+    document.getElementById('footerHelpTimeInp').value = s.footerHelpTime || 'শনি–বৃহস্পতি · সকাল ৯টা–রাত ৯টা';
+    document.getElementById('waPhoneInp').value = s.waPhone || '';
+    document.getElementById('copyrightInp').value = s.copyrightText || '';
+
+    // ─── Tracking ফিল্ড ───
+    document.getElementById('gtagIdInp').value = s.gtagId || '';
+    document.getElementById('fbPixelIdInp').value = s.fbPixelId || '';
+    document.getElementById('gtmIdInp').value = s.gtmId || '';
+    document.getElementById('gscVerifyInp').value = s.gscVerify || '';
   } catch{}
+}
+
+// ━━━ নতুন save ফাংশন ━━━
+async function saveSeoSettings() {
+  try {
+    await api('PUT','/api/settings',{
+      seoSiteTitle: document.getElementById('seoSiteTitle').value.trim(),
+      seoMetaDescription: document.getElementById('seoMetaDescription').value.trim(),
+      seoMetaKeywords: document.getElementById('seoMetaKeywords').value.trim(),
+      seoOgTitle: document.getElementById('seoOgTitle').value.trim(),
+      seoOgDescription: document.getElementById('seoOgDescription').value.trim(),
+      seoOgImage: document.getElementById('seoOgImage').value.trim(),
+      seoCanonicalUrl: document.getElementById('seoCanonicalUrl').value.trim(),
+      seoAuthor: document.getElementById('seoAuthor').value.trim(),
+    });
+    toast('SEO সেটিংস সংরক্ষিত','success');
+  } catch(err) { toast('ব্যর্থ: '+err.message,'error'); }
+}
+
+async function saveBrandingSettings() {
+  try {
+    await api('PUT','/api/settings',{
+      siteLogoUrl: document.getElementById('siteLogoUrl').value.trim(),
+      faviconUrl: document.getElementById('faviconUrl').value.trim(),
+    });
+    toast('ব্র্যান্ডিং সংরক্ষিত','success');
+  } catch(err) { toast('ব্যর্থ: '+err.message,'error'); }
+}
+
+async function saveFooterSettings() {
+  try {
+    await api('PUT','/api/settings',{
+      footerDesc: document.getElementById('footerDescInp').value.trim(),
+      footerHelpPhone: document.getElementById('footerHelpPhoneInp').value.trim(),
+      footerHelpTime: document.getElementById('footerHelpTimeInp').value.trim(),
+      waPhone: document.getElementById('waPhoneInp').value.trim(),
+      copyrightText: document.getElementById('copyrightInp').value.trim(),
+    });
+    toast('ফুটার সংরক্ষিত','success');
+  } catch(err) { toast('ব্যর্থ: '+err.message,'error'); }
+}
+
+async function saveTrackingSettings() {
+  try {
+    await api('PUT','/api/settings',{
+      gtagId: document.getElementById('gtagIdInp').value.trim(),
+      fbPixelId: document.getElementById('fbPixelIdInp').value.trim(),
+      gtmId: document.getElementById('gtmIdInp').value.trim(),
+      gscVerify: document.getElementById('gscVerifyInp').value.trim(),
+    });
+    toast('ট্র্যাকিং কোড সংরক্ষিত','success');
+  } catch(err) { toast('ব্যর্থ: '+err.message,'error'); }
+}
+
+// ━━━ লোগো / ফেভিকন আপলোড ━━━
+async function uploadBrandImage(kind, inp) {
+  const file = inp.files && inp.files[0];
+  if (!file) return;
+  const fd = new FormData();
+  fd.append('image', file);
+  try {
+    toast('আপলোড হচ্ছে...','info');
+    const res = await fetch(API+'/api/upload', { method:'POST', headers:{Authorization:'Bearer '+localStorage.getItem('adminToken')}, body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error||'upload failed');
+    const url = data.url;
+    if (kind==='logo') {
+      document.getElementById('siteLogoUrl').value = url;
+      document.getElementById('siteLogoPreview').innerHTML = `<div style="margin-top:8px"><img src="${url}" style="max-height:60px;border-radius:6px;background:#fff;padding:4px"></div>`;
+    } else {
+      document.getElementById('faviconUrl').value = url;
+      document.getElementById('faviconPreview').innerHTML = `<div style="margin-top:8px"><img src="${url}" style="max-height:48px;border-radius:6px;background:#fff;padding:4px"></div>`;
+    }
+    toast('আপলোড সম্পন্ন — "সংরক্ষণ করুন" চাপুন','success');
+  } catch(err) { toast('আপলোড ব্যর্থ: '+err.message,'error'); }
 }
 
 async function saveStoreSettings() {
