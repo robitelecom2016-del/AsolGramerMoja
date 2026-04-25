@@ -624,17 +624,117 @@ body{
 .slide{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .75s ease;}
 .slide.active{opacity:1;}
 .hero-slide-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;z-index:1;display:block;}
-.hero-slide-overlay{position:absolute;inset:0;background:linear-gradient(95deg,rgba(0,0,0,.50) 0%,rgba(0,0,0,.18) 40%,rgba(0,0,0,.0) 100%);z-index:2;pointer-events:none;}
+.hero-slide-overlay{position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,0,0,.65) 0%,rgba(0,0,0,.42) 40%,rgba(0,0,0,.08) 75%,rgba(0,0,0,.0) 100%);z-index:2;pointer-events:none;}
 .s1{background:linear-gradient(135deg,#c8d8e8 0%,#dce8f5 50%,#eef4fa 100%);}
 .s2{background:linear-gradient(135deg,#e8dfd0 0%,#f0e8d8 50%,#faf5ee 100%);}
 .s3{background:linear-gradient(135deg,#d0dce8 0%,#e0ecf8 50%,#f0f6fc 100%);}
 .hero-svg{position:absolute;inset:0;width:100%;height:100%;}
-.hero-cw{position:absolute;inset:0;display:flex;align-items:center;z-index:10;}
-.hero-ci{max-width:100%;width:100%;padding:0 48px;}
-.hero-ci h1{font-size:2rem;font-weight:700;color:#222;line-height:1.28;margin-bottom:10px;max-width:400px;}
-.hero-ci p{color:#555;font-size:.92rem;margin-bottom:22px;max-width:340px;}
-.btn-hero{background:var(--or);color:#fff;border:none;padding:11px 24px;border-radius:5px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(245,166,35,.35);}
-.btn-hero:hover{background:#e09510;transform:translateY(-2px);box-shadow:0 8px 20px rgba(245,166,35,.4);}
+/* ===== PAGE LOAD ANIMATIONS ===== */
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeInLeft{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeInScale{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes gentlePulse{0%,100%{box-shadow:0 4px 14px rgba(245,166,35,.35)}50%{box-shadow:0 8px 28px rgba(245,166,35,.6)}}
+
+/* Navbar animation */
+.navbar,.mob-header{animation:fadeInDown .55s cubic-bezier(.22,.68,0,1.2) both;}
+
+/* Hero section animate on load */
+.hero{animation:fadeInScale .6s cubic-bezier(.22,.68,0,1.2) .1s both;}
+
+/* Category bar */
+.cat-bar-outer{animation:fadeInUp .55s cubic-bezier(.22,.68,0,1.2) .25s both;}
+
+/* Main content sections */
+.sec-block{opacity:0;transform:translateY(24px);transition:opacity .55s ease,transform .55s ease;}
+.sec-block.visible{opacity:1;transform:translateY(0);}
+
+/* Side banners animate */
+.hero-side-col{animation:slideInRight .6s cubic-bezier(.22,.68,0,1.2) .2s both;}
+.hero-side-col:nth-child(3){animation-delay:.32s;}
+
+/* ===== HERO-CW: TEXT ALWAYS READABLE REGARDLESS OF BG IMAGE ===== */
+.hero-cw{
+  position:absolute;inset:0;
+  display:flex;align-items:center;
+  z-index:10;
+}
+/* Strong gradient overlay — left-heavy so text is always readable */
+.hero-cw::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(
+    105deg,
+    rgba(0,0,0,.72) 0%,
+    rgba(0,0,0,.55) 35%,
+    rgba(0,0,0,.28) 60%,
+    rgba(0,0,0,.0) 100%
+  );
+  z-index:0;
+  border-radius:inherit;
+  pointer-events:none;
+}
+.hero-ci{
+  position:relative;
+  z-index:1;
+  max-width:100%;width:100%;
+  padding:0 48px;
+}
+/* Badge */
+.hero-ci .hero-badge{
+  display:inline-block;
+  background:var(--or);
+  color:#fff;
+  font-size:.72rem;font-weight:700;
+  padding:4px 12px;
+  border-radius:3px;
+  margin-bottom:10px;
+  letter-spacing:.04em;
+  text-shadow:none;
+  box-shadow:0 2px 8px rgba(224,92,0,.45);
+}
+/* Heading — always white with text-shadow for contrast */
+.hero-ci h1{
+  font-size:2rem;font-weight:800;
+  color:#fff;
+  line-height:1.28;
+  margin-bottom:10px;
+  max-width:400px;
+  text-shadow:0 2px 16px rgba(0,0,0,.65), 0 1px 3px rgba(0,0,0,.55);
+  letter-spacing:-.01em;
+}
+/* Subtext */
+.hero-ci p{
+  color:#ffe0a0;
+  font-size:.95rem;
+  font-weight:700;
+  margin-bottom:6px;
+  max-width:340px;
+  text-shadow:0 1px 8px rgba(0,0,0,.55);
+}
+/* Price or secondary text */
+.hero-ci .hero-price{
+  font-size:1.9rem;font-weight:800;
+  color:#fff;
+  margin-bottom:16px;
+  text-shadow:0 2px 12px rgba(0,0,0,.55);
+}
+.btn-hero{
+  background:var(--or);color:#fff;border:none;
+  padding:11px 24px;border-radius:5px;
+  font-family:inherit;font-size:.9rem;font-weight:700;
+  cursor:pointer;
+  transition:all .22s cubic-bezier(.22,.68,0,1.2);
+  text-decoration:none;display:inline-flex;align-items:center;gap:7px;
+  box-shadow:0 4px 14px rgba(245,166,35,.45);
+  animation:gentlePulse 2.8s ease-in-out 1.2s infinite;
+}
+.btn-hero:hover{
+  background:#e09510;transform:translateY(-3px) scale(1.04);
+  box-shadow:0 10px 24px rgba(245,166,35,.55);
+  animation:none;
+}
 .slide-dots{position:absolute;bottom:14px;right:16px;display:flex;gap:6px;z-index:20;}
 .dot{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.2);cursor:pointer;transition:all .3s ease;border:1.5px solid rgba(0,0,0,.15);}
 .dot.active{background:var(--or);width:22px;border-radius:4px;border-color:var(--or);}
@@ -815,8 +915,9 @@ body{
 .why-in{max-width:var(--mw);margin:0 auto;}
 .why-ttl{text-align:center;font-size:1.3rem;font-weight:700;color:#222;margin-bottom:20px;}
 .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-.why-card{background:#fff;border-radius:10px;padding:20px 14px;text-align:center;box-shadow:0 1px 8px rgba(0,0,0,.06);transition:transform .2s;}
-.why-card:hover{transform:translateY(-3px);}
+.why-card{background:#fff;border-radius:10px;padding:20px 14px;text-align:center;box-shadow:0 1px 8px rgba(0,0,0,.06);transition:transform .2s, opacity .55s ease, box-shadow .2s;opacity:0;transform:translateY(20px);}
+.why-card.visible{opacity:1;transform:translateY(0);}
+.why-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1);}
 .why-ic{font-size:2rem;margin-bottom:7px;display:block;}
 .why-card h3{font-size:.92rem;font-weight:700;color:#222;margin-bottom:5px;}
 .why-card p{font-size:.78rem;color:var(--txt2);line-height:1.6;}
@@ -1275,7 +1376,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
   .hero-side-banner .side-title{font-size:.82rem;}
   .hero-side-banner .side-price{font-size:1rem;margin-bottom:6px;}
   .hero-ci{padding:0 18px;}
-  .hero-ci h1{font-size:1.4rem;max-width:100%;color:#222;}
+  .hero-ci h1{font-size:1.4rem;max-width:100%;color:#fff;}
   .hero-ci p{font-size:.85rem;max-width:100%;margin-bottom:10px;}
   .btn-hero{padding:9px 20px;font-size:.85rem;}
   .hero-arrow{width:34px;height:34px;font-size:.78rem;}
@@ -1598,10 +1699,10 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
         </div>
         <div class="hero-cw">
           <div class="hero-ci">
-            <div style="display:inline-block;background:#e05c00;color:#fff;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:3px;margin-bottom:10px;letter-spacing:.04em;">১০০% বিশুদ্ধ গ্রামীণ পণ্য</div>
+            <div class="hero-badge">১০০% বিশুদ্ধ গ্রামীণ পণ্য</div>
             <h1 id="hTitle">গ্রামীণ সতেজতা ও<br>স্বাদের আসল মজা</h1>
-            <p id="hSub" style="color:#e05c00;font-weight:700;font-size:1rem;margin-bottom:6px;">এই সপ্তাহের বিশেষ অফার</p>
-            <div style="font-size:1.9rem;font-weight:800;color:#1a1a1a;margin-bottom:16px;">৳৯৯ থেকে শুরু</div>
+            <p id="hSub">এই সপ্তাহের বিশেষ অফার</p>
+            <div class="hero-price">৳৯৯ থেকে শুরু</div>
             <a onclick="document.getElementById('sec-products').scrollIntoView({behavior:'smooth'})" class="btn-hero" style="cursor:pointer;background:var(--gd);"><i class="fa-solid fa-bag-shopping"></i> <span data-txt="heroCta">পণ্য কিনুন</span></a>
           </div>
         </div>
@@ -3654,6 +3755,27 @@ if (!heroTimer) {
     }
   }, 4500);
 }
+
+/* ━━━ Scroll-reveal: .sec-block visible on viewport enter ━━━ */
+(function(){
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  function observeBlocks() {
+    document.querySelectorAll('.sec-block, .why-card, .cat-item').forEach((el, i) => {
+      if (!el.classList.contains('visible')) {
+        el.style.transitionDelay = (i % 6) * 0.06 + 's';
+        io.observe(el);
+      }
+    });
+  }
+  observeBlocks();
+  // re-observe after dynamic content loads
+  setTimeout(observeBlocks, 1200);
+  setTimeout(observeBlocks, 3000);
+})();
 
 
 console.log("openOrderModal called", items.length);
