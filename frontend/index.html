@@ -1748,11 +1748,12 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     </div>
 
     <!-- Col 2: Navigation -->
-    <div class="footer-col" id="footerNavCol">
-      <h4 class="footer-heading" id="footerNavTitle">নেভিগেশন</h4>
-      <ul class="flinks footer-links" id="footerNavLinks">
+    <div class="footer-col">
+      <h4 class="footer-heading">নেভিগেশন</h4>
+      <ul class="flinks footer-links">
         <li><a onclick="goHome()">হোম</a></li>
         <li><a onclick="goProductsPage()">সকল পণ্য</a></li>
+        <li><a onclick="goHome()">হোম</a></li>
         <li><a onclick="goHome()">বেস্ট সেলার</a></li>
         <li><a onclick="goAboutPage()">আমাদের সম্পর্কে</a></li>
         <li><a onclick="goContactPage()">যোগাযোগ</a></li>
@@ -1761,23 +1762,23 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
 
     <!-- Col 3: Categories -->
     <div class="footer-col">
-      <h4 class="footer-heading" id="footerCatTitle">পণ্য বিভাগ</h4>
+      <h4 class="footer-heading">পণ্য বিভাগ</h4>
       <ul class="flinks footer-links" id="footerCatLinks"></ul>
     </div>
 
     <!-- Col 4: Customer Service -->
-    <div class="footer-col" id="footerServiceCol">
-      <h4 class="footer-heading" id="footerServiceTitle">গ্রাহক সেবা</h4>
-      <ul class="flinks footer-links" id="footerServiceLinks">
+    <div class="footer-col">
+      <h4 class="footer-heading">গ্রাহক সেবা</h4>
+      <ul class="flinks footer-links">
         <li><a>ডেলিভারি তথ্য</a></li>
         <li><a>রিটার্ন পলিসি</a></li>
         <li><a>গোপনীয়তা নীতি</a></li>
         <li><a onclick="goContactPage()">যোগাযোগ করুন</a></li>
       </ul>
-      <div class="footer-helpline-box" id="footerHelplineBox">
-        <div class="footer-helpline-label"><i class="fa-solid fa-headset"></i> <span id="footerHelpLabel">হেল্পলাইন</span></div>
+      <div class="footer-helpline-box">
+        <div class="footer-helpline-label"><i class="fa-solid fa-headset"></i> হেল্পলাইন</div>
         <div class="footer-helpline-num" id="footerHelpPhone">01XXXXXXXXX</div>
-        <div class="footer-helpline-time" id="footerHelpTime">শনি–বৃহস্পতি · সকাল ৯টা–রাত ৯টা</div>
+        <div class="footer-helpline-time">শনি–বৃহস্পতি · সকাল ৯টা–রাত ৯টা</div>
       </div>
     </div>
   </div>
@@ -1793,7 +1794,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
       <a onclick="goContactPage()" class="footer-bot-link">যোগাযোগ</a>
     </nav>
     <div class="footer-bottom-right">
-      <i class="fa-solid fa-lock" style="color:var(--gd);font-size:.7rem;"></i> <span id="footerSecureLbl">নিরাপদ শপিং</span>
+      <i class="fa-solid fa-lock" style="color:var(--gd);font-size:.7rem;"></i> নিরাপদ শপিং
     </div>
     </div>
   </div>
@@ -1953,12 +1954,9 @@ let heroSlides = [];
 let settings = {};
 let deliveryCharges = { inside: 80, outside: 130 };
 let storePhone = '01712345678';
-let ADVANCE_DELIVERY_CATS = ['মিষ্টি', 'দই', 'গ্রীষ্মকালীন পানীয়', 'রশমালাই'];
-let ADVANCE_PAYMENT_INFO = {
+const ADVANCE_DELIVERY_CATS = ['মিষ্টি', 'দই', 'গ্রীষ্মকালীন পানীয়', 'রশমালাই'];
+const ADVANCE_PAYMENT_INFO = {
   bkash: '01881245554',
-  nagad: '',
-  rocket: '',
-  note: '',
 };
 let dataLoaded = false;
 let prodPage = 1;
@@ -2027,8 +2025,6 @@ async function loadAllData() {
     dataLoaded = true;
     buildUI();
     buildWhyChooseSection();
-    applyFooterSettings();
-    applyAdvanceSettings();
     loadAboutPageContent().catch(()=>{});
     loadContactPageContent().catch(()=>{});
   } catch (err) {
@@ -2057,51 +2053,7 @@ function buildWhyChooseSection() {
   grid.innerHTML = cards.map(c => `<div class="why-card"><span class="why-ic">${esc(c.ic)}</span><h3>${esc(c.h)}</h3><p>${esc(c.p)}</p></div>`).join('');
   sec.style.display = '';
 }
-
-// Footer admin থেকে render
-function applyFooterSettings() {
-  const f = (settings && settings.footer) || {};
-  const esc = s => String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  const setText = (id, v) => { const el=document.getElementById(id); if(el && v!=null && v!=='') el.textContent = v; };
-  // About column
-  setText('footerDesc', f.desc);
-  if (f.phone) { const ph=document.getElementById('footerPhone'); if(ph) ph.innerHTML = `<i class="fa-solid fa-phone"></i> ${esc(f.phone)}`; }
-  // Social links
-  const fb=document.getElementById('fbLink'); if(fb && f.fbUrl)  fb.href = f.fbUrl;
-  const ig=document.getElementById('igLink'); if(ig && f.igUrl)  ig.href = f.igUrl;
-  const wa=document.getElementById('waLink'); if(wa && f.waPhone) wa.href = 'https://wa.me/' + String(f.waPhone).replace(/\D/g,'');
-  // Column titles
-  setText('footerNavTitle', f.navTitle);
-  setText('footerCatTitle', f.catTitle);
-  setText('footerServiceTitle', f.serviceTitle);
-  // Navigation links (custom)
-  if (Array.isArray(f.navLinks) && f.navLinks.length) {
-    const ul=document.getElementById('footerNavLinks');
-    if (ul) ul.innerHTML = f.navLinks.map(l => `<li><a href="${esc(l.url||'#')}">${esc(l.label||'')}</a></li>`).join('');
-  }
-  // Service links (custom)
-  if (Array.isArray(f.serviceLinks) && f.serviceLinks.length) {
-    const ul=document.getElementById('footerServiceLinks');
-    if (ul) ul.innerHTML = f.serviceLinks.map(l => `<li><a href="${esc(l.url||'#')}">${esc(l.label||'')}</a></li>`).join('');
-  }
-  // Helpline
-  setText('footerHelpLabel', f.helpLabel);
-  setText('footerHelpPhone', f.helpPhone);
-  setText('footerHelpTime', f.helpTime);
-  if (f.helpHide) { const box=document.getElementById('footerHelplineBox'); if(box) box.style.display='none'; }
-  // Copyright + secure label
-  setText('footerCopyright', f.copyright);
-  setText('footerSecureLbl', f.secureLabel);
-}
-
-// অগ্রিম পেমেন্ট ক্যাটাগরি ও নম্বর admin থেকে
-function applyAdvanceSettings() {
-  const a = (settings && settings.advance) || {};
-  if (Array.isArray(a.cats) && a.cats.length) ADVANCE_DELIVERY_CATS = a.cats.slice();
-  if (a.payment && typeof a.payment === 'object') {
-    ADVANCE_PAYMENT_INFO = Object.assign({}, ADVANCE_PAYMENT_INFO, a.payment);
-  }
-}
+function buildUI() {
   buildCatBar();
   buildAllCatTabs();
   renderBest();
