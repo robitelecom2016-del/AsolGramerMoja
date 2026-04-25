@@ -1714,9 +1714,47 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
           <div class="dot" onclick="goSlide(2)"></div>
         </div>
       </div>
-      <!-- Right Side: 2 columns × 2 rows of promo banners -->
-      <div class="hero-side-col" id="heroSideCol1"></div>
-      <div class="hero-side-col" id="heroSideCol2"></div>
+      <!-- Right Side: 2 columns x 2 rows of promo banners (defaults shown instantly, replaced by API data) -->
+      <div class="hero-side-col" id="heroSideCol1">
+        <div class="hero-side-banner" style="cursor:pointer;background-image:url('https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&auto=format&fit=crop&q=80');background-size:cover;background-position:center;" onclick="goProductsPage()">
+          <div style="position:absolute;inset:0;background:rgba(30,80,20,0.55);border-radius:8px;z-index:0;"></div>
+          <div style="position:relative;z-index:1;">
+            <div class="side-label" style="color:#d4f5a0;">প্রিমিয়াম মানের</div>
+            <div class="side-title" style="color:#fff;">খাঁটি মধু ও দেশি মিষ্টি</div>
+            <div class="side-price" style="color:#ffe066;">৳১৮০</div>
+            <button class="side-shop-btn" onclick="event.stopPropagation();goProductsPage()"><i class="fa-solid fa-cart-plus"></i> কিনুন</button>
+          </div>
+        </div>
+        <div class="hero-side-banner" style="cursor:pointer;background-image:url('https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&auto=format&fit=crop&q=80');background-size:cover;background-position:center;" onclick="goProductsPage()">
+          <div style="position:absolute;inset:0;background:rgba(10,60,100,0.55);border-radius:8px;z-index:0;"></div>
+          <div style="position:relative;z-index:1;">
+            <div class="side-label" style="color:#a8d8f0;">তাজা ও বিশুদ্ধ</div>
+            <div class="side-title" style="color:#fff;">দেশি দই ও রসমালাই</div>
+            <div class="side-price" style="color:#ffe066;">৳৫০</div>
+            <button class="side-shop-btn" style="background:#1a6fa8;" onclick="event.stopPropagation();goProductsPage()"><i class="fa-solid fa-cart-plus"></i> কিনুন</button>
+          </div>
+        </div>
+      </div>
+      <div class="hero-side-col" id="heroSideCol2">
+        <div class="hero-side-banner" style="cursor:pointer;background-image:url('https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&auto=format&fit=crop&q=80');background-size:cover;background-position:center;" onclick="goProductsPage()">
+          <div style="position:absolute;inset:0;background:rgba(100,60,0,0.5);border-radius:8px;z-index:0;"></div>
+          <div style="position:relative;z-index:1;">
+            <div class="side-label" style="color:#ffd080;">১০০% অর্গানিক</div>
+            <div class="side-title" style="color:#fff;">পরিবারকে দিন সেরা পুষ্টি</div>
+            <div class="side-price" style="color:#ffe066;">৳৩৯০</div>
+            <button class="side-shop-btn" onclick="event.stopPropagation();goProductsPage()"><i class="fa-solid fa-cart-plus"></i> কিনুন</button>
+          </div>
+        </div>
+        <div class="hero-side-banner" style="cursor:pointer;background-image:url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&auto=format&fit=crop&q=80');background-size:cover;background-position:center;" onclick="goProductsPage()">
+          <div style="position:absolute;inset:0;background:rgba(120,20,20,0.5);border-radius:8px;z-index:0;"></div>
+          <div style="position:relative;z-index:1;">
+            <div class="side-label" style="color:#ffb0a0;">সতেজ ও তাজা</div>
+            <div class="side-title" style="color:#fff;">সরিষার তৈল ও বোরহানী</div>
+            <div class="side-price" style="color:#ffe066;">৳১৫০</div>
+            <button class="side-shop-btn" style="background:#c0392b;" onclick="event.stopPropagation();goProductsPage()"><i class="fa-solid fa-cart-plus"></i> কিনুন</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="cat-bar-outer">
@@ -2255,6 +2293,10 @@ function buildSideBanners() {
   }
   document.getElementById('heroSideCol1').innerHTML = renderBanner(banners[0]) + renderBanner(banners[1]);
   document.getElementById('heroSideCol2').innerHTML = renderBanner(banners[2]) + renderBanner(banners[3]);
+  // Fade in smoothly after API replace
+  [document.getElementById('heroSideCol1'), document.getElementById('heroSideCol2')].forEach(el => {
+    if (el) { el.style.opacity = '0'; requestAnimationFrame(() => { el.style.transition = 'opacity .4s ease'; el.style.opacity = '1'; }); }
+  });
 }
 
 // ━━━ অ্যাডমিন থেকে আসা SEO/Footer/Branding/Tracking সেটিংস সাইটে প্রয়োগ ━━━
