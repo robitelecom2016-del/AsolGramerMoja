@@ -63,6 +63,17 @@ function buildOrderEmailHtml(order) {
          💳 <b>অগ্রিম ডেলিভারি চার্জ পরিশোধিত</b><br>
          ট্রানজেকশন ID: <b>${adv.trxId || '-'}</b> | পরিমাণ: ৳${adv.amount || 0}
        </td></tr>` : '';
+  const ap = order.advanceProduct || {};
+  const apItemsHtml = (ap.items || []).map(it => `• ${it.nm} × ${it.qty} → ৳${it.subtotal}`).join('<br>');
+  const advProdHtml = ap.required
+    ? `<tr><td colspan="3" style="padding:12px;border:2px solid #e53e3e;background:#fff5f5;color:#742a2a;">
+         🔔 <b style="color:#c53030;font-size:15px">পণ্য অগ্রিম পেমেন্ট আবশ্যক — VERIFY দরকার</b><br>
+         <b>পরিমাণ:</b> ৳${ap.amount || 0} &nbsp;|&nbsp; <b>মাধ্যম:</b> ${(ap.method||'').toUpperCase()}<br>
+         <b>TrxID:</b> <span style="background:#fff;padding:2px 8px;border-radius:4px;font-family:monospace;color:#c53030;border:1px solid #fed7d7">${ap.trxId || '-'}</span><br>
+         <b>প্রেরকের নম্বর:</b> ${ap.senderNumber || '-'}<br>
+         ${apItemsHtml ? `<div style="margin-top:6px;font-size:13px;color:#555">${apItemsHtml}</div>` : ''}
+         <div style="margin-top:8px;padding:6px 10px;background:#fed7d7;border-radius:4px;font-size:12px">⚠️ অ্যাডমিন প্যানেলে গিয়ে এই পেমেন্ট verify করুন।</div>
+       </td></tr>` : '';
   return `
     <div style="font-family:Arial,'Hind Siliguri',sans-serif;max-width:640px;margin:auto;color:#222;">
       <h2 style="color:#2d5a27;margin:0 0 6px;">🛒 নতুন অর্ডার এসেছে!</h2>
@@ -85,6 +96,7 @@ function buildOrderEmailHtml(order) {
         <tbody>
           ${itemsRows}
           ${advHtml}
+          ${advProdHtml}
           <tr><td colspan="2" style="padding:8px;border:1px solid #eee;text-align:right;"><b>সাবটোটাল</b></td><td style="padding:8px;border:1px solid #eee;text-align:right;">৳${(order.subtotal||0).toLocaleString('en')}</td></tr>
           <tr><td colspan="2" style="padding:8px;border:1px solid #eee;text-align:right;"><b>ডেলিভারি</b></td><td style="padding:8px;border:1px solid #eee;text-align:right;">৳${(order.delivery?.charge||0).toLocaleString('en')}</td></tr>
           <tr style="background:#f7f3ec;"><td colspan="2" style="padding:10px;border:1px solid #eee;text-align:right;font-size:16px;"><b>সর্বমোট</b></td><td style="padding:10px;border:1px solid #eee;text-align:right;font-size:16px;color:#e8660a;"><b>৳${(order.total||0).toLocaleString('en')}</b></td></tr>
@@ -102,7 +114,7 @@ async function sendOrderEmail(order) {
     const info = await mailTransporter.sendMail({
       from: `"আসল গ্রামের মজা" <${process.env.GMAIL_USER}>`,
       to,
-      subject: `🛒 নতুন অর্ডার ${order.orderNum} — ${order.customer?.name || ''} (৳${order.total || 0})`,
+      subject: `${order.advanceProduct?.required ? '💳🔔 ' : '🛒 '}নতুন অর্ডার ${order.orderNum} — ${order.customer?.name || ''} (৳${order.total || 0})${order.advanceProduct?.required ? ' [অগ্রিম: ৳' + (order.advanceProduct.amount||0) + ']' : ''}`,
       html: buildOrderEmailHtml(order),
       replyTo: process.env.GMAIL_USER,
     });
@@ -281,6 +293,11 @@ const productSchema = new mongoose.Schema({
   metaDescription: { type: String, default: '' },
   slug: { type: String, unique: true, sparse: true },
   stockOut: { type: Boolean, default: false },
+  // ━━━ অগ্রিম পেমেন্ট / Advance Payment feature ━━━
+  // (যেসব পণ্য বেশি সময় স্টকে রাখা যায় না - তাজা মিষ্টি, দই, রসমালাই ইত্যাদি)
+  requireAdvance: { type: Boolean, default: false },     // অগ্রিম পেমেন্ট লাগবে কি?
+  advanceAmount: { type: Number, default: 0 },           // কত টাকা অগ্রিম দিতে হবে (per piece/unit)
+  advanceNote: { type: String, default: '' },            // অগ্রিমের কারণ/নোট (যেমন: "তাজা পণ্য, অর্ডার আগেই দিতে হয়")
   // ━━━ বিশেষ মূল্য / Special Price feature ━━━
   isOnSale: { type: Boolean, default: false },
   specialPrice: { type: Number, default: 0 },          // discounted price (per base variant)
@@ -318,6 +335,25 @@ const orderSchema = new mongoose.Schema({
     paid: { type: Boolean, default: false },
     trxId: { type: String, default: '' },
     amount: { type: Number, default: 0 },
+  },
+  // ━━━ পণ্যভিত্তিক অগ্রিম পেমেন্ট (Product-level Advance) ━━━
+  advanceProduct: {
+    required: { type: Boolean, default: false },     // এই অর্ডারে অগ্রিম প্রয়োজন কি?
+    paid: { type: Boolean, default: false },         // গ্রাহক পরিশোধ করেছেন কি?
+    amount: { type: Number, default: 0 },            // মোট অগ্রিম টাকা
+    method: { type: String, default: '' },           // bkash / nagad / rocket
+    trxId: { type: String, default: '' },            // ট্রানজেকশন ID
+    senderNumber: { type: String, default: '' },     // যে নম্বর থেকে পাঠানো হয়েছে
+    verified: { type: Boolean, default: false },     // অ্যাডমিন verify করেছেন কি?
+    verifiedAt: { type: Date },
+    verifiedBy: { type: String, default: '' },
+    items: [{                                         // কোন পণ্যগুলোর জন্য অগ্রিম
+      productId: String,
+      nm: String,
+      qty: Number,
+      perUnit: Number,
+      subtotal: Number,
+    }],
   },
   subtotal: Number,
   total: Number,
@@ -1003,7 +1039,7 @@ app.patch('/api/categories/:id/toggle', authMiddleware, async (req, res) => {
 
 app.post('/api/orders', async (req, res) => {
   try {
-    const { items, customer, delivery, subtotal, total, advanceDelivery } = req.body;
+    const { items, customer, delivery, subtotal, total, advanceDelivery, advanceProduct } = req.body;
     if (!items?.length || !customer?.name || !customer?.phone || !customer?.address) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -1039,7 +1075,23 @@ app.post('/api/orders', async (req, res) => {
       totalBuyCost,
       totalProfit,
       advanceDelivery: advanceDelivery || { paid: false, trxId: '', amount: 0 },
-      statusHistory: [{ status: 'pending', note: 'Order placed', time: new Date() }],
+      advanceProduct: advanceProduct && advanceProduct.required ? {
+        required: true,
+        paid: !!advanceProduct.paid,
+        amount: Number(advanceProduct.amount) || 0,
+        method: advanceProduct.method || '',
+        trxId: advanceProduct.trxId || '',
+        senderNumber: advanceProduct.senderNumber || '',
+        verified: false,
+        items: Array.isArray(advanceProduct.items) ? advanceProduct.items : [],
+      } : { required: false, paid: false, amount: 0, method: '', trxId: '', verified: false, items: [] },
+      statusHistory: [{
+        status: 'pending',
+        note: (advanceProduct && advanceProduct.required)
+          ? `Order placed (advance ৳${advanceProduct.amount} - ${advanceProduct.method || 'N/A'} - TrxID: ${advanceProduct.trxId || 'N/A'})`
+          : 'Order placed',
+        time: new Date()
+      }],
     });
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1229,6 +1281,62 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
   }
 });
 
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 💳 অগ্রিম পেমেন্ট verify (admin only)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app.patch('/api/orders/:id/verify-advance', authMiddleware, async (req, res) => {
+  try {
+    const { verified, note } = req.body;
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    if (!order.advanceProduct || !order.advanceProduct.required) {
+      return res.status(400).json({ error: 'এই অর্ডারে অগ্রিম পেমেন্ট প্রযোজ্য নয়' });
+    }
+    order.advanceProduct.verified = verified !== false;
+    order.advanceProduct.verifiedAt = new Date();
+    order.advanceProduct.verifiedBy = req.user?.username || 'admin';
+    order.statusHistory.push({
+      status: order.status,
+      note: (verified !== false ? '✅ অগ্রিম পেমেন্ট verified' : '❌ অগ্রিম পেমেন্ট reject') + (note ? ' — ' + note : ''),
+      time: new Date(),
+    });
+    order.updatedAt = new Date();
+    await order.save();
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 📋 শুধুমাত্র Advance-Paid Orders তালিকা
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app.get('/api/orders-advance', authMiddleware, async (req, res) => {
+  try {
+    const { verified, search, page = 1, limit = 15 } = req.query;
+    let filter = { 'advanceProduct.required': true };
+    if (verified === 'yes') filter['advanceProduct.verified'] = true;
+    else if (verified === 'no') filter['advanceProduct.verified'] = false;
+    if (search && search.trim()) {
+      const re = new RegExp(search.trim(), 'i');
+      filter.$or = [
+        { orderNum: re },
+        { 'customer.name': re },
+        { 'customer.phone': re },
+        { 'advanceProduct.trxId': re },
+      ];
+    }
+    const total = await Order.countDocuments(filter);
+    const orders = await Order.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((parseInt(page) - 1) * parseInt(limit))
+      .limit(parseInt(limit));
+    res.json({ orders, total, pages: Math.ceil(total / parseInt(limit)) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.get('/api/hero', async (req, res) => {
   try {

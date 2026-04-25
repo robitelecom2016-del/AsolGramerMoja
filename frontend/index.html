@@ -1020,6 +1020,16 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
 .cart-checkout-bar .total-l{font-size:1.05rem;font-weight:800;color:#1a1a1a;}
 .cart-checkout-btn{background:linear-gradient(90deg,#ff9020,#f5a623);color:#fff;border:none;border-radius:24px;padding:10px 28px;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;letter-spacing:.5px;box-shadow:0 4px 12px rgba(245,166,35,.4);}
 .cart-checkout-btn:hover{filter:brightness(1.05);}
+.om-pa-method{display:flex;align-items:center;gap:6px;background:#fff;border:2px solid #e2e8f0;border-radius:24px;padding:7px 14px;font-family:inherit;font-size:.82rem;font-weight:600;color:#4a5568;cursor:pointer;transition:all .2s}
+.om-pa-method:hover{border-color:#e53e3e;color:#c53030}
+.om-pa-method.active{background:#fff5f5;border-color:#e53e3e;color:#c53030;box-shadow:0 2px 8px rgba(229,62,62,.2)}
+.om-pa-logo{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:#fff}
+.om-pa-logo.bk,.om-pay-logo.bk{background:#e2136e}
+.om-pa-logo.ng,.om-pay-logo.ng{background:#ee7700}
+.om-pa-logo.rk,.om-pay-logo.rk{background:#8a2be2}
+.prod-advance-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(90deg,#e53e3e,#c53030);color:#fff;font-size:.66rem;font-weight:700;padding:3px 8px;border-radius:10px;margin-left:4px;box-shadow:0 2px 6px rgba(229,62,62,.3)}
+.prod-advance-badge i{font-size:.6rem}
+.prod-advance-note{display:flex;align-items:center;gap:5px;background:#fff5f5;border:1px solid #fed7d7;color:#c53030;font-size:.7rem;font-weight:600;padding:4px 8px;border-radius:6px;margin-top:6px}
 
 /* ━━━ Special Price Page ━━━ */
 .special-page{max-width:var(--mw);margin:0 auto;padding:24px 16px 60px;}
@@ -2079,6 +2089,59 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
             <input type="text" class="om-trx-input" id="omTrxId" placeholder="বিকাশ ট্রানজেকশন ID লিখুন (যেমন: 8F3K9X2P)">
           </div>
         </div>
+
+        <!-- ━━━ পণ্যভিত্তিক অগ্রিম পেমেন্ট (Product-level Advance) ━━━ -->
+        <div class="om-advance-box" id="omProdAdvanceBox" style="display:none;margin-top:14px;background:linear-gradient(135deg,#fff3f3,#ffe9e9);border:2px solid #e53e3e;">
+          <div class="om-advance-title" style="color:#c53030">
+            <i class="fa-solid fa-bell"></i>
+            পণ্য অগ্রিম পেমেন্ট আবশ্যক
+          </div>
+          <div class="om-advance-alert" style="background:rgba(229,62,62,.08);border-color:rgba(229,62,62,.3);color:#742a2a">
+            ⚠️ আপনার অর্ডারে এমন কিছু পণ্য রয়েছে যেগুলো বেশি সময় স্টকে থাকে না (তাজা মিষ্টি, দই, রসমালাই ইত্যাদি)। এই পণ্যগুলোর জন্য <strong>অগ্রিম টাকা</strong> পাঠাতে হবে।
+            <div id="omProdAdvList" style="margin-top:8px;padding:8px 10px;background:#fff;border-radius:6px;font-size:.8rem;color:#1a1a1a;line-height:1.7"></div>
+          </div>
+
+          <!-- Payment method selection -->
+          <div style="margin-top:12px">
+            <div style="font-size:.8rem;font-weight:700;color:#742a2a;margin-bottom:8px">পেমেন্ট মাধ্যম নির্বাচন করুন:</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap" id="omProdAdvMethods">
+              <button type="button" class="om-pa-method active" data-method="bkash" onclick="selectProdAdvMethod('bkash')">
+                <span class="om-pa-logo bk">বি</span> বিকাশ
+              </button>
+              <button type="button" class="om-pa-method" data-method="nagad" onclick="selectProdAdvMethod('nagad')">
+                <span class="om-pa-logo ng">নগ</span> নগদ
+              </button>
+              <button type="button" class="om-pa-method" data-method="rocket" onclick="selectProdAdvMethod('rocket')">
+                <span class="om-pa-logo rk">রক</span> রকেট
+              </button>
+            </div>
+          </div>
+
+          <div class="om-pay-methods" style="margin-top:10px">
+            <div class="om-pay-method">
+              <div class="om-pay-logo" id="omProdAdvLogo">বি</div>
+              <div class="om-pay-details">
+                <div class="om-pay-type"><span id="omProdAdvMethodLabel">বিকাশ</span> — <strong>Send Money</strong></div>
+                <div class="om-pay-num" id="omProdAdvNum">—</div>
+              </div>
+              <button class="om-pay-copy" type="button" onclick="copyProdAdvNum(this)">কপি</button>
+            </div>
+          </div>
+
+          <div class="om-advance-amt" style="margin-top:10px;background:#fff;border:1px dashed #e53e3e;padding:10px;border-radius:6px;color:#742a2a;font-weight:600">
+            📌 মোট অগ্রিম পাঠাতে হবে: <strong style="font-size:1.15rem;color:#c53030" id="omProdAdvTotal">৳0</strong>
+          </div>
+
+          <div style="margin-top:12px">
+            <div class="om-trx-label"><i class="fa-solid fa-mobile-screen" style="color:#c53030"></i> যে নম্বর থেকে পাঠাচ্ছেন <span style="color:#e00">*</span></div>
+            <input type="text" class="om-trx-input" id="omProdAdvSender" placeholder="যেমন: 01XXXXXXXXX" maxlength="14">
+          </div>
+          <div style="margin-top:10px">
+            <div class="om-trx-label"><i class="fa-solid fa-receipt" style="color:#c53030"></i> ট্রানজেকশন ID <span style="color:#e00">*</span></div>
+            <input type="text" class="om-trx-input" id="omProdAdvTrx" placeholder="যেমন: 8F3K9X2P">
+          </div>
+        </div>
+
       </div>
       <div class="om-total-bar">
         <div class="om-total-row"><span>পণ্যের মূল্য</span><span id="omSubtotal2">৳0</span></div>
@@ -3114,6 +3177,14 @@ function renderPdp(p) {
             <button class="pdp-qbtn" onclick="pdpQtyChange(1)">+</button>
           </div>
         </div>
+        ${p.requireAdvance && p.advanceAmount > 0 ? `
+        <div style="background:linear-gradient(135deg,#fff5f5,#ffe9e9);border:1.5px solid #e53e3e;border-radius:10px;padding:12px 14px;margin:10px 0;font-size:.85rem;color:#742a2a;line-height:1.6">
+          <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#c53030;margin-bottom:4px">
+            <i class="fa-solid fa-bell"></i> অগ্রিম পেমেন্ট প্রয়োজন
+          </div>
+          <div>এই পণ্যে অর্ডার করতে <strong>৳${p.advanceAmount}</strong> অগ্রিম পেমেন্ট আবশ্যক (প্রতি পিস)। বিকাশ/নগদ/রকেটের মাধ্যমে দিতে হবে।</div>
+          ${p.advanceNote ? `<div style="margin-top:4px;font-size:.78rem;color:#666">${p.advanceNote}</div>` : ''}
+        </div>` : ''}
         <div class="pdp-btns">
           <button class="pdp-btn-cart" id="pdpCartBtn" onclick="pdpAddCart('${p._id||p.id}')" ${stockOut?'disabled':''}>
             <i class="fa-solid fa-cart-shopping"></i> ${stockOut?'স্টক নেই':'কার্টে যোগ'}
@@ -3308,6 +3379,10 @@ function toggleCart() {
 let selectedDelivery = null;
 let selectedDeliveryType = '';
 let requiresAdvanceDelivery = false;
+// ━━━ পণ্যভিত্তিক অগ্রিম পেমেন্ট state ━━━
+let prodAdvanceItems = [];      // [{productId, nm, qty, perUnit, subtotal}]
+let prodAdvanceTotal = 0;        // মোট অগ্রিম টাকা
+let prodAdvanceMethod = 'bkash'; // bkash/nagad/rocket
 function checkAdvanceDelivery(items) {
   const found = items.filter(i => {
     const cat = (i.cat || '').trim();
@@ -3366,6 +3441,37 @@ function openOrderModal() {
     advBox.style.display = 'none';
     if (legalEl) legalEl.textContent = 'ক্যাশ অন ডেলিভারি — পণ্য পেলে টাকা দিন। কোনো অগ্রিম পেমেন্ট নেই।';
   }
+
+  // ━━━ পণ্যভিত্তিক অগ্রিম পেমেন্ট (Product-level advance) ━━━
+  prodAdvanceItems = [];
+  prodAdvanceTotal = 0;
+  items.forEach(i => {
+    if (i.requireAdvance && i.advanceAmount > 0) {
+      const subtotal = i.advanceAmount * i.qty;
+      prodAdvanceItems.push({
+        productId: i._id || i.id,
+        nm: i.nm,
+        qty: i.qty,
+        perUnit: i.advanceAmount,
+        subtotal,
+        note: i.advanceNote || ''
+      });
+      prodAdvanceTotal += subtotal;
+    }
+  });
+  const prodAdvBox = document.getElementById('omProdAdvanceBox');
+  if (prodAdvanceTotal > 0) {
+    prodAdvBox.style.display = 'block';
+    document.getElementById('omProdAdvList').innerHTML = prodAdvanceItems
+      .map(it => `<div>• <strong>${it.nm}</strong> × ${it.qty} <span style="color:#c53030">→ ৳${it.subtotal.toLocaleString('en')}</span>${it.note?`<div style="font-size:.72rem;color:#666;margin-left:12px">${it.note}</div>`:''}</div>`).join('');
+    document.getElementById('omProdAdvTotal').textContent = '৳' + prodAdvanceTotal.toLocaleString('en');
+    document.getElementById('omProdAdvSender').value = '';
+    document.getElementById('omProdAdvTrx').value = '';
+    selectProdAdvMethod(prodAdvanceMethod || 'bkash');
+    if (legalEl) legalEl.innerHTML = '⚠️ এই অর্ডারে <strong>পণ্যের জন্য অগ্রিম টাকা</strong> পাঠাতে হবে। বাকি টাকা ডেলিভারিতে পরিশোধ করুন।';
+  } else {
+    prodAdvBox.style.display = 'none';
+  }
   const cartSb = document.getElementById('cartSb');
   const cartOv = document.getElementById('cartOv');
   const orderOv = document.getElementById('orderOv');
@@ -3389,6 +3495,8 @@ function closeOrderModal() {
     selectedDelivery = null;
     selectedDeliveryType = '';
     requiresAdvanceDelivery = false;
+    prodAdvanceItems = [];
+    prodAdvanceTotal = 0;
     document.getElementById('omMainContent').style.display = 'block';
     document.getElementById('omSuccess').classList.remove('show');
     const btn = document.getElementById('omSubmitBtn');
@@ -3474,6 +3582,32 @@ function selectDelivery(charge, optId, type) {
     advAmt.innerHTML = `📌 অগ্রিম পাঠাতে হবে: <strong>৳${charge.toLocaleString('en')}</strong> (ডেলিভারি চার্জ মাত্র)`;
   }
 }
+function selectProdAdvMethod(method) {
+  prodAdvanceMethod = method;
+  document.querySelectorAll('#omProdAdvMethods .om-pa-method').forEach(b => {
+    b.classList.toggle('active', b.dataset.method === method);
+  });
+  const labels = { bkash: 'বিকাশ', nagad: 'নগদ', rocket: 'রকেট' };
+  const logos = { bkash: 'বি', nagad: 'নগ', rocket: 'রক' };
+  const logoClasses = { bkash: 'bk', nagad: 'ng', rocket: 'rk' };
+  document.getElementById('omProdAdvMethodLabel').textContent = labels[method] || method;
+  const logoEl = document.getElementById('omProdAdvLogo');
+  logoEl.textContent = logos[method] || '';
+  logoEl.className = 'om-pay-logo ' + (logoClasses[method] || '');
+  const num = (typeof ADVANCE_PAYMENT_INFO !== 'undefined' && ADVANCE_PAYMENT_INFO[method])
+    ? ADVANCE_PAYMENT_INFO[method] : '01XXXXXXXXX';
+  document.getElementById('omProdAdvNum').textContent = num;
+}
+function copyProdAdvNum(btn) {
+  const num = document.getElementById('omProdAdvNum').textContent.trim();
+  if (!num || num === '—') return;
+  navigator.clipboard?.writeText(num).then(() => {
+    const orig = btn.textContent; btn.textContent = '✓ কপি'; btn.style.background = '#48bb78';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1500);
+    showToast('📋 নম্বর কপি হয়েছে');
+  });
+}
+
 async function submitOrder() {
   const name = document.getElementById('omName').value.trim();
   const phone = document.getElementById('omPhone').value.trim();
@@ -3498,6 +3632,33 @@ async function submitOrder() {
       return;
     }
   }
+  // ━━━ পণ্যভিত্তিক অগ্রিম পেমেন্ট validation ━━━
+  let prodAdvData = null;
+  if (prodAdvanceTotal > 0) {
+    const sender = (document.getElementById('omProdAdvSender')?.value || '').trim();
+    const padTrx = (document.getElementById('omProdAdvTrx')?.value || '').trim();
+    if (!sender || sender.length < 11) {
+      showToast('❌ যে নম্বর থেকে অগ্রিম পাঠিয়েছেন তা দিন');
+      document.getElementById('omProdAdvSender')?.focus();
+      document.getElementById('omProdAdvanceBox')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    if (!padTrx || padTrx.length < 6) {
+      showToast('❌ অগ্রিম পেমেন্টের ট্রানজেকশন ID দিন');
+      document.getElementById('omProdAdvTrx')?.focus();
+      document.getElementById('omProdAdvanceBox')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    prodAdvData = {
+      required: true,
+      paid: true,
+      amount: prodAdvanceTotal,
+      method: prodAdvanceMethod,
+      trxId: padTrx,
+      senderNumber: sender,
+      items: prodAdvanceItems,
+    };
+  }
   const items = Object.values(cart);
   const subtotal = items.reduce((s, i) => s + i.cartPrice * i.qty, 0);
   const total = subtotal + selectedDelivery;
@@ -3510,6 +3671,7 @@ async function submitOrder() {
     delivery: { type: selectedDeliveryType, charge: selectedDelivery },
     subtotal, total,
     advanceDelivery: requiresAdvanceDelivery ? { paid: true, trxId, amount: selectedDelivery } : null,
+    advanceProduct: prodAdvData,
   };
   try {
     const res = await fetch(API_BASE + '/api/orders', {
@@ -3521,7 +3683,16 @@ async function submitOrder() {
     if (!res.ok) throw new Error(data.error || 'Order failed');
     document.getElementById('omOrderNum').textContent = 'অর্ডার নম্বর: ' + data.orderNum;
     const advNote = document.getElementById('omSuccessAdvanceNote');
-    if (advNote) advNote.style.display = requiresAdvanceDelivery ? 'block' : 'none';
+    if (advNote) {
+      if (requiresAdvanceDelivery || prodAdvanceTotal > 0) {
+        advNote.style.display = 'block';
+        if (prodAdvanceTotal > 0) {
+          advNote.innerHTML = `💳 আপনার অগ্রিম পেমেন্ট (৳${prodAdvanceTotal.toLocaleString('en')}) যাচাই করার পরে আমাদের টিম আপনাকে কনফার্মেশন SMS পাঠাবে।`;
+        }
+      } else {
+        advNote.style.display = 'none';
+      }
+    }
     document.getElementById('omMainContent').style.display = 'none';
     document.getElementById('omSuccess').classList.add('show');
     cart = {};

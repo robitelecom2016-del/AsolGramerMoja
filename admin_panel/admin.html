@@ -662,6 +662,10 @@ textarea.form-control { resize:vertical; min-height:80px; }
         <i class="fa-solid fa-bag-shopping"></i> অর্ডার
         <span class="nav-badge" id="pendingBadge">0</span>
       </div>
+      <div class="nav-item" onclick="navTo('advance-orders')" data-page="advance-orders">
+        <i class="fa-solid fa-money-bill-wave"></i> অগ্রিম অর্ডার
+        <span class="nav-badge" id="advancePendingBadge" style="display:none;background:var(--red)">!</span>
+      </div>
       <div class="nav-section-label">কনটেন্ট</div>
       <div class="nav-item" onclick="navTo('products')" data-page="products">
         <i class="fa-solid fa-box-open"></i> পণ্য সমূহ
@@ -877,6 +881,38 @@ textarea.form-control { resize:vertical; min-height:80px; }
         </div>
       </div>
       <div class="pagination" id="orderPagination"></div>
+    </div>
+
+    <!-- ━━━ অগ্রিম পেমেন্ট অর্ডার (Advance Paid Orders) ━━━ -->
+    <div class="page-view" id="page-advance-orders">
+      <div class="filters-bar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" id="advOrderSearch" placeholder="অর্ডার নং / নাম / ফোন / TrxID..." oninput="debounce(loadAdvanceOrders,400)()">
+        </div>
+        <select class="select-filter" id="advVerifyFilter" onchange="loadAdvanceOrders()">
+          <option value="all">সব অগ্রিম অর্ডার</option>
+          <option value="no">⏳ verify বাকি</option>
+          <option value="yes">✅ verified</option>
+        </select>
+        <span class="filter-count" id="advOrderCount">0 অর্ডার</span>
+      </div>
+      <div class="card">
+        <div class="card-header" style="background:linear-gradient(90deg,rgba(218,54,51,.12),transparent);border-bottom:1px solid rgba(218,54,51,.3)">
+          <h3><i class="fa-solid fa-money-bill-wave" style="color:var(--red2)"></i> অগ্রিম পেমেন্ট অর্ডার তালিকা</h3>
+          <span style="font-size:.78rem;color:var(--txt2);margin-left:auto">যেসব অর্ডারে গ্রাহক বিকাশ/নগদ/রকেটে অগ্রিম পাঠিয়েছেন</span>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr>
+              <th>অর্ডার নং</th><th>গ্রাহক</th><th>অগ্রিম ৳</th><th>মাধ্যম</th><th>TrxID</th>
+              <th>verify</th><th>স্ট্যাটাস</th><th>তারিখ</th><th>অ্যাকশন</th>
+            </tr></thead>
+            <tbody id="advOrderTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="pagination" id="advOrderPagination"></div>
     </div>
 
     <div class="page-view" id="page-stock">
@@ -1663,6 +1699,32 @@ textarea.form-control { resize:vertical; min-height:80px; }
         <input type="text" class="form-control" id="pSlug" placeholder="যেমন: sorisha-fuler-modhu">
         <div class="form-hint">ফাঁকা রাখলে নাম থেকে অটো জেনারেট হবে।</div>
       </div>
+      <!-- ━━━ অগ্রিম পেমেন্ট (Advance Payment) ━━━ -->
+      <div class="form-group2" style="background:rgba(218,54,51,.08);border:1px solid rgba(218,54,51,.35);border-radius:8px;padding:14px;margin-top:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+          <div>
+            <label style="color:var(--red2);font-weight:700;margin:0">💳 অগ্রিম পেমেন্ট প্রয়োজন</label>
+            <div class="form-hint" style="margin-top:2px">যেসব পণ্য বেশি সময় স্টকে থাকে না (তাজা মিষ্টি, দই, রসমালাই) — অর্ডার দেয়ার সময় গ্রাহককে অগ্রিম পেমেন্ট করতে হবে।</div>
+          </div>
+          <label class="toggle-switch" onclick="toggleProdField('pRequireAdvance')">
+            <div class="toggle-track" id="pRequireAdvanceTrack"><div class="toggle-thumb"></div></div>
+            <span id="pRequireAdvanceLbl">বন্ধ</span>
+          </label>
+          <input type="hidden" id="pRequireAdvance" value="false">
+        </div>
+        <div class="form-row">
+          <div class="form-group2">
+            <label>অগ্রিম টাকার পরিমাণ (৳ — প্রতি ইউনিট)</label>
+            <input type="number" class="form-control" id="pAdvanceAmount" placeholder="যেমন: 100" min="0">
+            <div class="form-hint">প্রতি পিসের জন্য কত টাকা অগ্রিম। গ্রাহক একাধিক কিনলে স্বয়ংক্রিয় গুণ হবে।</div>
+          </div>
+          <div class="form-group2">
+            <label>অগ্রিমের নোট (ঐচ্ছিক)</label>
+            <input type="text" class="form-control" id="pAdvanceNote" placeholder="যেমন: তাজা পণ্য, অর্ডার আগেই কনফার্ম দরকার">
+          </div>
+        </div>
+      </div>
+
       <!-- ━━━ বিশেষ মূল্য (Special Price) ━━━ -->
       <div class="form-group2" style="background:rgba(232,102,10,.08);border:1px solid rgba(232,102,10,.3);border-radius:8px;padding:14px;margin-top:10px">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px">
@@ -2041,6 +2103,7 @@ function navTo(page) {
   if (page === 'products') loadProducts();
   if (page === 'stock') loadStock();
   if (page === 'orders') loadOrders();
+  if (page === 'advance-orders') loadAdvanceOrders();
   if (page === 'categories') loadCategories();
   if (page === 'hero') { loadHero(); loadPickerProducts(); }
   if (page === 'about') loadAboutPage();
@@ -2320,6 +2383,11 @@ function openProdModal(prod=null) {
   document.getElementById('pIsOnSaleTrack').className='toggle-track';
   document.getElementById('pIsOnSaleLbl').textContent='বন্ধ';
   document.getElementById('pSpecialPrice').value='';
+  document.getElementById('pRequireAdvance').value='false';
+  document.getElementById('pRequireAdvanceTrack').className='toggle-track';
+  document.getElementById('pRequireAdvanceLbl').textContent='বন্ধ';
+  document.getElementById('pAdvanceAmount').value='';
+  document.getElementById('pAdvanceNote').value='';
   document.getElementById('pSpecialDiscount').value='';
   document.getElementById('pSpecialNote').value='';
   document.getElementById('mainImgPreview').innerHTML=''; document.getElementById('thumbImgPreview').innerHTML='';
@@ -2356,6 +2424,12 @@ function openProdModal(prod=null) {
     document.getElementById('pIsOnSaleTrack').className = 'toggle-track ' + (isOnSale ? 'on' : '');
     document.getElementById('pIsOnSaleLbl').textContent = isOnSale ? 'চালু' : 'বন্ধ';
     document.getElementById('pSpecialPrice').value = prod.specialPrice || '';
+    const reqAdv = prod.requireAdvance === true;
+    document.getElementById('pRequireAdvance').value = String(reqAdv);
+    document.getElementById('pRequireAdvanceTrack').className = 'toggle-track ' + (reqAdv ? 'on' : '');
+    document.getElementById('pRequireAdvanceLbl').textContent = reqAdv ? 'চালু' : 'বন্ধ';
+    document.getElementById('pAdvanceAmount').value = prod.advanceAmount || '';
+    document.getElementById('pAdvanceNote').value = prod.advanceNote || '';
     document.getElementById('pSpecialDiscount').value = prod.specialDiscount || '';
     document.getElementById('pSpecialNote').value = prod.specialNote || '';
     renderVariants(prod.variants||[]); renderHighlights(prod.highlights||[]);
@@ -2509,6 +2583,9 @@ async function saveProd() {
     metaTitle: document.getElementById('pMetaTitle').value.trim(),
     metaDescription: document.getElementById('pMetaDesc').value.trim(),
     slug,
+    requireAdvance: document.getElementById('pRequireAdvance').value === 'true',
+    advanceAmount: parseFloat(document.getElementById('pAdvanceAmount').value) || 0,
+    advanceNote: document.getElementById('pAdvanceNote').value.trim(),
     isOnSale: document.getElementById('pIsOnSale').value === 'true',
     specialPrice: parseFloat(document.getElementById('pSpecialPrice').value) || 0,
     specialDiscount: parseFloat(document.getElementById('pSpecialDiscount').value) || 0,
@@ -3284,6 +3361,62 @@ async function updateOrderStatusFromModal(id, status, selectEl) {
   } catch { toast('আপডেট ব্যর্থ','error'); }
 }
 
+// ━━━ অগ্রিম পেমেন্ট অর্ডার তালিকা ━━━
+let advOrderPage = 1;
+async function loadAdvanceOrders() {
+  const search = document.getElementById('advOrderSearch').value.trim();
+  const verified = document.getElementById('advVerifyFilter').value;
+  const tbody = document.getElementById('advOrderTableBody');
+  tbody.innerHTML = '<tr><td colspan="9"><div class="loader"><i class="fa-solid fa-spinner"></i></div></td></tr>';
+  try {
+    let url = `/api/orders-advance?page=${advOrderPage}&limit=15&verified=${verified}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    const res = await api('GET', url);
+    document.getElementById('advOrderCount').textContent = `${res.total} অর্ডার`;
+    if (!res.orders.length) {
+      tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-money-bill-wave"></i><h3>কোনো অগ্রিম পেমেন্ট অর্ডার নেই</h3></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = res.orders.map(o => {
+      const ap = o.advanceProduct || {};
+      return `
+      <tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--green2)">${o.orderNum}</span></td>
+        <td><div class="td-name">${o.customer.name}</div><div class="td-sub">${o.customer.phone}</div></td>
+        <td><strong style="color:var(--orange2)">৳${(ap.amount||0).toLocaleString('en')}</strong></td>
+        <td style="text-transform:capitalize;font-size:.8rem">${ap.method||'—'}</td>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:.74rem;background:var(--bg3);padding:3px 7px;border-radius:4px;color:var(--yellow2)">${ap.trxId||'—'}</span></td>
+        <td>${ap.verified
+          ? '<span style="background:var(--green);color:#fff;padding:3px 9px;border-radius:10px;font-size:.7rem;font-weight:700">✅ VERIFIED</span>'
+          : '<span style="background:var(--red);color:#fff;padding:3px 9px;border-radius:10px;font-size:.7rem;font-weight:700">⏳ PENDING</span>'}</td>
+        <td><span style="font-size:.74rem;color:${statusColor(o.status)};text-transform:capitalize">${o.status}</span></td>
+        <td style="font-size:.72rem;color:var(--txt2)">${timeAgo(o.createdAt)}</td>
+        <td style="white-space:nowrap">
+          <button class="icon-btn edit" title="বিস্তারিত" onclick="viewOrder('${o._id}')"><i class="fa-solid fa-eye"></i></button>
+          ${!ap.verified ? `<button class="icon-btn" title="Verify পেমেন্ট" style="background:var(--green);color:#fff" onclick="verifyAdvancePayment('${o._id}',true,true)"><i class="fa-solid fa-check"></i></button>` : ''}
+        </td>
+      </tr>`;
+    }).join('');
+    renderPagination('advOrderPagination', res.total, 15, advOrderPage, (pg) => { advOrderPage = pg; loadAdvanceOrders(); });
+  } catch (err) {
+    toast('অগ্রিম অর্ডার লোড ব্যর্থ: ' + err.message, 'error');
+  }
+}
+
+async function verifyAdvancePayment(orderId, approve, fromList) {
+  const msg = approve ? 'এই অগ্রিম পেমেন্টটি verify করতে চান?' : 'এই অগ্রিম পেমেন্টটি reject করতে চান?';
+  showConfirm(approve?'✅':'❌', msg, approve?'গ্রাহকের পাঠানো TrxID আপনি নিজে চেক করেছেন কি?':'এটি reject করা হবে।', async () => {
+    try {
+      await api('PATCH', `/api/orders/${orderId}/verify-advance`, { verified: approve });
+      toast(approve ? '✅ অগ্রিম পেমেন্ট verified' : '❌ অগ্রিম পেমেন্ট rejected', 'success');
+      if (fromList) loadAdvanceOrders();
+      else { closeModal('orderModal'); }
+    } catch (err) {
+      toast('আপডেট ব্যর্থ: ' + err.message, 'error');
+    }
+  });
+}
+
 function deleteOrder(id, orderNum) {
   showConfirm('🗑️',`অর্ডার "${orderNum}" মুছে ফেলতে চান?`,'এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।', async () => {
     try { await api('DELETE', `/api/orders/${id}`); toast('অর্ডার মুছে ফেলা হয়েছে', 'success'); loadOrders(); }
@@ -3353,6 +3486,37 @@ async function viewOrder(id) {
                       </div>
                     </div>
                   </div>
+                </div>
+              ` : ''}
+              ${o.advanceProduct?.required ? `
+                <div style="border:1px solid ${o.advanceProduct.verified?'var(--green)':'var(--red2)'};background:${o.advanceProduct.verified?'rgba(46,160,67,.08)':'rgba(218,54,51,.08)'};border-radius:8px;padding:10px;margin-top:8px">
+                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-weight:700;color:${o.advanceProduct.verified?'var(--green3)':'var(--red2)'}">
+                    <i class="fa-solid fa-money-bill-wave"></i> অগ্রিম পণ্য পেমেন্ট
+                    <span style="margin-left:auto;font-size:.7rem;padding:2px 8px;border-radius:10px;background:${o.advanceProduct.verified?'var(--green)':'var(--red)'};color:#fff">${o.advanceProduct.verified?'✅ VERIFIED':'⏳ PENDING'}</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.78rem">
+                    <div><span style="color:var(--txt2)">পরিমাণ:</span> <strong style="color:var(--orange2)">৳${(o.advanceProduct.amount||0).toLocaleString('en')}</strong></div>
+                    <div><span style="color:var(--txt2)">মাধ্যম:</span> <strong style="text-transform:capitalize">${o.advanceProduct.method||'—'}</strong></div>
+                    <div style="grid-column:1/-1"><span style="color:var(--txt2)">TrxID:</span> <span style="font-family:'JetBrains Mono',monospace;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--yellow2)">${o.advanceProduct.trxId||'—'}</span></div>
+                    ${o.advanceProduct.senderNumber ? `<div style="grid-column:1/-1"><span style="color:var(--txt2)">প্রেরকের নম্বর:</span> ${o.advanceProduct.senderNumber}</div>` : ''}
+                  </div>
+                  ${(o.advanceProduct.items||[]).length ? `
+                    <div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-size:.74rem">
+                      <div style="color:var(--txt2);margin-bottom:4px">অগ্রিম প্রযোজ্য পণ্য:</div>
+                      ${o.advanceProduct.items.map(it=>`<div>• ${it.nm} × ${it.qty} → ৳${(it.subtotal||0).toLocaleString('en')}</div>`).join('')}
+                    </div>` : ''}
+                  ${!o.advanceProduct.verified ? `
+                    <div style="display:flex;gap:8px;margin-top:10px">
+                      <button class="btn-primary" style="flex:1;background:var(--green);font-size:.78rem;padding:7px" onclick="verifyAdvancePayment('${o._id}',true)">
+                        <i class="fa-solid fa-check"></i> Verify পেমেন্ট
+                      </button>
+                      <button class="btn-secondary" style="font-size:.78rem;padding:7px" onclick="verifyAdvancePayment('${o._id}',false)">
+                        <i class="fa-solid fa-xmark"></i> Reject
+                      </button>
+                    </div>` : `
+                    <div style="margin-top:6px;font-size:.72rem;color:var(--green3)">
+                      ✅ ${o.advanceProduct.verifiedAt ? new Date(o.advanceProduct.verifiedAt).toLocaleString('en-GB') : ''} ${o.advanceProduct.verifiedBy?'by '+o.advanceProduct.verifiedBy:''}
+                    </div>`}
                 </div>
               ` : ''}
               <div style="border-top:1px solid var(--border);padding-top:7px;margin-top:4px" id="orderTotalRow">
