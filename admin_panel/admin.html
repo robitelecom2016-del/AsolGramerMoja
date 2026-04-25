@@ -1143,6 +1143,92 @@ textarea.form-control { resize:vertical; min-height:80px; }
         </div>
       </div>
 
+      <!-- ━━━ ওয়েবসাইট টেক্সট সেকশন (নেভ, হিরো, ফুটার, কার্ট, অর্ডার মডাল) ━━━ -->
+      <div class="settings-section">
+        <div class="settings-section-hd"><i class="fa-solid fa-pen-to-square" style="color:var(--green)"></i><h3>ওয়েবসাইট টেক্সট (পন্য বাদে সব লেখা)</h3></div>
+        <div class="settings-body">
+          <div class="form-hint" style="margin-bottom:14px">এখান থেকে নেভিগেশন মেনু, হিরো বাটন, সেকশন শিরোনাম, কার্ট/অর্ডার মডাল, ফুটার লিংক — সব দৃশ্যমান লেখা পরিবর্তন করতে পারবেন। খালি রাখলে ডিফল্ট লেখা থাকবে।</div>
+
+          <h4 style="margin:14px 0 8px;color:var(--green)"><i class="fa-solid fa-bars"></i> নেভিগেশন মেনু (উপরে)</h4>
+          <div class="form-row">
+            <div class="form-group2"><label>হোম মেনু</label><input type="text" class="form-control" data-st="navHome" placeholder="হোম"></div>
+            <div class="form-group2"><label>বিশেষ মূল্য মেনু</label><input type="text" class="form-control" data-st="navSpecial" placeholder="বিশেষ মূল্য"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group2"><label>ক্যাটাগরি মেনু</label><input type="text" class="form-control" data-st="navCategories" placeholder="ক্যাটাগরি"></div>
+            <div class="form-group2"><label>সকল পণ্য মেনু</label><input type="text" class="form-control" data-st="navShop" placeholder="সকল পণ্য"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group2"><label>আমাদের সম্পর্কে মেনু</label><input type="text" class="form-control" data-st="navAbout" placeholder="আমাদের সম্পর্কে"></div>
+            <div class="form-group2"><label>যোগাযোগ মেনু</label><input type="text" class="form-control" data-st="navContact" placeholder="যোগাযোগ"></div>
+          </div>
+          <div class="form-group2"><label>সার্চ বক্স প্লেসহোল্ডার</label><input type="text" class="form-control" data-st="searchPlaceholder" placeholder="পণ্য খুঁজুন..."></div>
+
+          <h4 style="margin:18px 0 8px;color:var(--orange)"><i class="fa-solid fa-image"></i> হোম পেইজ — হিরো ও সেকশন শিরোনাম</h4>
+          <div class="form-group2"><label>হিরো CTA বাটন (Call to action)</label><input type="text" class="form-control" data-st="heroCta" placeholder="পণ্য কিনুন"></div>
+          <div class="form-row">
+            <div class="form-group2"><label>"বেস্ট সেলার" সেকশন শিরোনাম</label><input type="text" class="form-control" data-st="bestSellerTitle" placeholder="🏆 আমাদের বেস্ট সেলার"></div>
+            <div class="form-group2"><label>"সকল পণ্য" সেকশন শিরোনাম</label><input type="text" class="form-control" data-st="allProductsTitle" placeholder="📦 সকল পণ্য"></div>
+          </div>
+
+          <h4 style="margin:18px 0 8px;color:var(--blue)"><i class="fa-solid fa-tag"></i> বিশেষ মূল্য পেইজ</h4>
+          <div class="form-row">
+            <div class="form-group2"><label>পেইজ শিরোনাম</label><input type="text" class="form-control" data-st="specialTitle" placeholder="বিশেষ মূল্য"></div>
+            <div class="form-group2"><label>পেইজ সাবটাইটেল</label><input type="text" class="form-control" data-st="specialSubtitle" placeholder="সীমিত সময়ের জন্য বিশেষ ছাড়ে..."></div>
+          </div>
+
+          <h4 style="margin:18px 0 8px;color:var(--purple)"><i class="fa-solid fa-filter"></i> পণ্য পেইজ ফিল্টার</h4>
+          <div class="form-group2"><label>"সব ক্যাটাগরি" ফিল্টার অপশন</label><input type="text" class="form-control" data-st="allCategories" placeholder="সব ক্যাটাগরি"></div>
+
+          <h4 style="margin:18px 0 8px;color:var(--green)"><i class="fa-solid fa-cart-shopping"></i> কার্ট সাইডবার</h4>
+          <div class="form-row">
+            <div class="form-group2"><label>কার্টের লেবেল</label><input type="text" class="form-control" data-st="myCartLabel" placeholder="My Cart"></div>
+            <div class="form-group2"><label>"সম্পর্কিত পণ্য" শিরোনাম</label><input type="text" class="form-control" data-st="relatedProductsTitle" placeholder="সম্পর্কিত পণ্য"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group2"><label>"Sub Total" লেবেল</label><input type="text" class="form-control" data-st="cartSubTotal" placeholder="Sub Total"></div>
+            <div class="form-group2"><label>"Total" লেবেল</label><input type="text" class="form-control" data-st="cartTotalLabel" placeholder="Total"></div>
+          </div>
+          <div class="form-group2"><label>"CHECKOUT" বাটন</label><input type="text" class="form-control" data-st="checkoutBtn" placeholder="CHECKOUT"></div>
+
+          <h4 style="margin:18px 0 8px;color:var(--orange)"><i class="fa-solid fa-receipt"></i> অর্ডার মডাল (চেকআউট)</h4>
+          <div class="form-group2"><label>মডাল শিরোনাম</label><input type="text" class="form-control" data-st="orderModalTitle" placeholder="অর্ডার করুন — ক্যাশ অন ডেলিভারি"></div>
+          <div class="form-row">
+            <div class="form-group2"><label>সারসংক্ষেপ শিরোনাম</label><input type="text" class="form-control" data-st="orderSummaryTitle" placeholder="📋 অর্ডার সারসংক্ষেপ"></div>
+            <div class="form-group2"><label>"আপনার তথ্য দিন" লেবেল</label><input type="text" class="form-control" data-st="yourInfoLabel" placeholder="আপনার তথ্য দিন"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group2"><label>অর্ডার সফল শিরোনাম</label><input type="text" class="form-control" data-st="orderSuccessTitle" placeholder="অর্ডার সম্পন্ন হয়েছে!"></div>
+            <div class="form-group2"><label>"বাড়িতে ফিরে যান" বাটন</label><input type="text" class="form-control" data-st="backHomeBtn" placeholder="বাড়িতে ফিরে যান"></div>
+          </div>
+          <div class="form-group2"><label>অর্ডার সফল মেসেজ (HTML সাপোর্ট)</label><textarea class="form-control" data-st="orderSuccessMsg" rows="2" placeholder="আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে।&lt;br&gt;শীঘ্রই আমাদের টিম আপনার সাথে যোগাযোগ করবে।"></textarea></div>
+
+          <h4 style="margin:18px 0 8px;color:var(--blue)"><i class="fa-solid fa-window-maximize"></i> ফুটার শিরোনাম ও লিংক</h4>
+          <div class="form-row">
+            <div class="form-group2"><label>"নেভিগেশন" শিরোনাম</label><input type="text" class="form-control" data-st="footerNavHeading" placeholder="নেভিগেশন"></div>
+            <div class="form-group2"><label>"পণ্য বিভাগ" শিরোনাম</label><input type="text" class="form-control" data-st="footerCatHeading" placeholder="পণ্য বিভাগ"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group2"><label>"গ্রাহক সেবা" শিরোনাম</label><input type="text" class="form-control" data-st="footerServiceHeading" placeholder="গ্রাহক সেবা"></div>
+            <div class="form-group2"><label>ফুটারে "পণ্য" লিংক</label><input type="text" class="form-control" data-st="footerProducts" placeholder="পণ্য"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group2"><label>"ডেলিভারি তথ্য" লিংক</label><input type="text" class="form-control" data-st="csDelivery" placeholder="ডেলিভারি তথ্য"></div>
+            <div class="form-group2"><label>"রিটার্ন পলিসি" লিংক</label><input type="text" class="form-control" data-st="csReturn" placeholder="রিটার্ন পলিসি"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group2"><label>"গোপনীয়তা নীতি" লিংক</label><input type="text" class="form-control" data-st="csPrivacy" placeholder="গোপনীয়তা নীতি"></div>
+            <div class="form-group2"><label>"যোগাযোগ করুন" লিংক</label><input type="text" class="form-control" data-st="csContact" placeholder="যোগাযোগ করুন"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group2"><label>"হেল্পলাইন" লেবেল</label><input type="text" class="form-control" data-st="helplineLabel" placeholder="হেল্পলাইন"></div>
+            <div class="form-group2"><label>"নিরাপদ শপিং" টেক্সট</label><input type="text" class="form-control" data-st="safeShopping" placeholder="নিরাপদ শপিং"></div>
+          </div>
+
+          <button class="btn-primary" onclick="saveSiteTextSettings()"><i class="fa-solid fa-floppy-disk"></i> সমস্ত টেক্সট সংরক্ষণ করুন</button>
+        </div>
+      </div>
+
       <div class="settings-section">
         <div class="settings-section-hd"><i class="fa-solid fa-lock" style="color:var(--purple)"></i><h3>পাসওয়ার্ড পরিবর্তন</h3></div>
         <div class="settings-body">
@@ -3772,6 +3858,9 @@ async function loadSettings() {
     document.getElementById('fbPixelIdInp').value = s.fbPixelId || '';
     document.getElementById('gtmIdInp').value = s.gtmId || '';
     document.getElementById('gscVerifyInp').value = s.gscVerify || '';
+
+    // ─── ওয়েবসাইট টেক্সট ফিল্ড ───
+    loadSiteTextIntoInputs(s.siteText || {});
   } catch{}
 }
 
@@ -3825,6 +3914,28 @@ async function saveTrackingSettings() {
     });
     toast('ট্র্যাকিং কোড সংরক্ষিত','success');
   } catch(err) { toast('ব্যর্থ: '+err.message,'error'); }
+}
+
+// ━━━ ওয়েবসাইট টেক্সট save/load ━━━
+async function saveSiteTextSettings() {
+  try {
+    const siteText = {};
+    document.querySelectorAll('[data-st]').forEach(inp => {
+      const k = inp.getAttribute('data-st');
+      const v = inp.value.trim();
+      if (k && v) siteText[k] = v;
+    });
+    await api('PUT','/api/settings',{ siteText });
+    toast('ওয়েবসাইট টেক্সট সংরক্ষিত','success');
+  } catch(err) { toast('ব্যর্থ: '+err.message,'error'); }
+}
+
+function loadSiteTextIntoInputs(siteText) {
+  if (!siteText || typeof siteText !== 'object') return;
+  document.querySelectorAll('[data-st]').forEach(inp => {
+    const k = inp.getAttribute('data-st');
+    if (k && siteText[k] != null) inp.value = siteText[k];
+  });
 }
 
 // ━━━ লোগো / ফেভিকন আপলোড ━━━

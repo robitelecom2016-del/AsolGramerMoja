@@ -1507,15 +1507,15 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     </a>
     <!-- Desktop Nav Links -->
     <ul class="nav-links">
-      <li><a onclick="goHome()" id="navHome" class="active"><i class="fa-solid fa-house"></i> হোম</a></li>
-      <li><a onclick="goSpecialPage()" id="navSpecial"><i class="fa-solid fa-tag"></i> বিশেষ মূল্য</a></li>
+      <li><a onclick="goHome()" id="navHome" class="active"><i class="fa-solid fa-house"></i> <span data-txt="navHome">হোম</span></a></li>
+      <li><a onclick="goSpecialPage()" id="navSpecial"><i class="fa-solid fa-tag"></i> <span data-txt="navSpecial">বিশেষ মূল্য</span></a></li>
       <li class="nav-cat-dropdown-wrap" style="position:relative;">
-        <a style="cursor:pointer;" id="navCatLink"><i class="fa-solid fa-th-large"></i> ক্যাটাগরি <i class="fa-solid fa-chevron-down" style="font-size:.6rem;"></i></a>
+        <a style="cursor:pointer;" id="navCatLink"><i class="fa-solid fa-th-large"></i> <span data-txt="navCategories">ক্যাটাগরি</span> <i class="fa-solid fa-chevron-down" style="font-size:.6rem;"></i></a>
         <div class="nav-cat-dropdown" id="navCatDropdown"></div>
       </li>
-      <li><a onclick="goProductsPage()" id="navShop"><i class="fa-solid fa-box-open"></i> সকল পণ্য</a></li>
-      <li><a onclick="goAboutPage()" id="navAbout">আমাদের সম্পর্কে</a></li>
-      <li><a onclick="goContactPage()" id="navContact">যোগাযোগ</a></li>
+      <li><a onclick="goProductsPage()" id="navShop"><i class="fa-solid fa-box-open"></i> <span data-txt="navShop">সকল পণ্য</span></a></li>
+      <li><a onclick="goAboutPage()" id="navAbout"><span data-txt="navAbout">আমাদের সম্পর্কে</span></a></li>
+      <li><a onclick="goContactPage()" id="navContact"><span data-txt="navContact">যোগাযোগ</span></a></li>
     </ul>
     <!-- Search + Recently Viewed + Cart -->
     <div class="nb-right">
@@ -1554,7 +1554,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
 </header>
 <div class="mob-search-overlay" id="mobSearchOverlay" onclick="closeMobSearchOutside(event)">
   <div class="mob-search-box">
-    <input class="mob-s-input" id="mobSearchInput" type="text" placeholder="পণ্য খুঁজুন..." autocomplete="off" oninput="doSearch(this.value,'mobSearchResults')">
+    <input class="mob-s-input" id="mobSearchInput" type="text" placeholder="পণ্য খুঁজুন..." autocomplete="off" oninput="doSearch(this.value,'mobSearchResults')" data-ph="searchPlaceholder">
     <button class="mob-s-close" onclick="closeMobSearch()"><i class="fa-solid fa-xmark"></i></button>
   </div>
   <div class="mob-search-results" id="mobSearchResults"></div>
@@ -1602,7 +1602,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
             <h1 id="hTitle">গ্রামীণ সতেজতা ও<br>স্বাদের আসল মজা</h1>
             <p id="hSub" style="color:#e05c00;font-weight:700;font-size:1rem;margin-bottom:6px;">এই সপ্তাহের বিশেষ অফার</p>
             <div style="font-size:1.9rem;font-weight:800;color:#1a1a1a;margin-bottom:16px;">৳৯৯ থেকে শুরু</div>
-            <a onclick="document.getElementById('sec-products').scrollIntoView({behavior:'smooth'})" class="btn-hero" style="cursor:pointer;background:var(--gd);"><i class="fa-solid fa-bag-shopping"></i> পণ্য কিনুন</a>
+            <a onclick="document.getElementById('sec-products').scrollIntoView({behavior:'smooth'})" class="btn-hero" style="cursor:pointer;background:var(--gd);"><i class="fa-solid fa-bag-shopping"></i> <span data-txt="heroCta">পণ্য কিনুন</span></a>
           </div>
         </div>
         <button class="hero-arrow prev" onclick="goSlide((cur-1+heroSlides.length)%heroSlides.length||0)"><i class="fa-solid fa-chevron-left"></i></button>
@@ -1638,7 +1638,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
   <div class="main" id="sec-products">
     <div class="sec-block">
       <div class="sec-head">
-        <h2>🏆 আমাদের বেস্ট সেলার</h2>
+        <h2 data-txt="bestSellerTitle">🏆 আমাদের বেস্ট সেলার</h2>
         <div class="sec-arrows">
           <button class="arr-btn" onclick="slideRow('best',-1)"><i class="fa-solid fa-chevron-left"></i></button>
           <button class="arr-btn" onclick="slideRow('best',1)"><i class="fa-solid fa-chevron-right"></i></button>
@@ -1669,7 +1669,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     </div>
     <div class="sec-block">
       <div class="sec-head">
-        <h2>📦 সকল পণ্য</h2>
+        <h2 data-txt="allProductsTitle">📦 সকল পণ্য</h2>
       </div>
       <div id="allCatTabs" class="all-cat-tabs"></div>
       <div class="all-grid" id="allGrid">
@@ -1693,10 +1693,10 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
 <div class="page" id="page-products">
   <div class="products-page">
     <div class="products-header">
-      <div class="products-title"><i class="fa-solid fa-box-open" style="color:var(--gd)"></i> সকল পণ্য</div>
+      <div class="products-title"><i class="fa-solid fa-box-open" style="color:var(--gd)"></i> <span data-txt="allProductsTitle">সকল পণ্য</span></div>
       <div class="products-filters">
         <select class="filter-select" id="prodCatFilter" onchange="goProductsPage(this.value)">
-          <option value="">সব ক্যাটাগরি</option>
+          <option value="" data-txt="allCategories">সব ক্যাটাগরি</option>
         </select>
       </div>
     </div>
@@ -1708,8 +1708,8 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
   <div class="special-page">
     <div class="special-hero">
       <div class="sp-ic">🏷️</div>
-      <h1>বিশেষ মূল্য</h1>
-      <p>সীমিত সময়ের জন্য বিশেষ ছাড়ে পাচ্ছেন এই পণ্যগুলো। দ্রুত অর্ডার করুন!</p>
+      <h1 data-txt="specialTitle">বিশেষ মূল্য</h1>
+      <p data-txt="specialSubtitle">সীমিত সময়ের জন্য বিশেষ ছাড়ে পাচ্ছেন এই পণ্যগুলো। দ্রুত অর্ডার করুন!</p>
     </div>
     <div id="specialGrid" class="special-grid"></div>
   </div>
@@ -1749,7 +1749,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
 
     <!-- Col 2: Navigation -->
     <div class="footer-col">
-      <h4 class="footer-heading">নেভিগেশন</h4>
+      <h4 class="footer-heading" data-txt="footerNavHeading">নেভিগেশন</h4>
       <ul class="flinks footer-links">
         <li><a onclick="goHome()">হোম</a></li>
         <li><a onclick="goProductsPage()">সকল পণ্য</a></li>
@@ -1762,23 +1762,23 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
 
     <!-- Col 3: Categories -->
     <div class="footer-col">
-      <h4 class="footer-heading">পণ্য বিভাগ</h4>
+      <h4 class="footer-heading" data-txt="footerCatHeading">পণ্য বিভাগ</h4>
       <ul class="flinks footer-links" id="footerCatLinks"></ul>
     </div>
 
     <!-- Col 4: Customer Service -->
     <div class="footer-col">
-      <h4 class="footer-heading">গ্রাহক সেবা</h4>
+      <h4 class="footer-heading" data-txt="footerServiceHeading">গ্রাহক সেবা</h4>
       <ul class="flinks footer-links">
-        <li><a>ডেলিভারি তথ্য</a></li>
-        <li><a>রিটার্ন পলিসি</a></li>
-        <li><a>গোপনীয়তা নীতি</a></li>
-        <li><a onclick="goContactPage()">যোগাযোগ করুন</a></li>
+        <li><a data-txt="csDelivery">ডেলিভারি তথ্য</a></li>
+        <li><a data-txt="csReturn">রিটার্ন পলিসি</a></li>
+        <li><a data-txt="csPrivacy">গোপনীয়তা নীতি</a></li>
+        <li><a onclick="goContactPage()" data-txt="csContact">যোগাযোগ করুন</a></li>
       </ul>
       <div class="footer-helpline-box">
-        <div class="footer-helpline-label"><i class="fa-solid fa-headset"></i> হেল্পলাইন</div>
+        <div class="footer-helpline-label"><i class="fa-solid fa-headset"></i> <span data-txt="helplineLabel">হেল্পলাইন</span></div>
         <div class="footer-helpline-num" id="footerHelpPhone">01XXXXXXXXX</div>
-        <div class="footer-helpline-time">শনি–বৃহস্পতি · সকাল ৯টা–রাত ৯টা</div>
+        <div class="footer-helpline-time" id="footerHelpTime">শনি–বৃহস্পতি · সকাল ৯টা–রাত ৯টা</div>
       </div>
     </div>
   </div>
@@ -1788,13 +1788,13 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     <div class="footer-bottom-inner">
     <span id="footerCopyright" style="color:#bbb;">&copy; 2024 আসল গ্রামের মজা — সর্বস্বত্ব সংরক্ষিত</span>
     <nav class="footer-bottom-nav">
-      <a onclick="goHome()" class="footer-bot-link">হোম</a>
-      <a onclick="goProductsPage()" class="footer-bot-link">পণ্য</a>
-      <a onclick="goAboutPage()" class="footer-bot-link">আমাদের সম্পর্কে</a>
-      <a onclick="goContactPage()" class="footer-bot-link">যোগাযোগ</a>
+      <a onclick="goHome()" class="footer-bot-link" data-txt="navHome">হোম</a>
+      <a onclick="goProductsPage()" class="footer-bot-link" data-txt="footerProducts">পণ্য</a>
+      <a onclick="goAboutPage()" class="footer-bot-link" data-txt="navAbout">আমাদের সম্পর্কে</a>
+      <a onclick="goContactPage()" class="footer-bot-link" data-txt="navContact">যোগাযোগ</a>
     </nav>
     <div class="footer-bottom-right">
-      <i class="fa-solid fa-lock" style="color:var(--gd);font-size:.7rem;"></i> নিরাপদ শপিং
+      <i class="fa-solid fa-lock" style="color:var(--gd);font-size:.7rem;"></i> <span data-txt="safeShopping">নিরাপদ শপিং</span>
     </div>
     </div>
   </div>
@@ -1825,13 +1825,13 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
 <div class="cart-sb" id="cartSb">
   <div class="cart-hd-new">
     <button class="cls-cart-new" onclick="toggleCart()" aria-label="বন্ধ"><i class="fa-solid fa-xmark"></i></button>
-    <h2><span class="my-cart-cnt-lbl">My Cart</span> <span class="my-cart-cnt">(<span id="myCartCount">0</span>)</span></h2>
+    <h2><span class="my-cart-cnt-lbl" data-txt="myCartLabel">My Cart</span> <span class="my-cart-cnt">(<span id="myCartCount">0</span>)</span></h2>
     <button class="cls-cart-new home-ic" onclick="goHome();toggleCart();" aria-label="হোম"><i class="fa-solid fa-house"></i></button>
   </div>
   <div class="cart-its" id="cartIts"></div>
   <div class="cart-related-section" id="cartRelSection" style="display:none">
     <div class="cart-rel-hd">
-      <span class="cart-rel-hd-title">সম্পর্কিত পণ্য</span>
+      <span class="cart-rel-hd-title" data-txt="relatedProductsTitle">সম্পর্কিত পণ্য</span>
       <div class="cart-rel-arrows">
         <button class="crel-arr" onclick="slideRelated(-1)"><i class="fa-solid fa-chevron-left"></i></button>
         <button class="crel-arr" onclick="slideRelated(1)"><i class="fa-solid fa-chevron-right"></i></button>
@@ -1841,23 +1841,23 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
   </div>
   <div class="cart-ft" id="cartFt" style="display:none;padding:0;border:none;background:#fcfbf8;">
     <div class="cart-summary-new">
-      <div class="cart-sum-row"><span>Sub Total</span><span id="cartSubTotal">৳0</span></div>
+      <div class="cart-sum-row"><span data-txt="cartSubTotal">Sub Total</span><span id="cartSubTotal">৳0</span></div>
     </div>
     <div class="cart-checkout-bar">
-      <div><div style="font-size:.7rem;color:#888;line-height:1">Total</div><div class="total-l" id="cartTotal">৳0</div></div>
-      <button class="cart-checkout-btn" onclick="openOrderModal()">CHECKOUT</button>
+      <div><div style="font-size:.7rem;color:#888;line-height:1" data-txt="cartTotalLabel">Total</div><div class="total-l" id="cartTotal">৳0</div></div>
+      <button class="cart-checkout-btn" onclick="openOrderModal()" data-txt="checkoutBtn">CHECKOUT</button>
     </div>
   </div>
 </div>
 <div class="order-ov" id="orderOv">
   <div class="order-modal" id="orderModal">
     <div class="om-hd">
-      <h2><span>🛍️</span> অর্ডার করুন — ক্যাশ অন ডেলিভারি</h2>
+      <h2><span>🛍️</span> <span data-txt="orderModalTitle">অর্ডার করুন — ক্যাশ অন ডেলিভারি</span></h2>
       <button class="om-cls" onclick="closeOrderModal()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div id="omMainContent">
       <div class="om-summary">
-        <div class="om-sum-title">📋 অর্ডার সারসংক্ষেপ</div>
+        <div class="om-sum-title" data-txt="orderSummaryTitle">📋 অর্ডার সারসংক্ষেপ</div>
         <div class="om-items" id="omItems"></div>
         <div style="margin-top:10px;padding-top:8px;border-top:1px dashed #ddd;">
           <div class="om-sum-row"><span>পণ্যের মূল্য</span><span id="omSubtotal">৳0</span></div>
@@ -1866,7 +1866,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
         </div>
       </div>
       <div class="om-form">
-        <div class="om-sec-label"><i class="fa-solid fa-user" style="color:var(--gd)"></i> আপনার তথ্য দিন</div>
+        <div class="om-sec-label"><i class="fa-solid fa-user" style="color:var(--gd)"></i> <span data-txt="yourInfoLabel">আপনার তথ্য দিন</span></div>
         <div class="om-field"><label>নাম <span>*</span></label><input type="text" id="omName" placeholder="আপনার নাম লিখুন"></div>
         <div class="om-field"><label>মোবাইল নম্বর <span>*</span></label><input type="tel" id="omPhone" placeholder="১১ ডিজিটের মোবাইল নম্বর" maxlength="14"></div>
         <div class="om-field"><label>ঠিকানা <span>*</span></label><textarea id="omAddress" placeholder="আপনার সম্পূর্ণ ঠিকানা লিখুন"></textarea></div>
@@ -1929,14 +1929,14 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
     </div>
     <div class="om-success" id="omSuccess">
       <div style="font-size:4rem;margin-bottom:12px;animation:popIn .5s ease">✅</div>
-      <h3>অর্ডার সম্পন্ন হয়েছে!</h3>
-      <p>আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে।<br>শীঘ্রই আমাদের টিম আপনার সাথে যোগাযোগ করবে।</p>
+      <h3 data-txt="orderSuccessTitle">অর্ডার সম্পন্ন হয়েছে!</h3>
+      <p data-txt="orderSuccessMsg">আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে।<br>শীঘ্রই আমাদের টিম আপনার সাথে যোগাযোগ করবে।</p>
       <div class="order-num" id="omOrderNum"></div>
       <div id="omSuccessAdvanceNote" style="display:none;background:#fff8e6;border:1px solid #f0a500;border-radius:8px;padding:10px 14px;font-size:.8rem;color:#7a4500;margin:10px 0;line-height:1.7;">
         💳 আপনার অগ্রিম ডেলিভারি চার্জ পেমেন্ট যাচাই করা হবে এবং কনফার্মেশন SMS পাবেন।
       </div>
       <p style="font-size:.8rem;color:#aaa;margin-top:8px;">ধন্যবাদ আমাদের সাথে কেনাকাটা করার জন্য 🙏</p>
-      <button onclick="closeOrderModal()" style="margin-top:20px;background:var(--gd);color:#fff;border:none;padding:11px 30px;border-radius:7px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;">বাড়িতে ফিরে যান</button>
+      <button onclick="closeOrderModal()" style="margin-top:20px;background:var(--gd);color:#fff;border:none;padding:11px 30px;border-radius:7px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;" data-txt="backHomeBtn">বাড়িতে ফিরে যান</button>
     </div>
   </div>
 </div>
@@ -2256,6 +2256,25 @@ function applySiteSettings() {
     window._gtmInjected = true;
     (function(w,d,s2,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s2)[0],j=d.createElement(s2),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer',s.gtmId);
   }
+
+  // ── ওয়েবসাইট টেক্সট (data-txt / data-ph) প্রতিস্থাপন ──
+  // admin → settings.siteText { key: value } ম্যাপ থেকে
+  const txt = (s.siteText && typeof s.siteText === 'object') ? s.siteText : {};
+  document.querySelectorAll('[data-txt]').forEach(el => {
+    const key = el.getAttribute('data-txt');
+    if (key && txt[key] != null && String(txt[key]).trim() !== '') {
+      el.innerHTML = txt[key];
+    }
+  });
+  document.querySelectorAll('[data-ph]').forEach(el => {
+    const key = el.getAttribute('data-ph');
+    if (key && txt[key] != null && String(txt[key]).trim() !== '') {
+      el.setAttribute('placeholder', txt[key]);
+    }
+  });
+  // helpline time আলাদা
+  const helpTimeEl = document.getElementById('footerHelpTime');
+  if (helpTimeEl && s.footerHelpTime) helpTimeEl.textContent = s.footerHelpTime;
 }
 
 function buildFooter() {
