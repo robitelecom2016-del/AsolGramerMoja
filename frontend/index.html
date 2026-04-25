@@ -630,12 +630,8 @@ body{
 .s3{background:linear-gradient(135deg,#d0dce8 0%,#e0ecf8 50%,#f0f6fc 100%);}
 .hero-svg{position:absolute;inset:0;width:100%;height:100%;}
 .hero-cw{position:absolute;inset:0;display:flex;align-items:center;z-index:10;}
-.hero-ci{max-width:560px;width:100%;padding:0 48px;display:flex;flex-direction:column;align-items:flex-start;gap:0;}
-.hero-ci .hero-badge{display:inline-block;background:#e05c00;color:#fff;font-size:.72rem;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:14px;letter-spacing:.04em;text-transform:uppercase;box-shadow:0 3px 10px rgba(224,92,0,.25);}
-.hero-ci h1{font-size:2.2rem;font-weight:800;color:#1a1a1a;line-height:1.2;margin:0 0 12px 0;max-width:440px;letter-spacing:-.5px;}
-.hero-ci .hero-sub{color:#e05c00;font-weight:700;font-size:.95rem;margin:0 0 4px 0;letter-spacing:.02em;}
-.hero-ci .hero-price{font-size:1.85rem;font-weight:800;color:#1a1a1a;margin:0 0 20px 0;line-height:1;}
-.hero-ci .hero-price .from{font-size:.7rem;font-weight:600;color:#888;margin-right:6px;letter-spacing:.05em;}
+.hero-ci{max-width:100%;width:100%;padding:0 48px;}
+.hero-ci h1{font-size:2rem;font-weight:700;color:#222;line-height:1.28;margin-bottom:10px;max-width:400px;}
 .hero-ci p{color:#555;font-size:.92rem;margin-bottom:22px;max-width:340px;}
 .btn-hero{background:var(--or);color:#fff;border:none;padding:11px 24px;border-radius:5px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(245,166,35,.35);}
 .btn-hero:hover{background:#e09510;transform:translateY(-2px);box-shadow:0 8px 20px rgba(245,166,35,.4);}
@@ -1278,12 +1274,8 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
   .hero-side-banner{padding:12px 14px;}
   .hero-side-banner .side-title{font-size:.82rem;}
   .hero-side-banner .side-price{font-size:1rem;margin-bottom:6px;}
-  .hero-ci{padding:0 18px;gap:0;}
-  .hero-ci .hero-badge{font-size:.62rem;padding:3px 10px;margin-bottom:8px;}
-  .hero-ci h1{font-size:1.4rem;max-width:100%;color:#222;margin-bottom:8px;}
-  .hero-ci .hero-sub{font-size:.78rem;}
-  .hero-ci .hero-price{font-size:1.3rem;margin-bottom:12px;}
-  .hero-ci .hero-price .from{font-size:.6rem;}
+  .hero-ci{padding:0 18px;}
+  .hero-ci h1{font-size:1.4rem;max-width:100%;color:#222;}
   .hero-ci p{font-size:.85rem;max-width:100%;margin-bottom:10px;}
   .btn-hero{padding:9px 20px;font-size:.85rem;}
   .hero-arrow{width:34px;height:34px;font-size:.78rem;}
@@ -1606,10 +1598,10 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
         </div>
         <div class="hero-cw">
           <div class="hero-ci">
-            <span class="hero-badge">১০০% বিশুদ্ধ গ্রামীণ পণ্য</span>
+            <div style="display:inline-block;background:#e05c00;color:#fff;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:3px;margin-bottom:10px;letter-spacing:.04em;">১০০% বিশুদ্ধ গ্রামীণ পণ্য</div>
             <h1 id="hTitle">গ্রামীণ সতেজতা ও<br>স্বাদের আসল মজা</h1>
-            <div class="hero-sub" id="hSub">এই সপ্তাহের বিশেষ অফার</div>
-            <div class="hero-price"><span class="from">শুরু</span>৳৯৯</div>
+            <p id="hSub" style="color:#e05c00;font-weight:700;font-size:1rem;margin-bottom:6px;">এই সপ্তাহের বিশেষ অফার</p>
+            <div style="font-size:1.9rem;font-weight:800;color:#1a1a1a;margin-bottom:16px;">৳৯৯ থেকে শুরু</div>
             <a onclick="document.getElementById('sec-products').scrollIntoView({behavior:'smooth'})" class="btn-hero" style="cursor:pointer;background:var(--gd);"><i class="fa-solid fa-bag-shopping"></i> <span data-txt="heroCta">পণ্য কিনুন</span></a>
           </div>
         </div>
