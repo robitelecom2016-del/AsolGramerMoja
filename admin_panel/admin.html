@@ -617,6 +617,12 @@ textarea.form-control { resize:vertical; min-height:80px; }
       <div class="nav-item" onclick="navTo('whychoose')" data-page="whychoose">
         <i class="fa-solid fa-star"></i> কেন আমাদের পণ্য
       </div>
+      <div class="nav-item" onclick="navTo('footer')" data-page="footer">
+        <i class="fa-solid fa-shoe-prints"></i> ফুটার
+      </div>
+      <div class="nav-item" onclick="navTo('advance')" data-page="advance">
+        <i class="fa-solid fa-money-bill-wave"></i> অগ্রিম পেমেন্ট
+      </div>
       <div class="nav-section-label">সিস্টেম</div>
       <div class="nav-item" onclick="navTo('settings')" data-page="settings">
         <i class="fa-solid fa-gear"></i> সেটিংস
@@ -1059,7 +1065,115 @@ textarea.form-control { resize:vertical; min-height:80px; }
       </div>
     </div>
 
-    <div class="page-view" id="page-settings">
+    <!-- ━━━ ফুটার সেকশন ━━━ -->
+    <div class="page-view" id="page-footer">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-shoe-prints" style="color:var(--green3)"></i> ফুটার সেটিংস</h3>
+          <button class="btn-primary btn-sm" onclick="saveFooterPage()">
+            <i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="form-group2">
+            <label>About বিবরণ (ফুটারের প্রথম কলামে)</label>
+            <textarea class="form-control" id="ftDesc" rows="4" placeholder="আমাদের সম্পর্কে সংক্ষিপ্ত বিবরণ..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group2"><label>ফোন (About কলামে দেখাবে)</label><input type="text" class="form-control" id="ftPhone" placeholder="01712345678"></div>
+            <div class="form-group2"><label>WhatsApp নম্বর</label><input type="text" class="form-control" id="ftWa" placeholder="8801712345678"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group2"><label>Facebook URL</label><input type="text" class="form-control" id="ftFb" placeholder="https://facebook.com/..."></div>
+            <div class="form-group2"><label>Instagram URL</label><input type="text" class="form-control" id="ftIg" placeholder="https://instagram.com/..."></div>
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+
+          <div class="form-row">
+            <div class="form-group2"><label>কলাম-২ শিরোনাম</label><input type="text" class="form-control" id="ftNavTitle" placeholder="নেভিগেশন"></div>
+            <div class="form-group2"><label>কলাম-৩ শিরোনাম</label><input type="text" class="form-control" id="ftCatTitle" placeholder="পণ্য বিভাগ"></div>
+            <div class="form-group2"><label>কলাম-৪ শিরোনাম</label><input type="text" class="form-control" id="ftServiceTitle" placeholder="গ্রাহক সেবা"></div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px">
+            <label style="margin:0;font-weight:700">নেভিগেশন লিংক সমূহ (কলাম-২)</label>
+            <button class="btn-secondary btn-sm" type="button" onclick="addFtNavLink()"><i class="fa-solid fa-plus"></i> যোগ</button>
+          </div>
+          <div id="ftNavList" style="display:grid;gap:8px"></div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px">
+            <label style="margin:0;font-weight:700">গ্রাহক সেবা লিংক সমূহ (কলাম-৪)</label>
+            <button class="btn-secondary btn-sm" type="button" onclick="addFtServiceLink()"><i class="fa-solid fa-plus"></i> যোগ</button>
+          </div>
+          <div id="ftServiceList" style="display:grid;gap:8px"></div>
+
+          <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+
+          <h4 style="margin-bottom:10px;font-size:.92rem">📞 হেল্পলাইন বক্স</h4>
+          <div class="form-row">
+            <div class="form-group2"><label>হেল্পলাইন লেবেল</label><input type="text" class="form-control" id="ftHelpLabel" placeholder="হেল্পলাইন"></div>
+            <div class="form-group2"><label>হেল্পলাইন ফোন</label><input type="text" class="form-control" id="ftHelpPhone" placeholder="01712345678"></div>
+          </div>
+          <div class="form-group2"><label>সময়সূচী</label><input type="text" class="form-control" id="ftHelpTime" placeholder="শনি–বৃহস্পতি · সকাল ৯টা–রাত ৯টা"></div>
+          <div class="form-group2">
+            <label>হেল্পলাইন বক্স লুকান?</label>
+            <label class="toggle-switch" onclick="togglePageField('ftHelpHide')">
+              <div class="toggle-track" id="ftHelpHideTrack"><div class="toggle-thumb"></div></div>
+              <span id="ftHelpHideLbl">না</span>
+            </label>
+            <input type="hidden" id="ftHelpHide" value="false">
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+
+          <div class="form-row">
+            <div class="form-group2"><label>কপিরাইট টেক্সট</label><input type="text" class="form-control" id="ftCopyright" placeholder="© 2024 আসল গ্রামের মজা — সর্বস্বত্ব সংরক্ষিত"></div>
+            <div class="form-group2"><label>"নিরাপদ শপিং" লেবেল</label><input type="text" class="form-control" id="ftSecureLabel" placeholder="নিরাপদ শপিং"></div>
+          </div>
+
+          <div class="form-hint" style="margin-top:10px">💡 কোনো ফিল্ড ফাঁকা রাখলে ডিফল্ট টেক্সট দেখাবে। লিংকে # দিলে কোনো নেভিগেশন হবে না।</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ━━━ অগ্রিম পেমেন্ট সেকশন ━━━ -->
+    <div class="page-view" id="page-advance">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-money-bill-wave" style="color:var(--orange)"></i> অগ্রিম পেমেন্ট সেটিংস</h3>
+          <button class="btn-primary btn-sm" onclick="saveAdvancePage()">
+            <i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="form-hint" style="margin-bottom:14px">
+            ⚠️ এখানে যে ক্যাটাগরিগুলো যোগ করবেন, সেই ক্যাটাগরির পণ্য অর্ডার করতে গেলে গ্রাহককে অগ্রিম পেমেন্ট করতে হবে।
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0 8px">
+            <label style="margin:0;font-weight:700">অগ্রিম পেমেন্ট লাগবে এমন ক্যাটাগরি</label>
+            <button class="btn-secondary btn-sm" type="button" onclick="addAdvCat()"><i class="fa-solid fa-plus"></i> যোগ</button>
+          </div>
+          <div id="advCatsList" style="display:grid;gap:8px"></div>
+          <div class="form-hint" style="margin-top:8px">💡 ক্যাটাগরির নামের অংশ (substring) মিললেই কাজ করবে। যেমন "মিষ্টি" লিখলে "ঐতিহ্যবাহী মিষ্টি" ও মিলবে।</div>
+
+          <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+
+          <h4 style="margin-bottom:10px;font-size:.92rem">💳 পেমেন্ট নম্বর সমূহ</h4>
+          <div class="form-row">
+            <div class="form-group2"><label>bKash নম্বর</label><input type="text" class="form-control" id="advBkash" placeholder="01XXXXXXXXX"></div>
+            <div class="form-group2"><label>Nagad নম্বর</label><input type="text" class="form-control" id="advNagad" placeholder="01XXXXXXXXX"></div>
+            <div class="form-group2"><label>Rocket নম্বর</label><input type="text" class="form-control" id="advRocket" placeholder="01XXXXXXXXX"></div>
+          </div>
+          <div class="form-group2">
+            <label>অতিরিক্ত নোট (গ্রাহককে দেখাবে)</label>
+            <textarea class="form-control" id="advNote" rows="2" placeholder="যেমন: Send Money করুন এবং Transaction ID দিন..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
       <div class="settings-section">
         <div class="settings-section-hd"><i class="fa-solid fa-store" style="color:var(--green)"></i><h3>স্টোর তথ্য</h3></div>
         <div class="settings-body">
@@ -1815,6 +1929,8 @@ function navTo(page) {
   if (page === 'about') loadAboutPage();
   if (page === 'contact') loadContactPage();
   if (page === 'whychoose') loadWhyChoosePage();
+  if (page === 'footer') loadFooterPage();
+  if (page === 'advance') loadAdvancePage();
   if (page === 'settings') loadSettings();
   if (page === 'website-cost') loadWebsiteCost();
 }
@@ -3755,6 +3871,130 @@ async function saveWhyChoosePage() {
     await api('PUT','/api/settings',{ whyChooseUs });
     toast('"কেন আমাদের পণ্য কিনবেন?" সেকশন সংরক্ষিত হয়েছে', 'success');
   } catch (err) { toast('ব্যর্থ: '+err.message, 'error'); }
+}
+
+// ━━━ FOOTER PAGE ━━━
+async function loadFooterPage() {
+  try {
+    const s = await api('GET','/api/settings');
+    const f = s.footer || {};
+    document.getElementById('ftDesc').value = f.desc || '';
+    document.getElementById('ftPhone').value = f.phone || '';
+    document.getElementById('ftWa').value = f.waPhone || '';
+    document.getElementById('ftFb').value = f.fbUrl || '';
+    document.getElementById('ftIg').value = f.igUrl || '';
+    document.getElementById('ftNavTitle').value = f.navTitle || '';
+    document.getElementById('ftCatTitle').value = f.catTitle || '';
+    document.getElementById('ftServiceTitle').value = f.serviceTitle || '';
+    document.getElementById('ftHelpLabel').value = f.helpLabel || '';
+    document.getElementById('ftHelpPhone').value = f.helpPhone || '';
+    document.getElementById('ftHelpTime').value = f.helpTime || '';
+    document.getElementById('ftCopyright').value = f.copyright || '';
+    document.getElementById('ftSecureLabel').value = f.secureLabel || '';
+    const hide = f.helpHide === true;
+    document.getElementById('ftHelpHide').value = String(hide);
+    document.getElementById('ftHelpHideTrack').className = 'toggle-track ' + (hide ? 'on' : '');
+    document.getElementById('ftHelpHideLbl').textContent = hide ? 'হ্যাঁ' : 'না';
+    renderFtLinks('ftNavList', Array.isArray(f.navLinks) ? f.navLinks : []);
+    renderFtLinks('ftServiceList', Array.isArray(f.serviceLinks) ? f.serviceLinks : []);
+  } catch (err) { toast('লোড ব্যর্থ: '+err.message,'error'); }
+}
+function renderFtLinks(listId, links) {
+  const list = document.getElementById(listId);
+  const prefix = listId === 'ftNavList' ? 'ftN' : 'ftS';
+  list.innerHTML = links.map((l,i) => `
+    <div style="display:flex;gap:6px;align-items:center" id="${prefix}-${i}">
+      <input type="text" class="form-control" placeholder="লেবেল (যেমন: হোম)" id="${prefix}L-${i}" value="${(l.label||'').replace(/"/g,'&quot;')}">
+      <input type="text" class="form-control" placeholder="URL (যেমন: # বা https://...)" id="${prefix}U-${i}" value="${(l.url||'').replace(/"/g,'&quot;')}">
+      <button class="icon-btn del" type="button" onclick="rmFtLink('${listId}',${i})"><i class="fa-solid fa-minus"></i></button>
+    </div>`).join('');
+}
+function getFtLinks(listId) {
+  const prefix = listId === 'ftNavList' ? 'ftN' : 'ftS';
+  const list = document.getElementById(listId);
+  const out = [];
+  for (let i=0;i<list.children.length;i++){
+    const lbl = document.getElementById(prefix+'L-'+i)?.value?.trim() || '';
+    const url = document.getElementById(prefix+'U-'+i)?.value?.trim() || '';
+    if (lbl) out.push({label:lbl, url:url||'#'});
+  }
+  return out;
+}
+function addFtNavLink(){ const cur=getFtLinks('ftNavList'); cur.push({label:'',url:'#'}); renderFtLinks('ftNavList',cur); }
+function addFtServiceLink(){ const cur=getFtLinks('ftServiceList'); cur.push({label:'',url:'#'}); renderFtLinks('ftServiceList',cur); }
+function rmFtLink(listId, idx){ const cur=getFtLinks(listId); cur.splice(idx,1); renderFtLinks(listId,cur); }
+async function saveFooterPage() {
+  try {
+    const footer = {
+      desc: document.getElementById('ftDesc').value.trim(),
+      phone: document.getElementById('ftPhone').value.trim(),
+      waPhone: document.getElementById('ftWa').value.trim(),
+      fbUrl: document.getElementById('ftFb').value.trim(),
+      igUrl: document.getElementById('ftIg').value.trim(),
+      navTitle: document.getElementById('ftNavTitle').value.trim(),
+      catTitle: document.getElementById('ftCatTitle').value.trim(),
+      serviceTitle: document.getElementById('ftServiceTitle').value.trim(),
+      navLinks: getFtLinks('ftNavList'),
+      serviceLinks: getFtLinks('ftServiceList'),
+      helpLabel: document.getElementById('ftHelpLabel').value.trim(),
+      helpPhone: document.getElementById('ftHelpPhone').value.trim(),
+      helpTime: document.getElementById('ftHelpTime').value.trim(),
+      helpHide: document.getElementById('ftHelpHide').value === 'true',
+      copyright: document.getElementById('ftCopyright').value.trim(),
+      secureLabel: document.getElementById('ftSecureLabel').value.trim(),
+    };
+    await api('PUT','/api/settings',{ footer });
+    toast('ফুটার সংরক্ষিত হয়েছে','success');
+  } catch (err) { toast('ব্যর্থ: '+err.message,'error'); }
+}
+
+// ━━━ ADVANCE PAYMENT PAGE ━━━
+async function loadAdvancePage() {
+  try {
+    const s = await api('GET','/api/settings');
+    const a = s.advance || {};
+    const cats = Array.isArray(a.cats) && a.cats.length ? a.cats : ['মিষ্টি','দই','গ্রীষ্মকালীন পানীয়','রশমালাই'];
+    renderAdvCats(cats);
+    const p = a.payment || {};
+    document.getElementById('advBkash').value = p.bkash || '';
+    document.getElementById('advNagad').value = p.nagad || '';
+    document.getElementById('advRocket').value = p.rocket || '';
+    document.getElementById('advNote').value = p.note || '';
+  } catch (err) { toast('লোড ব্যর্থ: '+err.message,'error'); }
+}
+function renderAdvCats(cats) {
+  const list = document.getElementById('advCatsList');
+  list.innerHTML = cats.map((c,i) => `
+    <div style="display:flex;gap:6px;align-items:center" id="adv-${i}">
+      <input type="text" class="form-control" placeholder="ক্যাটাগরি নাম (যেমন: মিষ্টি)" id="advC-${i}" value="${(c||'').replace(/"/g,'&quot;')}">
+      <button class="icon-btn del" type="button" onclick="rmAdvCat(${i})"><i class="fa-solid fa-minus"></i></button>
+    </div>`).join('');
+}
+function getAdvCats() {
+  const list = document.getElementById('advCatsList');
+  const out = [];
+  for (let i=0;i<list.children.length;i++){
+    const v = document.getElementById('advC-'+i)?.value?.trim();
+    if (v) out.push(v);
+  }
+  return out;
+}
+function addAdvCat(){ const cur=getAdvCats(); cur.push(''); renderAdvCats(cur); }
+function rmAdvCat(idx){ const cur=getAdvCats(); cur.splice(idx,1); renderAdvCats(cur); }
+async function saveAdvancePage() {
+  try {
+    const advance = {
+      cats: getAdvCats(),
+      payment: {
+        bkash: document.getElementById('advBkash').value.trim(),
+        nagad: document.getElementById('advNagad').value.trim(),
+        rocket: document.getElementById('advRocket').value.trim(),
+        note: document.getElementById('advNote').value.trim(),
+      },
+    };
+    await api('PUT','/api/settings',{ advance });
+    toast('অগ্রিম পেমেন্ট সেটিংস সংরক্ষিত হয়েছে','success');
+  } catch (err) { toast('ব্যর্থ: '+err.message,'error'); }
 }
 
 function togglePageField(id) {
