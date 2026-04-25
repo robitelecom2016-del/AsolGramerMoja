@@ -2048,6 +2048,8 @@ function showApp() {
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('appLayout').style.display = 'block';
   loadDashboard(); loadCategoriesForFilter(); checkHealth();
+  updateAdvancePendingBadge();
+  setInterval(updateAdvancePendingBadge, 60000);
   loadFrontendUrl();
   autoSeedDefaultData();
 }
@@ -2088,6 +2090,7 @@ function navTo(page) {
     products:['পণ্য সমূহ','সকল পণ্য দেখুন ও সম্পাদনা করুন'],
     stock:['স্টক ম্যানেজমেন্ট','পণ্যের স্টক পরিমাণ ও বিক্রয় বিশ্লেষণ'],
     orders:['অর্ডার','সকল অর্ডার ট্র্যাক করুন'],
+    'advance-orders':['অগ্রিম অর্ডার','যেসব অর্ডারে গ্রাহক অগ্রিম পেমেন্ট পাঠিয়েছেন'],
     categories:['ক্যাটাগরি','পণ্যের বিভাগ পরিচালনা করুন'],
     hero:['হিরো স্লাইড','হোমপেজের ব্যানার স্লাইডার পরিচালনা করুন'],
     about:['আমাদের সম্পর্কে','পেজ কনটেন্ট পরিচালনা করুন'],
@@ -3363,16 +3366,27 @@ async function updateOrderStatusFromModal(id, status, selectEl) {
 
 // ━━━ অগ্রিম পেমেন্ট অর্ডার তালিকা ━━━
 let advOrderPage = 1;
+let _advOrderSearchPrev = '';
+let _advOrderVerifyPrev = 'all';
 async function loadAdvanceOrders() {
   const search = document.getElementById('advOrderSearch').value.trim();
   const verified = document.getElementById('advVerifyFilter').value;
+  // search/filter বদলালে পেজ ১-এ ফিরে যাও
+  if (search !== _advOrderSearchPrev || verified !== _advOrderVerifyPrev) {
+    advOrderPage = 1;
+    _advOrderSearchPrev = search;
+    _advOrderVerifyPrev = verified;
+  }
   const tbody = document.getElementById('advOrderTableBody');
   tbody.innerHTML = '<tr><td colspan="9"><div class="loader"><i class="fa-solid fa-spinner"></i></div></td></tr>';
   try {
-    let url = `/api/orders-advance?page=${advOrderPage}&limit=15&verified=${verified}`;
+    let url = `/api/orders-advance?page=${advOrderPage}&limit=15`;
+    if (verified === 'yes' || verified === 'no') url += `&verified=${verified}`;
     if (search) url += `&search=${encodeURIComponent(search)}`;
     const res = await api('GET', url);
     document.getElementById('advOrderCount').textContent = `${res.total} অর্ডার`;
+    // pending badge update
+    updateAdvancePendingBadge();
     if (!res.orders.length) {
       tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-money-bill-wave"></i><h3>কোনো অগ্রিম পেমেন্ট অর্ডার নেই</h3></div></td></tr>';
       return;
@@ -3382,7 +3396,7 @@ async function loadAdvanceOrders() {
       return `
       <tr>
         <td><span style="font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--green2)">${o.orderNum}</span></td>
-        <td><div class="td-name">${o.customer.name}</div><div class="td-sub">${o.customer.phone}</div></td>
+        <td><div class="td-name">${o.customer?.name||'—'}</div><div class="td-sub">${o.customer?.phone||''}</div></td>
         <td><strong style="color:var(--orange2)">৳${(ap.amount||0).toLocaleString('en')}</strong></td>
         <td style="text-transform:capitalize;font-size:.8rem">${ap.method||'—'}</td>
         <td><span style="font-family:'JetBrains Mono',monospace;font-size:.74rem;background:var(--bg3);padding:3px 7px;border-radius:4px;color:var(--yellow2)">${ap.trxId||'—'}</span></td>
@@ -3393,14 +3407,30 @@ async function loadAdvanceOrders() {
         <td style="font-size:.72rem;color:var(--txt2)">${timeAgo(o.createdAt)}</td>
         <td style="white-space:nowrap">
           <button class="icon-btn edit" title="বিস্তারিত" onclick="viewOrder('${o._id}')"><i class="fa-solid fa-eye"></i></button>
-          ${!ap.verified ? `<button class="icon-btn" title="Verify পেমেন্ট" style="background:var(--green);color:#fff" onclick="verifyAdvancePayment('${o._id}',true,true)"><i class="fa-solid fa-check"></i></button>` : ''}
+          ${!ap.verified ? `<button class="icon-btn" title="Verify পেমেন্ট" style="background:var(--green);color:#fff" onclick="verifyAdvancePayment('${o._id}',true,true)"><i class="fa-solid fa-check"></i></button><button class="icon-btn" title="Reject" style="background:var(--red);color:#fff" onclick="verifyAdvancePayment('${o._id}',false,true)"><i class="fa-solid fa-xmark"></i></button>` : ''}
         </td>
       </tr>`;
     }).join('');
     renderPagination('advOrderPagination', res.total, 15, advOrderPage, (pg) => { advOrderPage = pg; loadAdvanceOrders(); });
   } catch (err) {
     toast('অগ্রিম অর্ডার লোড ব্যর্থ: ' + err.message, 'error');
+    tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><h3>লোড করা যায়নি</h3><p style="font-size:.78rem;color:var(--txt2)">'+(err.message||'')+'</p></div></td></tr>';
   }
+}
+
+// ━━━ অগ্রিম pending badge (sidebar) ━━━
+async function updateAdvancePendingBadge() {
+  try {
+    const res = await api('GET', '/api/orders-advance?page=1&limit=1&verified=no');
+    const badge = document.getElementById('advancePendingBadge');
+    if (!badge) return;
+    if (res.total > 0) {
+      badge.textContent = res.total > 99 ? '99+' : res.total;
+      badge.style.display = 'inline-flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch {}
 }
 
 async function verifyAdvancePayment(orderId, approve, fromList) {
@@ -3411,6 +3441,7 @@ async function verifyAdvancePayment(orderId, approve, fromList) {
       toast(approve ? '✅ অগ্রিম পেমেন্ট verified' : '❌ অগ্রিম পেমেন্ট rejected', 'success');
       if (fromList) loadAdvanceOrders();
       else { closeModal('orderModal'); }
+      updateAdvancePendingBadge();
     } catch (err) {
       toast('আপডেট ব্যর্থ: ' + err.message, 'error');
     }
