@@ -2660,29 +2660,67 @@ function goProduct(idOrSlug) {
   addProductStructuredData(p);
 }
 async function loadProductById(id) {
-  document.getElementById('pdpContent').innerHTML = '<div style="padding:60px;text-align:center;"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--gd)"></i></div>';
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('pdpContent').innerHTML = '<div style="padding:60px;text-align:center;"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--gd)"></i><p style="margin-top:12px;color:#999;font-size:.9rem">পণ্য লোড হচ্ছে...</p></div>';
+  document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
   document.getElementById('page-product').classList.add('active');
   setActiveNav('');
   window.scrollTo(0, 0);
+
+  // প্রথমে prods array-এ খোঁজো (যদি ইতিমধ্যে লোড হয়ে থাকে)
+  if (prods && prods.length > 0) {
+    const found = prods.find(x =>
+      x._id === id ||
+      x.slug === id ||
+      (x.nm && x.nm.replace(/\s+/g, '-') === id)
+    );
+    if (found) {
+      trackProductClick(found._id);
+      addToRecentlyViewed(found);
+      buildPdp(found);
+      const slug = found.slug || found.nm.replace(/\s+/g, '-');
+      window.history.replaceState({ pid: found._id }, '', '#/product/' + slug);
+      updateMetaTags(found);
+      addProductStructuredData(found);
+      return;
+    }
+  }
+
+  // API থেকে load করো
   try {
-    const p = await api(`/api/products/${id}`);
-    // প্রোডাক্ট ক্লিক রেকর্ড করো (API থেকে লোড হলেও)
+    const p = await api('/api/products/' + id);
     trackProductClick(p._id);
     addToRecentlyViewed(p);
     buildPdp(p);
     const slug = p.slug || p.nm.replace(/\s+/g, '-');
-    window.history.pushState({ pid: p._id }, '', `#/product/${slug}`);
+    window.history.replaceState({ pid: p._id }, '', '#/product/' + slug);
     updateMetaTags(p);
     addProductStructuredData(p);
   } catch {
-    document.getElementById('pdpContent').innerHTML = '<div class="error-state" style="padding:80px"><i class="fa-solid fa-box-open"></i><p>পণ্যটি পাওয়া যায়নি</p><button class="retry-btn" onclick="goHome()">হোমে ফিরে যান</button></div>';
+    // slug দিয়ে না পেলে search করো
+    try {
+      const res = await api('/api/products?slug=' + encodeURIComponent(id) + '&limit=1');
+      const list = res.products || res || [];
+      const p = Array.isArray(list) ? list[0] : list;
+      if (p && p._id) {
+        trackProductClick(p._id);
+        addToRecentlyViewed(p);
+        buildPdp(p);
+        const slug = p.slug || p.nm.replace(/\s+/g, '-');
+        window.history.replaceState({ pid: p._id }, '', '#/product/' + slug);
+        updateMetaTags(p);
+        addProductStructuredData(p);
+      } else {
+        throw new Error('not found');
+      }
+    } catch {
+      document.getElementById('pdpContent').innerHTML = '<div class="error-state" style="padding:80px"><i class="fa-solid fa-box-open"></i><p>পণ্যটি পাওয়া যায়নি</p><button class="retry-btn" onclick="goHome()">হোমে ফিরে যান</button></div>';
+    }
   }
 }
 window.addEventListener('popstate', e => {
   const h = location.hash;
   if (h.startsWith('#/product/')) {
-    const slug = h.split('/').pop();
+    const slug = decodeURIComponent(h.split('/').pop());
     goProduct(slug);
   } else if (h.startsWith('#/products/')) {
     const cat = decodeURIComponent(h.replace('#/products/', ''));
@@ -2726,8 +2764,31 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const h = location.hash;
   if (h.startsWith('#/product/')) {
-    const slug = h.split('/').pop();
-    loadAllData().then(() => goProduct(slug));
+    const slug = decodeURIComponent(h.split('/').pop());
+    // প্রথমে product page দেখাও, তারপর data load করো
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-product').classList.add('active');
+    document.getElementById('pdpContent').innerHTML = '<div style="padding:80px;text-align:center;"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--gd)"></i><p style="margin-top:12px;color:#999;font-size:.9rem">পণ্য লোড হচ্ছে...</p></div>';
+    window.scrollTo(0, 0);
+    // data load করো, তারপর product দেখাও
+    loadAllData().then(() => {
+      // প্রথমে prods array থেকে খোঁজো
+      const found = prods.find(x =>
+        x.slug === slug ||
+        x._id === slug ||
+        (x.nm && x.nm.replace(/\s+/g, '-') === slug)
+      );
+      if (found) {
+        addToRecentlyViewed(found);
+        buildPdp(found);
+        window.history.replaceState({ pid: found._id }, '', `#/product/${found.slug || slug}`);
+        updateMetaTags(found);
+        addProductStructuredData(found);
+      } else {
+        // API থেকে সরাসরি load করো
+        loadProductById(slug);
+      }
+    }).catch(() => loadProductById(slug));
   } else if (h.startsWith('#/products/')) {
     const cat = decodeURIComponent(h.replace('#/products/', ''));
     loadAllData().then(() => goProductsPage(cat));
