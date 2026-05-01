@@ -778,6 +778,7 @@ body{
 .bcard:hover .c-price{color:var(--gd);transition:color .25s;}
 .b-badge{position:absolute;top:0;left:0;z-index:5;background:var(--or);color:#fff;font-size:.58rem;font-weight:700;padding:3px 8px;border-radius:0 0 5px 0;transition:background .2s;}
 .bcard:hover .b-badge{background:#c44d00;}
+.disc-badge{position:absolute;top:8px;left:8px;background:#dc2626;color:#fff;font-size:.65rem;font-weight:800;padding:3px 8px;border-radius:5px;z-index:5;letter-spacing:.2px;pointer-events:none;box-shadow:0 2px 6px rgba(220,38,38,.35);}
 .cat-row-wrap{overflow:hidden;}
 .cat-row{display:flex;gap:0;transition:transform .4s ease;}
 .pcard{flex:0 0 calc(20% - 11.2px);width:calc(20% - 11.2px);margin-right:14px;background:#fff;border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:box-shadow .2s,transform .2s;cursor:pointer;position:relative;}
@@ -2809,9 +2810,20 @@ function acts(id) {
     <button class="c-act ca${so?' disabled-act':''}" onclick="${so?'':'addToCartBase(\''+id+'\');'}event.stopPropagation()" title="${so?'স্টক নেই':'কার্টে যোগ'}"><i class="fa-solid fa-cart-shopping"></i></button>
   </div>`;
 }
+function getDiscountInfo(p) {
+  const v = p.variants?.[0] || {};
+  const bp = v.p || 0;
+  const bo = v.op || null;
+  const discText = v.disc || '';
+  // শুধুমাত্র admin থেকে op (পুরনো মূল্য) দেওয়া থাকলে discount দেখাবে
+  if (!bo || bo <= bp) return { pct: 0, text: '', hasDisc: false };
+  const pct = Math.round((1 - bp / bo) * 100);
+  return { pct, text: discText || `-${pct}%`, hasDisc: true };
+}
 function cardBody(p) {
   const bp = getBasePrice(p), bo = getBaseOld(p);
-  const old = bo ? `<span class="c-old">৳${bo.toLocaleString('en')}</span>` : '';
+  const disc = getDiscountInfo(p);
+  const old = (bo && bo > bp) ? `<span class="c-old">৳${bo.toLocaleString('en')}</span>` : '';
   return `<div class="c-body">
     <div class="c-name">${p.nm}</div>
     <div class="c-sub">${p.sub || ''}</div>
@@ -2820,12 +2832,14 @@ function cardBody(p) {
 }
 function bestCard(p) {
   const so = isStockOut(p);
+  const disc = getDiscountInfo(p);
   return `<div class="bcard">
     <div class="bcard-inner">
       ${p.best ? '<div class="b-badge">Best Seller</div>' : ''}
       <div class="c-img" style="background:${p.bg||'#c8a55a'}22;position:relative;" onclick="goProduct('${p._id}')">
         ${p.img ? imgTag(p.img, p.nm) : `<span style="font-size:3rem">${p.em}</span>`}
         <span style="position:absolute;bottom:8px;right:10px;font-size:1.4rem;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));pointer-events:none;">${p.em}</span>
+        ${disc.hasDisc ? `<div class="disc-badge">${disc.text}</div>` : ''}
         ${so ? '<div class="stock-out-badge">স্টক আউট</div><div class="stock-out-overlay"><span>স্টক নেই</span></div>' : ''}
       </div>
       ${acts(p._id)}${cardBody(p)}
@@ -2837,10 +2851,12 @@ function bestCard(p) {
 }
 function regCard(p) {
   const so = isStockOut(p);
+  const disc = getDiscountInfo(p);
   return `<div class="pcard" onclick="goProduct('${p._id}')">
     <div class="c-img" style="background:${p.bg||'#c8a55a'}22;position:relative;">
       ${p.img ? imgTag(p.img, p.nm) : `<span style="font-size:2.5rem;position:absolute">${p.em}</span>`}
       <span style="position:absolute;bottom:6px;right:8px;font-size:1.2rem;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));pointer-events:none;">${p.em}</span>
+      ${disc.hasDisc ? `<div class="disc-badge">${disc.text}</div>` : ''}
       ${so ? '<div class="stock-out-badge">স্টক আউট</div><div class="stock-out-overlay"><span>স্টক নেই</span></div>' : ''}
     </div>
     ${acts(p._id)}${cardBody(p)}
@@ -2848,10 +2864,12 @@ function regCard(p) {
 }
 function allCard(p) {
   const so = isStockOut(p);
+  const disc = getDiscountInfo(p);
   return `<div class="agcard" onclick="goProduct('${p._id}')">
     <div class="c-img" style="background:${p.bg||'#c8a55a'}22;position:relative;">
       ${p.img ? imgTag(p.img, p.nm) : `<span style="font-size:2.5rem;position:absolute">${p.em}</span>`}
       <span style="position:absolute;bottom:6px;right:8px;font-size:1.2rem;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));pointer-events:none;">${p.em}</span>
+      ${disc.hasDisc ? `<div class="disc-badge">${disc.text}</div>` : ''}
       ${so ? '<div class="stock-out-badge">স্টক আউট</div><div class="stock-out-overlay"><span>স্টক নেই</span></div>' : ''}
     </div>
     ${acts(p._id)}${cardBody(p)}
@@ -3719,18 +3737,20 @@ async function loadProductsPage(page) {
     } else {
       grid.innerHTML = prodsPage.map(p => {
         const so = p.stockOut === true;
+        const disc = getDiscountInfo(p);
         return `
         <div class="prod-card" onclick="goProduct('${p._id}')">
           <div class="c-img" style="background:${p.bg||'#c8a55a'}22;position:relative;">
             ${p.img ? imgTag(p.img, p.nm) : `<span style="font-size:2.5rem;position:absolute">${p.em}</span>`}
             <span style="position:absolute;bottom:6px;right:8px;font-size:1.2rem;z-index:3;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));pointer-events:none;">${p.em}</span>
+            ${disc.hasDisc ? `<div class="disc-badge">${disc.text}</div>` : ''}
             ${so ? '<div class="stock-out-badge">স্টক আউট</div><div class="stock-out-overlay"><span>স্টক নেই</span></div>' : ''}
           </div>
           <div class="c-body">
             <div class="c-name">${p.nm}</div>
             <div class="c-prices">
               <span class="c-price">৳${getBasePrice(p).toLocaleString('en')}</span>
-              ${getBaseOld(p) ? `<span class="c-old">৳${getBaseOld(p).toLocaleString('en')}</span>` : ''}
+              ${disc.hasDisc ? `<span class="c-old">৳${getBaseOld(p).toLocaleString('en')}</span>` : ''}
             </div>
           </div>
           <div class="c-acts">
