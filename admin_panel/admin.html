@@ -1676,7 +1676,7 @@ textarea.form-control { resize:vertical; min-height:80px; }
           <span style="font-size:.7rem;color:var(--txt3)">কেনা মূল্য (৳)</span>
           <span style="font-size:.7rem;color:var(--txt3)">বিক্রি মূল্য (৳)</span>
           <span style="font-size:.7rem;color:var(--txt3)">পুরনো মূল্য</span>
-          <span style="font-size:.7rem;color:var(--txt3)">ছাড় % → বিক্রি মূল্য</span>
+          <span style="font-size:.7rem;color:rgba(139,92,246,.9)">✦ ছাড় % (অটো)</span>
           <span style="font-size:.7rem;color:var(--blue2)">📦 স্টক</span>
           <span></span>
         </div>
@@ -2440,72 +2440,23 @@ function openProdModal(prod=null) {
   openModal('prodModal');
 }
 
-// ━━━ ভেরিয়েন্ট অটো ক্যালকুলেশন হ্যান্ডলারস ━━━
-// নিয়ম:
-//   "বিক্রি মূল্য (p)" = admin দেওয়া মূল দাম (এটা সবসময় অপরিবর্তিত থাকে)
-//   ছাড় % দিলে → "পুরনো মূল্য (op)" = p (মূল দাম), "বিক্রি মূল্য (p)" = ছাড়কাটা দাম
-//   উদাহরণ: p=250, disc=5% → op=250, p=238
-
-// ছাড় % দিলে বা পরিবর্তন করলে কল হয়
-function onDiscPctChange(discInput) {
-  const row      = discInput.closest('.variant-item');
-  const pInput   = row.querySelector('[data-field="p"]');
-  const opInput  = row.querySelector('[data-field="op"]');
-  const pct      = parseFloat(discInput.value) || 0;
-
-  // মূল দাম নির্ধারণ: op-এ আগের মূল দাম থাকলে সেটা, নাহলে p-এর বর্তমান মান
-  let basePrice = parseFloat(opInput.dataset.base || opInput.value || pInput.value) || 0;
-  if (!basePrice) basePrice = parseFloat(pInput.value) || 0;
-
-  if (pct > 0 && basePrice > 0) {
-    // মূল দাম op-এ রাখো (যদি এখনো সেট না হয়)
-    if (!opInput.value || parseFloat(opInput.value) < basePrice) {
-      opInput.value = basePrice;
-    }
-    opInput.dataset.base = basePrice;
-    const discounted = Math.round(basePrice * (1 - pct / 100));
-    pInput.value = discounted;
-    // সবুজ ফ্ল্যাশ
-    pInput.style.borderColor = 'rgba(46,160,67,.9)';
-    setTimeout(() => { pInput.style.borderColor = 'rgba(46,160,67,.4)'; }, 1200);
-  } else if (pct === 0) {
-    // ছাড় ০ হলে মূল দাম ফিরিয়ে দাও
-    const base = parseFloat(opInput.dataset.base || opInput.value) || 0;
-    if (base > 0) {
-      pInput.value = base;
-      opInput.value = '';
-      delete opInput.dataset.base;
-    }
-  }
-}
-
-// পুরনো মূল্য ম্যানুয়ালি পরিবর্তন করলে → ছাড় % থাকলে বিক্রি মূল্য রিক্যালকুলেট
-function onOldPriceChange(opInput) {
-  const row       = opInput.closest('.variant-item');
+// ━━━ ভেরিয়েন্ট: ছাড় % অটো ক্যালকুলেশন ━━━
+// নিয়ম: পুরনো মূল্য (op) ও বিক্রি মূল্য (p) থেকে ছাড় % বের করা হয়
+// ছাড় % = (op - p) / op × 100  →  অটো ছাড় ঘরে বসে যায়
+function calcDiscPct(row) {
+  const p  = parseFloat(row.querySelector('[data-field="p"]')?.value)  || 0;
+  const op = parseFloat(row.querySelector('[data-field="op"]')?.value) || 0;
   const discInput = row.querySelector('[data-field="disc"]');
-  const pInput    = row.querySelector('[data-field="p"]');
-  const pct       = parseFloat(discInput.value) || 0;
-  const op        = parseFloat(opInput.value)   || 0;
-  if (pct > 0 && op > 0) {
-    opInput.dataset.base = op;
-    pInput.value = Math.round(op * (1 - pct / 100));
-    pInput.style.borderColor = 'rgba(46,160,67,.9)';
-    setTimeout(() => { pInput.style.borderColor = 'rgba(46,160,67,.4)'; }, 1200);
+  if (!discInput) return;
+  if (op > 0 && p > 0 && p < op) {
+    discInput.value = Math.round((op - p) / op * 100);
+  } else {
+    discInput.value = '';
   }
 }
+function onSellPriceChange(inp)  { calcDiscPct(inp.closest('.variant-item')); }
+function onOldPriceChange(inp)   { calcDiscPct(inp.closest('.variant-item')); }
 
-// বিক্রি মূল্য ম্যানুয়ালি দিলে → base হিসেবে সংরক্ষণ করো, ছাড় % ক্লিয়ার করো
-function onSellPriceChange(pInput) {
-  const row       = pInput.closest('.variant-item');
-  const opInput   = row.querySelector('[data-field="op"]');
-  const discInput = row.querySelector('[data-field="disc"]');
-  // বিক্রি মূল্য ম্যানুয়ালি বদলালে base রিসেট করো
-  delete opInput.dataset.base;
-  // যদি ছাড় না থাকে, op ক্লিয়ার করো
-  if (!discInput.value || parseFloat(discInput.value) === 0) {
-    opInput.value = '';
-  }
-}
 
 function renderVariants(variants) {
   document.getElementById('variantsList').innerHTML = variants.map((v,i)=>{
@@ -2516,8 +2467,8 @@ function renderVariants(variants) {
       <input type="text" placeholder="যেমন: 1 বোতল (500g)" value="${v.lbl||''}" data-field="lbl" data-idx="${i}">
       <input type="number" placeholder="কেনা মূল্য" value="${v.bp||''}" data-field="bp" data-idx="${i}" style="border-color:rgba(232,102,10,.4)" title="কেনা মূল্য (Cost Price)">
       <input type="number" placeholder="বিক্রি মূল্য" value="${v.p||''}" data-field="p" data-idx="${i}" style="border-color:rgba(46,160,67,.4)" title="বিক্রি মূল্য (Sell Price)" oninput="onSellPriceChange(this)">
-      <input type="number" placeholder="পুরনো মূল্য" value="${v.op||''}" data-field="op" data-idx="${i}" ${v.op ? 'data-base="'+v.op+'"' : ''} oninput="onOldPriceChange(this)">
-      <input type="number" placeholder="যেমন: 20" value="${discPct||''}" data-field="disc" data-idx="${i}" min="0" max="100" style="border-color:rgba(139,92,246,.4)" title="ছাড়ের পরিমাণ %" oninput="onDiscPctChange(this)">
+      <input type="number" placeholder="পুরনো মূল্য" value="${v.op||''}" data-field="op" data-idx="${i}" oninput="onOldPriceChange(this)">
+      <input type="number" placeholder="যেমন: 20" value="${discPct||''}" data-field="disc" data-idx="${i}" min="0" max="100" style="border-color:rgba(139,92,246,.4);background:rgba(139,92,246,.08)" title="অটো ছাড় %" readonly tabindex="-1">
       <input type="number" placeholder="স্টক" value="${v.stock||0}" data-field="stock" data-idx="${i}" style="border-color:rgba(59,130,246,.4)" title="এই ভ্যারিয়েন্টের স্টক সংখ্যা" min="0">
       <button class="icon-btn del" onclick="removeVariant(${i})"><i class="fa-solid fa-trash"></i></button>
     </div>`;
@@ -2529,7 +2480,7 @@ function addVariant() {
   const count = list.querySelectorAll('.variant-item').length;
   const div = document.createElement('div');
   div.className='variant-item'; div.id='var-'+count;
-  div.innerHTML=`<input type="text" placeholder="লেবেল" data-field="lbl" data-idx="${count}"><input type="number" placeholder="কেনা মূল্য" data-field="bp" data-idx="${count}" style="border-color:rgba(232,102,10,.4)" title="কেনা মূল্য"><input type="number" placeholder="বিক্রি মূল্য" data-field="p" data-idx="${count}" style="border-color:rgba(46,160,67,.4)" title="বিক্রি মূল্য" oninput="onSellPriceChange(this)"><input type="number" placeholder="পুরনো মূল্য" data-field="op" data-idx="${count}" oninput="onOldPriceChange(this)"><input type="number" placeholder="যেমন: 20" data-field="disc" data-idx="${count}" min="0" max="100" style="border-color:rgba(139,92,246,.4)" title="ছাড়ের পরিমাণ %" oninput="onDiscPctChange(this)"><input type="number" placeholder="স্টক" data-field="stock" data-idx="${count}" style="border-color:rgba(59,130,246,.4)" title="স্টক সংখ্যা" min="0" value="0"><button class="icon-btn del" onclick="removeVariant(${count})"><i class="fa-solid fa-trash"></i></button>`;
+  div.innerHTML=`<input type="text" placeholder="লেবেল" data-field="lbl" data-idx="${count}"><input type="number" placeholder="কেনা মূল্য" data-field="bp" data-idx="${count}" style="border-color:rgba(232,102,10,.4)" title="কেনা মূল্য"><input type="number" placeholder="বিক্রি মূল্য" data-field="p" data-idx="${count}" style="border-color:rgba(46,160,67,.4)" title="বিক্রি মূল্য" oninput="onSellPriceChange(this)"><input type="number" placeholder="পুরনো মূল্য" data-field="op" data-idx="${count}" oninput="onOldPriceChange(this)"><input type="number" placeholder="যেমন: 20" data-field="disc" data-idx="${count}" min="0" max="100" style="border-color:rgba(139,92,246,.4);background:rgba(139,92,246,.08)" title="অটো ছাড় %" readonly tabindex="-1"><input type="number" placeholder="স্টক" data-field="stock" data-idx="${count}" style="border-color:rgba(59,130,246,.4)" title="স্টক সংখ্যা" min="0" value="0"><button class="icon-btn del" onclick="removeVariant(${count})"><i class="fa-solid fa-trash"></i></button>`;
   list.appendChild(div);
 }
 
