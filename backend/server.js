@@ -12,45 +12,42 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📧 Google Apps Script — অর্ডার নোটিফিকেশন (App Password ছাড়া)
+// 📧 Gmail SMTP — অর্ডার নোটিফিকেশন
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Render dashboard → Environment-এ এই ভেরিয়েবলগুলো যোগ করুন:
-//   APPS_SCRIPT_URL      = https://script.google.com/macros/s/XXXXXXX/exec
-//   APPS_SCRIPT_SECRET   = একটি গোপন স্ট্রিং (Apps Script-এও একই বসাবেন)
+// Render dashboard → Environment-এ এই ৩টি ভেরিয়েবল যোগ করুন:
+//   GMAIL_USER           = robitelecom2016@gmail.com
+//   GMAIL_APP_PASSWORD   = twur bijq agrg syzq   (স্পেস সহ ১৬ অক্ষর)
 //   ORDER_NOTIFY_EMAIL   = robitelecom2016@gmail.com  (যেখানে অর্ডার মেইল আসবে)
-//
-// Google Apps Script সেটআপ গাইড নিচের ফাইলে দেওয়া আছে: apps-script/Code.gs
-// ১) script.google.com → New Project → Code.gs-এ ঐ কোড পেস্ট করুন
-// ২) Deploy → New deployment → Web app → Execute as: Me, Access: Anyone → Deploy
-// ৩) যে URL পাবেন তা APPS_SCRIPT_URL হিসেবে Render-এ বসান
-// ৪) Apps Script-এর Script Properties-এ SECRET = একই value দিন
-const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL || '';
-const APPS_SCRIPT_SECRET = process.env.APPS_SCRIPT_SECRET || '';
-if (APPS_SCRIPT_URL) {
-  console.log('✅ Apps Script email ready — অর্ডার মেইল পাঠানো যাবে');
-  console.log('   → মেইল যাবে:', process.env.ORDER_NOTIFY_EMAIL || '(Apps Script default)');
-} else {
-  console.warn('⚠️ APPS_SCRIPT_URL সেট নেই — অর্ডার মেইল পাঠানো হবে না');
-}
-
-async function sendViaAppsScript(payload) {
-  if (!APPS_SCRIPT_URL) throw new Error('APPS_SCRIPT_URL not set');
-  // Node 18+ এ ফেচ বিল্টইন; পুরনো Node-এর জন্য fallback
-  const fetchFn = (typeof fetch === 'function')
-    ? fetch
-    : (...args) => import('node-fetch').then(({ default: f }) => f(...args));
-  const res = await fetchFn(APPS_SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ secret: APPS_SCRIPT_SECRET, ...payload }),
-    redirect: 'follow',
-  });
-  const text = await res.text();
-  let data; try { data = JSON.parse(text); } catch { data = { raw: text }; }
-  if (!res.ok || data.ok === false) {
-    throw new Error(data.error || `Apps Script HTTP ${res.status}`);
+let mailTransporter = null;
+try {
+  const nodemailer = require('nodemailer');
+  if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    mailTransporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        // App password থেকে স্পেস সরিয়ে দিচ্ছি (Gmail স্পেস সহ/ছাড়া উভয় গ্রহণ করে)
+        pass: (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, ''),
+      },
+    });
+    mailTransporter.verify((err) => {
+      if (err) {
+        console.warn('⚠️ Gmail SMTP verify failed:', err.message);
+        console.warn('   → App Password সঠিক কিনা চেক করুন: https://myaccount.google.com/apppasswords');
+      } else {
+        console.log('✅ Gmail SMTP ready — অর্ডার মেইল পাঠানো যাবে');
+        console.log('   → মেইল যাবে:', process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER);
+      }
+    });
+  } else {
+    console.warn('⚠️ GMAIL_USER / GMAIL_APP_PASSWORD সেট নেই — অর্ডার মেইল পাঠানো হবে না');
+    console.warn('   GMAIL_USER:', process.env.GMAIL_USER ? '✓ সেট আছে' : '✗ অনুপস্থিত');
+    console.warn('   GMAIL_APP_PASSWORD:', process.env.GMAIL_APP_PASSWORD ? '✓ সেট আছে' : '✗ অনুপস্থিত');
   }
-  return data;
+} catch (e) {
+  console.error('❌ nodemailer ইনস্টল নেই! Render-এ build command-এ যোগ করুন: npm install nodemailer');
+  console.error('   অথবা package.json-এ "nodemailer": "^6.9.14" যোগ করুন');
+  console.error('   বিস্তারিত:', e.message);
 }
 
 function buildOrderEmailHtml(order) {
@@ -110,13 +107,18 @@ function buildOrderEmailHtml(order) {
 }
 
 async function sendOrderEmail(order) {
-  if (!APPS_SCRIPT_URL) return;
-  const to = process.env.ORDER_NOTIFY_EMAIL || '';
+  if (!mailTransporter) return;
+  const to = process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER;
+  if (!to) return;
   try {
-    const subject = `${order.advanceProduct?.required ? '💳🔔 ' : '🛒 '}নতুন অর্ডার ${order.orderNum} — ${order.customer?.name || ''} (৳${order.total || 0})${order.advanceProduct?.required ? ' [অগ্রিম: ৳' + (order.advanceProduct.amount||0) + ']' : ''}`;
-    const html = buildOrderEmailHtml(order);
-    const data = await sendViaAppsScript({ type: 'order', to, subject, html, fromName: 'আসল গ্রামের মজা' });
-    console.log(`📧 অর্ডার মেইল পাঠানো হয়েছে (Apps Script): ${data.messageId || 'ok'} → ${to || '(default)'}`);
+    const info = await mailTransporter.sendMail({
+      from: `"আসল গ্রামের মজা" <${process.env.GMAIL_USER}>`,
+      to,
+      subject: `${order.advanceProduct?.required ? '💳🔔 ' : '🛒 '}নতুন অর্ডার ${order.orderNum} — ${order.customer?.name || ''} (৳${order.total || 0})${order.advanceProduct?.required ? ' [অগ্রিম: ৳' + (order.advanceProduct.amount||0) + ']' : ''}`,
+      html: buildOrderEmailHtml(order),
+      replyTo: process.env.GMAIL_USER,
+    });
+    console.log(`📧 অর্ডার মেইল পাঠানো হয়েছে: ${info.messageId} → ${to}`);
   } catch (err) {
     console.error('❌ অর্ডার মেইল ব্যর্থ:', err.message);
   }
@@ -126,8 +128,9 @@ async function sendOrderEmail(order) {
 // 📧 স্টক-আউট অ্যালার্ট ইমেইল (variant-ভিত্তিক)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 async function sendStockOutEmail(product, variantLabel, orderNum) {
-  if (!APPS_SCRIPT_URL) return;
-  const to = process.env.ORDER_NOTIFY_EMAIL || '';
+  if (!mailTransporter) return;
+  const to = process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER;
+  if (!to) return;
   try {
     const subject = `⚠️ স্টক শেষ — ${product.nm} (${variantLabel})`;
     const html = `
@@ -148,7 +151,10 @@ async function sendStockOutEmail(product, variantLabel, orderNum) {
         </div>
         <div style="padding:10px 18px;background:#f7f7f7;color:#888;font-size:12px;">— gramerasolmoja.shop · admin alert</div>
       </div>`;
-    await sendViaAppsScript({ type: 'stockout', to, subject, html, fromName: 'আসল গ্রামের মজা — Stock Alert' });
+    await mailTransporter.sendMail({
+      from: `"আসল গ্রামের মজা — Stock Alert" <${process.env.GMAIL_USER}>`,
+      to, subject, html, replyTo: process.env.GMAIL_USER,
+    });
     console.log(`📧 স্টক-আউট মেইল পাঠানো হয়েছে: ${product.nm} / ${variantLabel}`);
   } catch (err) {
     console.error('❌ স্টক-আউট মেইল ব্যর্থ:', err.message);
@@ -1850,24 +1856,24 @@ Sitemap: ${process.env.FRONTEND_URL || 'https://asolgramermoja.netlify.app'}/sit
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 app.get('/api/test-email', async (req, res) => {
   const status = {
-    APPS_SCRIPT_URL: APPS_SCRIPT_URL ? '✓ set' : '✗ missing',
-    APPS_SCRIPT_SECRET: APPS_SCRIPT_SECRET ? '✓ set' : '✗ missing (recommended)',
-    ORDER_NOTIFY_EMAIL: process.env.ORDER_NOTIFY_EMAIL || '(Apps Script default)',
+    nodemailerLoaded: !!mailTransporter,
+    GMAIL_USER: process.env.GMAIL_USER ? '✓ set' : '✗ missing',
+    GMAIL_APP_PASSWORD: process.env.GMAIL_APP_PASSWORD ? '✓ set (' + (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g,'').length + ' chars)' : '✗ missing',
+    ORDER_NOTIFY_EMAIL: process.env.ORDER_NOTIFY_EMAIL || '(using GMAIL_USER)',
   };
-  if (!APPS_SCRIPT_URL) {
-    return res.status(500).json({ ok: false, status, error: 'APPS_SCRIPT_URL not set' });
+  if (!mailTransporter) {
+    return res.status(500).json({ ok: false, status, error: 'mailTransporter not initialized — check server startup logs' });
   }
   try {
-    const data = await sendViaAppsScript({
-      type: 'test',
-      to: process.env.ORDER_NOTIFY_EMAIL || '',
+    const info = await mailTransporter.sendMail({
+      from: `"আসল গ্রামের মজা (টেস্ট)" <${process.env.GMAIL_USER}>`,
+      to: process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER,
       subject: '✅ Test email — ' + new Date().toLocaleString('en-GB'),
-      html: '<h2>এটা একটা টেস্ট ইমেইল</h2><p>Google Apps Script কনফিগারেশন সঠিকভাবে কাজ করছে।</p>',
-      fromName: 'আসল গ্রামের মজা (টেস্ট)',
+      html: '<h2>এটা একটা টেস্ট ইমেইল</h2><p>আপনার Gmail SMTP কনফিগারেশন সঠিকভাবে কাজ করছে।</p>',
     });
-    res.json({ ok: true, status, messageId: data.messageId || null });
+    res.json({ ok: true, status, messageId: info.messageId, accepted: info.accepted });
   } catch (err) {
-    res.status(500).json({ ok: false, status, error: err.message });
+    res.status(500).json({ ok: false, status, error: err.message, code: err.code, command: err.command });
   }
 });
 
