@@ -22,8 +22,23 @@ let mailTransporter = null;
 try {
   const nodemailer = require('nodemailer');
   if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // Gmail SMTP — Render/Cloud-এ port 465 প্রায়ই ব্লক থাকে।
+    // তাই port 587 (STARTTLS) ব্যবহার করছি + timeout বাড়ানো হয়েছে।
+    // pool: true → connection reuse, কম timeout-এর সম্ভাবনা।
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     mailTransporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,         // STARTTLS (port 587)
+      requireTLS: true,
+      pool: true,
+      maxConnections: 3,
+      maxMessages: 50,
+      connectionTimeout: 30000,  // 30s
+      greetingTimeout: 30000,
+      socketTimeout: 60000,
+      tls: { rejectUnauthorized: false, servername: 'smtp.gmail.com' },
       auth: {
         user: process.env.GMAIL_USER,
         // App password থেকে স্পেস সরিয়ে দিচ্ছি (Gmail স্পেস সহ/ছাড়া উভয় গ্রহণ করে)
@@ -33,9 +48,33 @@ try {
     mailTransporter.verify((err) => {
       if (err) {
         console.warn('⚠️ Gmail SMTP verify failed:', err.message);
-        console.warn('   → App Password সঠিক কিনা চেক করুন: https://myaccount.google.com/apppasswords');
+        console.warn('   → কারণ হতে পারে:');
+        console.warn('     1) App Password ভুল — https://myaccount.google.com/apppasswords');
+        console.warn('     2) হোস্টিং প্রোভাইডার (Render Free) outbound SMTP ব্লক করছে');
+        console.warn('     3) 2-Step Verification চালু না — Google Account-এ চালু করুন');
+        // Fallback: port 465 (SSL) চেষ্টা করি
+        console.warn('   → port 465 (SSL) দিয়ে fallback চেষ্টা করছি...');
+        try {
+          mailTransporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            pool: true,
+            connectionTimeout: 30000,
+            greetingTimeout: 30000,
+            socketTimeout: 60000,
+            auth: {
+              user: process.env.GMAIL_USER,
+              pass: (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, ''),
+            },
+          });
+          mailTransporter.verify((e2) => {
+            if (e2) console.warn('⚠️ port 465 fallback-ও ব্যর্থ:', e2.message);
+            else console.log('✅ Gmail SMTP ready (port 465 fallback)');
+          });
+        } catch (e3) { console.warn('fallback init error:', e3.message); }
       } else {
-        console.log('✅ Gmail SMTP ready — অর্ডার মেইল পাঠানো যাবে');
+        console.log('✅ Gmail SMTP ready (port 587 / STARTTLS) — অর্ডার মেইল পাঠানো যাবে');
         console.log('   → মেইল যাবে:', process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER);
       }
     });
