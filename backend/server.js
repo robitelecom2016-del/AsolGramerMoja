@@ -12,81 +12,49 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📧 Gmail SMTP — অর্ডার নোটিফিকেশন
+// 📧 Google Apps Script — অর্ডার নোটিফিকেশন Email
+// Gmail App Password / nodemailer সম্পূর্ণ বাদ ✅
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Render dashboard → Environment-এ এই ৩টি ভেরিয়েবল যোগ করুন:
-//   GMAIL_USER           = robitelecom2016@gmail.com
-//   GMAIL_APP_PASSWORD   = twur bijq agrg syzq   (স্পেস সহ ১৬ অক্ষর)
-//   ORDER_NOTIFY_EMAIL   = robitelecom2016@gmail.com  (যেখানে অর্ডার মেইল আসবে)
-let mailTransporter = null;
-try {
-  const nodemailer = require('nodemailer');
-  if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // Gmail SMTP — Render/Cloud-এ port 465 প্রায়ই ব্লক থাকে।
-    // তাই port 587 (STARTTLS) ব্যবহার করছি + timeout বাড়ানো হয়েছে।
-    // pool: true → connection reuse, কম timeout-এর সম্ভাবনা।
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    mailTransporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,         // STARTTLS (port 587)
-      requireTLS: true,
-      pool: true,
-      maxConnections: 3,
-      maxMessages: 50,
-      connectionTimeout: 30000,  // 30s
-      greetingTimeout: 30000,
-      socketTimeout: 60000,
-      tls: { rejectUnauthorized: false, servername: 'smtp.gmail.com' },
-      auth: {
-        user: process.env.GMAIL_USER,
-        // App password থেকে স্পেস সরিয়ে দিচ্ছি (Gmail স্পেস সহ/ছাড়া উভয় গ্রহণ করে)
-        pass: (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, ''),
-      },
-    });
-    mailTransporter.verify((err) => {
-      if (err) {
-        console.warn('⚠️ Gmail SMTP verify failed:', err.message);
-        console.warn('   → কারণ হতে পারে:');
-        console.warn('     1) App Password ভুল — https://myaccount.google.com/apppasswords');
-        console.warn('     2) হোস্টিং প্রোভাইডার (Render Free) outbound SMTP ব্লক করছে');
-        console.warn('     3) 2-Step Verification চালু না — Google Account-এ চালু করুন');
-        // Fallback: port 465 (SSL) চেষ্টা করি
-        console.warn('   → port 465 (SSL) দিয়ে fallback চেষ্টা করছি...');
-        try {
-          mailTransporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
-            pool: true,
-            connectionTimeout: 30000,
-            greetingTimeout: 30000,
-            socketTimeout: 60000,
-            auth: {
-              user: process.env.GMAIL_USER,
-              pass: (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, ''),
-            },
-          });
-          mailTransporter.verify((e2) => {
-            if (e2) console.warn('⚠️ port 465 fallback-ও ব্যর্থ:', e2.message);
-            else console.log('✅ Gmail SMTP ready (port 465 fallback)');
-          });
-        } catch (e3) { console.warn('fallback init error:', e3.message); }
-      } else {
-        console.log('✅ Gmail SMTP ready (port 587 / STARTTLS) — অর্ডার মেইল পাঠানো যাবে');
-        console.log('   → মেইল যাবে:', process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER);
-      }
-    });
-  } else {
-    console.warn('⚠️ GMAIL_USER / GMAIL_APP_PASSWORD সেট নেই — অর্ডার মেইল পাঠানো হবে না');
-    console.warn('   GMAIL_USER:', process.env.GMAIL_USER ? '✓ সেট আছে' : '✗ অনুপস্থিত');
-    console.warn('   GMAIL_APP_PASSWORD:', process.env.GMAIL_APP_PASSWORD ? '✓ সেট আছে' : '✗ অনুপস্থিত');
+// Render dashboard → Environment-এ এই ২টি ভেরিয়েবল যোগ করুন:
+//   GOOGLE_SCRIPT_URL    = https://script.google.com/macros/s/XXXX/exec
+//   GOOGLE_SCRIPT_SECRET = asolgramer_gas_secret_2024   (GoogleAppsScript.gs এর SECRET_TOKEN এর সাথে মিলতে হবে)
+//   ORDER_NOTIFY_EMAIL   = robitelecom2016@gmail.com    (যেখানে অর্ডার মেইল আসবে)
+const GOOGLE_SCRIPT_URL    = process.env.GOOGLE_SCRIPT_URL || '';
+const GOOGLE_SCRIPT_SECRET = process.env.GOOGLE_SCRIPT_SECRET || 'asolgramer_gas_secret_2024';
+const ORDER_NOTIFY_EMAIL   = process.env.ORDER_NOTIFY_EMAIL || 'robitelecom2016@gmail.com';
+
+if (GOOGLE_SCRIPT_URL) {
+  console.log('✅ Google Apps Script Email Service চালু আছে');
+  console.log('   → মেইল যাবে:', ORDER_NOTIFY_EMAIL);
+} else {
+  console.warn('⚠️ GOOGLE_SCRIPT_URL সেট নেই — অর্ডার মেইল পাঠানো হবে না');
+  console.warn('   Render Dashboard → Environment Variables-এ GOOGLE_SCRIPT_URL যোগ করুন');
+}
+
+// ── Google Apps Script দিয়ে ইমেইল পাঠানোর helper ──
+async function sendViaGAS(to, subject, html, type = 'general') {
+  if (!GOOGLE_SCRIPT_URL) {
+    console.warn('⚠️ GOOGLE_SCRIPT_URL নেই, মেইল পাঠানো হলো না।');
+    return false;
   }
-} catch (e) {
-  console.error('❌ nodemailer ইনস্টল নেই! Render-এ build command-এ যোগ করুন: npm install nodemailer');
-  console.error('   অথবা package.json-এ "nodemailer": "^6.9.14" যোগ করুন');
-  console.error('   বিস্তারিত:', e.message);
+  try {
+    const res = await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret: GOOGLE_SCRIPT_SECRET, to, subject, html, type }),
+      signal: AbortSignal.timeout(20000),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      console.log(`📧 Email sent via GAS | type:${type} | to:${to}`);
+      return true;
+    }
+    console.error(`❌ GAS email error: ${data.error}`);
+    return false;
+  } catch (err) {
+    console.error('❌ GAS fetch error:', err.message);
+    return false;
+  }
 }
 
 function buildOrderEmailHtml(order) {
@@ -146,58 +114,39 @@ function buildOrderEmailHtml(order) {
 }
 
 async function sendOrderEmail(order) {
-  if (!mailTransporter) return;
-  const to = process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER;
+  const to = ORDER_NOTIFY_EMAIL;
   if (!to) return;
-  try {
-    const info = await mailTransporter.sendMail({
-      from: `"আসল গ্রামের মজা" <${process.env.GMAIL_USER}>`,
-      to,
-      subject: `${order.advanceProduct?.required ? '💳🔔 ' : '🛒 '}নতুন অর্ডার ${order.orderNum} — ${order.customer?.name || ''} (৳${order.total || 0})${order.advanceProduct?.required ? ' [অগ্রিম: ৳' + (order.advanceProduct.amount||0) + ']' : ''}`,
-      html: buildOrderEmailHtml(order),
-      replyTo: process.env.GMAIL_USER,
-    });
-    console.log(`📧 অর্ডার মেইল পাঠানো হয়েছে: ${info.messageId} → ${to}`);
-  } catch (err) {
-    console.error('❌ অর্ডার মেইল ব্যর্থ:', err.message);
-  }
+  const subject = `${order.advanceProduct?.required ? '💳🔔 ' : '🛒 '}নতুন অর্ডার ${order.orderNum} — ${order.customer?.name || ''} (৳${order.total || 0})${order.advanceProduct?.required ? ' [অগ্রিম: ৳' + (order.advanceProduct.amount||0) + ']' : ''}`;
+  await sendViaGAS(to, subject, buildOrderEmailHtml(order), 'order');
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 📧 স্টক-আউট অ্যালার্ট ইমেইল (variant-ভিত্তিক)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 async function sendStockOutEmail(product, variantLabel, orderNum) {
-  if (!mailTransporter) return;
-  const to = process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER;
+  const to = ORDER_NOTIFY_EMAIL;
   if (!to) return;
-  try {
-    const subject = `⚠️ স্টক শেষ — ${product.nm} (${variantLabel})`;
-    const html = `
-      <div style="font-family:Arial,'Hind Siliguri',sans-serif;max-width:600px;margin:auto;color:#222;border:1px solid #eee;border-radius:8px;overflow:hidden;">
-        <div style="background:#da3633;color:#fff;padding:14px 18px;">
-          <h2 style="margin:0;font-size:18px;">⚠️ স্টক আউট সতর্কতা</h2>
-        </div>
-        <div style="padding:18px;">
-          <p style="margin:0 0 10px;font-size:15px;">নিচের পণ্যের একটি ভ্যারিয়েন্টের স্টক <b>শূন্য</b> হয়ে গেছে:</p>
-          <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:8px;">
-            <tr><td style="padding:8px;border:1px solid #eee;width:140px;"><b>পণ্যের নাম</b></td><td style="padding:8px;border:1px solid #eee;">${product.em||''} ${product.nm}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #eee;"><b>ক্যাটাগরি</b></td><td style="padding:8px;border:1px solid #eee;">${product.cat||'-'}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #eee;"><b>ভ্যারিয়েন্ট</b></td><td style="padding:8px;border:1px solid #eee;color:#da3633;"><b>${variantLabel}</b></td></tr>
-            <tr><td style="padding:8px;border:1px solid #eee;"><b>মোট স্টক</b></td><td style="padding:8px;border:1px solid #eee;">${product.stockQuantity||0}</td></tr>
-            ${orderNum ? `<tr><td style="padding:8px;border:1px solid #eee;"><b>ট্রিগার অর্ডার</b></td><td style="padding:8px;border:1px solid #eee;">${orderNum}</td></tr>` : ''}
-          </table>
-          <p style="margin:16px 0 0;color:#555;font-size:13px;">দ্রুত স্টক রিফিল করুন যাতে গ্রাহক অর্ডার দিতে পারেন।</p>
-        </div>
-        <div style="padding:10px 18px;background:#f7f7f7;color:#888;font-size:12px;">— gramerasolmoja.shop · admin alert</div>
-      </div>`;
-    await mailTransporter.sendMail({
-      from: `"আসল গ্রামের মজা — Stock Alert" <${process.env.GMAIL_USER}>`,
-      to, subject, html, replyTo: process.env.GMAIL_USER,
-    });
-    console.log(`📧 স্টক-আউট মেইল পাঠানো হয়েছে: ${product.nm} / ${variantLabel}`);
-  } catch (err) {
-    console.error('❌ স্টক-আউট মেইল ব্যর্থ:', err.message);
-  }
+  const subject = `⚠️ স্টক শেষ — ${product.nm} (${variantLabel})`;
+  const html = `
+    <div style="font-family:Arial,'Hind Siliguri',sans-serif;max-width:600px;margin:auto;color:#222;border:1px solid #eee;border-radius:8px;overflow:hidden;">
+      <div style="background:#da3633;color:#fff;padding:14px 18px;">
+        <h2 style="margin:0;font-size:18px;">⚠️ স্টক আউট সতর্কতা</h2>
+      </div>
+      <div style="padding:18px;">
+        <p style="margin:0 0 10px;font-size:15px;">নিচের পণ্যের একটি ভ্যারিয়েন্টের স্টক <b>শূন্য</b> হয়ে গেছে:</p>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:8px;">
+          <tr><td style="padding:8px;border:1px solid #eee;width:140px;"><b>পণ্যের নাম</b></td><td style="padding:8px;border:1px solid #eee;">${product.em||''} ${product.nm}</td></tr>
+          <tr><td style="padding:8px;border:1px solid #eee;"><b>ক্যাটাগরি</b></td><td style="padding:8px;border:1px solid #eee;">${product.cat||'-'}</td></tr>
+          <tr><td style="padding:8px;border:1px solid #eee;"><b>ভ্যারিয়েন্ট</b></td><td style="padding:8px;border:1px solid #eee;color:#da3633;"><b>${variantLabel}</b></td></tr>
+          <tr><td style="padding:8px;border:1px solid #eee;"><b>মোট স্টক</b></td><td style="padding:8px;border:1px solid #eee;">${product.stockQuantity||0}</td></tr>
+          ${orderNum ? `<tr><td style="padding:8px;border:1px solid #eee;"><b>ট্রিগার অর্ডার</b></td><td style="padding:8px;border:1px solid #eee;">${orderNum}</td></tr>` : ''}
+        </table>
+        <p style="margin:16px 0 0;color:#555;font-size:13px;">দ্রুত স্টক রিফিল করুন যাতে গ্রাহক অর্ডার দিতে পারেন।</p>
+      </div>
+      <div style="padding:10px 18px;background:#f7f7f7;color:#888;font-size:12px;">— gramerasolmoja.shop · admin alert</div>
+    </div>`;
+  await sendViaGAS(to, subject, html, 'stock-alert');
+  console.log(`📧 স্টক-আউট মেইল পাঠানো হয়েছে: ${product.nm} / ${variantLabel}`);
 }
 
 cloudinary.config({
@@ -1895,24 +1844,25 @@ Sitemap: ${process.env.FRONTEND_URL || 'https://asolgramermoja.netlify.app'}/sit
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 app.get('/api/test-email', async (req, res) => {
   const status = {
-    nodemailerLoaded: !!mailTransporter,
-    GMAIL_USER: process.env.GMAIL_USER ? '✓ set' : '✗ missing',
-    GMAIL_APP_PASSWORD: process.env.GMAIL_APP_PASSWORD ? '✓ set (' + (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g,'').length + ' chars)' : '✗ missing',
-    ORDER_NOTIFY_EMAIL: process.env.ORDER_NOTIFY_EMAIL || '(using GMAIL_USER)',
+    gasConfigured: !!GOOGLE_SCRIPT_URL,
+    GOOGLE_SCRIPT_URL: GOOGLE_SCRIPT_URL ? '✓ set' : '✗ missing',
+    GOOGLE_SCRIPT_SECRET: GOOGLE_SCRIPT_SECRET ? '✓ set' : '✗ missing',
+    ORDER_NOTIFY_EMAIL: ORDER_NOTIFY_EMAIL || '✗ missing',
   };
-  if (!mailTransporter) {
-    return res.status(500).json({ ok: false, status, error: 'mailTransporter not initialized — check server startup logs' });
+  if (!GOOGLE_SCRIPT_URL) {
+    return res.status(500).json({ ok: false, status, error: 'GOOGLE_SCRIPT_URL সেট নেই — Render Dashboard → Environment Variables চেক করুন' });
   }
   try {
-    const info = await mailTransporter.sendMail({
-      from: `"আসল গ্রামের মজা (টেস্ট)" <${process.env.GMAIL_USER}>`,
-      to: process.env.ORDER_NOTIFY_EMAIL || process.env.GMAIL_USER,
-      subject: '✅ Test email — ' + new Date().toLocaleString('en-GB'),
-      html: '<h2>এটা একটা টেস্ট ইমেইল</h2><p>আপনার Gmail SMTP কনফিগারেশন সঠিকভাবে কাজ করছে।</p>',
-    });
-    res.json({ ok: true, status, messageId: info.messageId, accepted: info.accepted });
+    const ok = await sendViaGAS(
+      ORDER_NOTIFY_EMAIL,
+      '✅ Test email — আসল গ্রামের মজা — ' + new Date().toLocaleString('en-GB'),
+      '<h2>এটা একটা টেস্ট ইমেইল</h2><p>আপনার Google Apps Script Email Service সঠিকভাবে কাজ করছে ✅</p><p>— gramerasolmoja.shop</p>',
+      'test'
+    );
+    if (ok) res.json({ ok: true, status, message: 'Test email পাঠানো হয়েছে → ' + ORDER_NOTIFY_EMAIL });
+    else res.status(500).json({ ok: false, status, error: 'GAS থেকে email পাঠানো ব্যর্থ হয়েছে' });
   } catch (err) {
-    res.status(500).json({ ok: false, status, error: err.message, code: err.code, command: err.command });
+    res.status(500).json({ ok: false, status, error: err.message });
   }
 });
 
