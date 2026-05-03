@@ -12,56 +12,111 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📧 Google Apps Script — অর্ডার নোটিফিকেশন
+// 📧 Google Apps Script — অর্ডার নোটিফিকেশন (App Password ছাড়া)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Render dashboard → Environment-এ এই ভেরিয়েবল যোগ করুন:
-//   APPS_SCRIPT_URL = https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
-// 
-// Google Apps Script Setup:
-// 1. script.google.com এ যান
-// 2. New Project তৈরি করুন
-// 3. google-apps-script.js এর কোড copy করে paste করুন
-// 4. Deploy > New deployment > Web app
-// 5. Execute as: Me | Who has access: Anyone
-// 6. Deploy করুন এবং URL copy করে APPS_SCRIPT_URL এ সেট করুন
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
-
+// Render dashboard → Environment-এ এই ভেরিয়েবলগুলো যোগ করুন:
+//   APPS_SCRIPT_URL      = https://script.google.com/macros/s/XXXXXXX/exec
+//   APPS_SCRIPT_SECRET   = একটি গোপন স্ট্রিং (Apps Script-এও একই বসাবেন)
+//   ORDER_NOTIFY_EMAIL   = robitelecom2016@gmail.com  (যেখানে অর্ডার মেইল আসবে)
+//
+// Google Apps Script সেটআপ গাইড নিচের ফাইলে দেওয়া আছে: apps-script/Code.gs
+// ১) script.google.com → New Project → Code.gs-এ ঐ কোড পেস্ট করুন
+// ২) Deploy → New deployment → Web app → Execute as: Me, Access: Anyone → Deploy
+// ৩) যে URL পাবেন তা APPS_SCRIPT_URL হিসেবে Render-এ বসান
+// ৪) Apps Script-এর Script Properties-এ SECRET = একই value দিন
+const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL || '';
+const APPS_SCRIPT_SECRET = process.env.APPS_SCRIPT_SECRET || '';
 if (APPS_SCRIPT_URL) {
-  console.log('✅ Google Apps Script Email Service configured');
-  console.log('   → URL:', APPS_SCRIPT_URL);
+  console.log('✅ Apps Script email ready — অর্ডার মেইল পাঠানো যাবে');
+  console.log('   → মেইল যাবে:', process.env.ORDER_NOTIFY_EMAIL || '(Apps Script default)');
 } else {
   console.warn('⚠️ APPS_SCRIPT_URL সেট নেই — অর্ডার মেইল পাঠানো হবে না');
-  console.warn('   → script.google.com এ গিয়ে Web App deploy করুন এবং URL সেট করুন');
 }
 
+async function sendViaAppsScript(payload) {
+  if (!APPS_SCRIPT_URL) throw new Error('APPS_SCRIPT_URL not set');
+  // Node 18+ এ ফেচ বিল্টইন; পুরনো Node-এর জন্য fallback
+  const fetchFn = (typeof fetch === 'function')
+    ? fetch
+    : (...args) => import('node-fetch').then(({ default: f }) => f(...args));
+  const res = await fetchFn(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ secret: APPS_SCRIPT_SECRET, ...payload }),
+    redirect: 'follow',
+  });
+  const text = await res.text();
+  let data; try { data = JSON.parse(text); } catch { data = { raw: text }; }
+  if (!res.ok || data.ok === false) {
+    throw new Error(data.error || `Apps Script HTTP ${res.status}`);
+  }
+  return data;
+}
+
+function buildOrderEmailHtml(order) {
+  const itemsRows = (order.items || []).map(i => `
+    <tr>
+      <td style="padding:8px;border:1px solid #eee;">${i.nm || ''} <br><small style="color:#888">${i.varLabel || ''}</small></td>
+      <td style="padding:8px;border:1px solid #eee;text-align:center;">${i.qty || 1}</td>
+      <td style="padding:8px;border:1px solid #eee;text-align:right;">৳${((i.cartPrice || 0) * (i.qty || 1)).toLocaleString('en')}</td>
+    </tr>`).join('');
+  const adv = order.advanceDelivery || {};
+  const advHtml = adv.paid
+    ? `<tr><td colspan="3" style="padding:10px;border:1px solid #eee;background:#fff8e6;">
+         💳 <b>অগ্রিম ডেলিভারি চার্জ পরিশোধিত</b><br>
+         ট্রানজেকশন ID: <b>${adv.trxId || '-'}</b> | পরিমাণ: ৳${adv.amount || 0}
+       </td></tr>` : '';
+  const ap = order.advanceProduct || {};
+  const apItemsHtml = (ap.items || []).map(it => `• ${it.nm} × ${it.qty} → ৳${it.subtotal}`).join('<br>');
+  const advProdHtml = ap.required
+    ? `<tr><td colspan="3" style="padding:12px;border:2px solid #e53e3e;background:#fff5f5;color:#742a2a;">
+         🔔 <b style="color:#c53030;font-size:15px">পণ্য অগ্রিম পেমেন্ট আবশ্যক — VERIFY দরকার</b><br>
+         <b>পরিমাণ:</b> ৳${ap.amount || 0} &nbsp;|&nbsp; <b>মাধ্যম:</b> ${(ap.method||'').toUpperCase()}<br>
+         <b>TrxID:</b> <span style="background:#fff;padding:2px 8px;border-radius:4px;font-family:monospace;color:#c53030;border:1px solid #fed7d7">${ap.trxId || '-'}</span><br>
+         <b>প্রেরকের নম্বর:</b> ${ap.senderNumber || '-'}<br>
+         ${apItemsHtml ? `<div style="margin-top:6px;font-size:13px;color:#555">${apItemsHtml}</div>` : ''}
+         <div style="margin-top:8px;padding:6px 10px;background:#fed7d7;border-radius:4px;font-size:12px">⚠️ অ্যাডমিন প্যানেলে গিয়ে এই পেমেন্ট verify করুন।</div>
+       </td></tr>` : '';
+  return `
+    <div style="font-family:Arial,'Hind Siliguri',sans-serif;max-width:640px;margin:auto;color:#222;">
+      <h2 style="color:#2d5a27;margin:0 0 6px;">🛒 নতুন অর্ডার এসেছে!</h2>
+      <p style="margin:0 0 14px;color:#555;">অর্ডার নং: <b>${order.orderNum}</b> · ${new Date(order.createdAt || Date.now()).toLocaleString('en-GB')}</p>
+      <h3 style="margin:14px 0 6px;">👤 কাস্টমার</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:14px;">
+        <tr><td style="padding:6px 8px;border:1px solid #eee;width:120px;"><b>নাম</b></td><td style="padding:6px 8px;border:1px solid #eee;">${order.customer?.name || ''}</td></tr>
+        <tr><td style="padding:6px 8px;border:1px solid #eee;"><b>ফোন</b></td><td style="padding:6px 8px;border:1px solid #eee;"><a href="tel:${order.customer?.phone || ''}">${order.customer?.phone || ''}</a></td></tr>
+        <tr><td style="padding:6px 8px;border:1px solid #eee;"><b>ঠিকানা</b></td><td style="padding:6px 8px;border:1px solid #eee;">${order.customer?.address || ''}</td></tr>
+        ${order.customer?.note ? `<tr><td style="padding:6px 8px;border:1px solid #eee;"><b>নোট</b></td><td style="padding:6px 8px;border:1px solid #eee;">${order.customer.note}</td></tr>` : ''}
+        <tr><td style="padding:6px 8px;border:1px solid #eee;"><b>ডেলিভারি</b></td><td style="padding:6px 8px;border:1px solid #eee;">${order.delivery?.type || ''} — ৳${order.delivery?.charge || 0}</td></tr>
+      </table>
+      <h3 style="margin:14px 0 6px;">📦 পণ্য</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:14px;">
+        <thead><tr style="background:#f5f5f5;">
+          <th style="padding:8px;border:1px solid #eee;text-align:left;">পণ্য</th>
+          <th style="padding:8px;border:1px solid #eee;">পরিমাণ</th>
+          <th style="padding:8px;border:1px solid #eee;text-align:right;">মূল্য</th>
+        </tr></thead>
+        <tbody>
+          ${itemsRows}
+          ${advHtml}
+          ${advProdHtml}
+          <tr><td colspan="2" style="padding:8px;border:1px solid #eee;text-align:right;"><b>সাবটোটাল</b></td><td style="padding:8px;border:1px solid #eee;text-align:right;">৳${(order.subtotal||0).toLocaleString('en')}</td></tr>
+          <tr><td colspan="2" style="padding:8px;border:1px solid #eee;text-align:right;"><b>ডেলিভারি</b></td><td style="padding:8px;border:1px solid #eee;text-align:right;">৳${(order.delivery?.charge||0).toLocaleString('en')}</td></tr>
+          <tr style="background:#f7f3ec;"><td colspan="2" style="padding:10px;border:1px solid #eee;text-align:right;font-size:16px;"><b>সর্বমোট</b></td><td style="padding:10px;border:1px solid #eee;text-align:right;font-size:16px;color:#e8660a;"><b>৳${(order.total||0).toLocaleString('en')}</b></td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:18px;color:#888;font-size:12px;">— gramerasolmoja.shop</p>
+    </div>`;
+}
 
 async function sendOrderEmail(order) {
-  if (!APPS_SCRIPT_URL) {
-    console.warn('⚠️ APPS_SCRIPT_URL not configured — skipping order email');
-    return;
-  }
-  
+  if (!APPS_SCRIPT_URL) return;
+  const to = process.env.ORDER_NOTIFY_EMAIL || '';
   try {
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        type: 'order',
-        order: order
-      })
-    });
-    
-    const result = await response.json();
-    
-    if (result.success) {
-      console.log(`📧 অর্ডার মেইল পাঠানো হয়েছে: ${result.orderNum} → ${result.to}`);
-    } else {
-      console.error('❌ অর্ডার মেইল ব্যর্থ:', result.error);
-    }
+    const subject = `${order.advanceProduct?.required ? '💳🔔 ' : '🛒 '}নতুন অর্ডার ${order.orderNum} — ${order.customer?.name || ''} (৳${order.total || 0})${order.advanceProduct?.required ? ' [অগ্রিম: ৳' + (order.advanceProduct.amount||0) + ']' : ''}`;
+    const html = buildOrderEmailHtml(order);
+    const data = await sendViaAppsScript({ type: 'order', to, subject, html, fromName: 'আসল গ্রামের মজা' });
+    console.log(`📧 অর্ডার মেইল পাঠানো হয়েছে (Apps Script): ${data.messageId || 'ok'} → ${to || '(default)'}`);
   } catch (err) {
     console.error('❌ অর্ডার মেইল ব্যর্থ:', err.message);
   }
@@ -71,32 +126,30 @@ async function sendOrderEmail(order) {
 // 📧 স্টক-আউট অ্যালার্ট ইমেইল (variant-ভিত্তিক)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 async function sendStockOutEmail(product, variantLabel, orderNum) {
-  if (!APPS_SCRIPT_URL) {
-    console.warn('⚠️ APPS_SCRIPT_URL not configured — skipping stock out email');
-    return;
-  }
-  
+  if (!APPS_SCRIPT_URL) return;
+  const to = process.env.ORDER_NOTIFY_EMAIL || '';
   try {
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        type: 'stockOut',
-        product: product,
-        variantLabel: variantLabel,
-        orderNum: orderNum
-      })
-    });
-    
-    const result = await response.json();
-    
-    if (result.success) {
-      console.log(`📧 স্টক-আউট মেইল পাঠানো হয়েছে: ${product.nm} / ${variantLabel}`);
-    } else {
-      console.error('❌ স্টক-আউট মেইল ব্যর্থ:', result.error);
-    }
+    const subject = `⚠️ স্টক শেষ — ${product.nm} (${variantLabel})`;
+    const html = `
+      <div style="font-family:Arial,'Hind Siliguri',sans-serif;max-width:600px;margin:auto;color:#222;border:1px solid #eee;border-radius:8px;overflow:hidden;">
+        <div style="background:#da3633;color:#fff;padding:14px 18px;">
+          <h2 style="margin:0;font-size:18px;">⚠️ স্টক আউট সতর্কতা</h2>
+        </div>
+        <div style="padding:18px;">
+          <p style="margin:0 0 10px;font-size:15px;">নিচের পণ্যের একটি ভ্যারিয়েন্টের স্টক <b>শূন্য</b> হয়ে গেছে:</p>
+          <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:8px;">
+            <tr><td style="padding:8px;border:1px solid #eee;width:140px;"><b>পণ্যের নাম</b></td><td style="padding:8px;border:1px solid #eee;">${product.em||''} ${product.nm}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #eee;"><b>ক্যাটাগরি</b></td><td style="padding:8px;border:1px solid #eee;">${product.cat||'-'}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #eee;"><b>ভ্যারিয়েন্ট</b></td><td style="padding:8px;border:1px solid #eee;color:#da3633;"><b>${variantLabel}</b></td></tr>
+            <tr><td style="padding:8px;border:1px solid #eee;"><b>মোট স্টক</b></td><td style="padding:8px;border:1px solid #eee;">${product.stockQuantity||0}</td></tr>
+            ${orderNum ? `<tr><td style="padding:8px;border:1px solid #eee;"><b>ট্রিগার অর্ডার</b></td><td style="padding:8px;border:1px solid #eee;">${orderNum}</td></tr>` : ''}
+          </table>
+          <p style="margin:16px 0 0;color:#555;font-size:13px;">দ্রুত স্টক রিফিল করুন যাতে গ্রাহক অর্ডার দিতে পারেন।</p>
+        </div>
+        <div style="padding:10px 18px;background:#f7f7f7;color:#888;font-size:12px;">— gramerasolmoja.shop · admin alert</div>
+      </div>`;
+    await sendViaAppsScript({ type: 'stockout', to, subject, html, fromName: 'আসল গ্রামের মজা — Stock Alert' });
+    console.log(`📧 স্টক-আউট মেইল পাঠানো হয়েছে: ${product.nm} / ${variantLabel}`);
   } catch (err) {
     console.error('❌ স্টক-আউট মেইল ব্যর্থ:', err.message);
   }
@@ -1797,52 +1850,24 @@ Sitemap: ${process.env.FRONTEND_URL || 'https://asolgramermoja.netlify.app'}/sit
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 app.get('/api/test-email', async (req, res) => {
   const status = {
-    appsScriptConfigured: !!APPS_SCRIPT_URL,
     APPS_SCRIPT_URL: APPS_SCRIPT_URL ? '✓ set' : '✗ missing',
+    APPS_SCRIPT_SECRET: APPS_SCRIPT_SECRET ? '✓ set' : '✗ missing (recommended)',
+    ORDER_NOTIFY_EMAIL: process.env.ORDER_NOTIFY_EMAIL || '(Apps Script default)',
   };
-  
   if (!APPS_SCRIPT_URL) {
-    return res.status(500).json({ 
-      ok: false, 
-      status, 
-      error: 'APPS_SCRIPT_URL not configured — check environment variables' 
-    });
+    return res.status(500).json({ ok: false, status, error: 'APPS_SCRIPT_URL not set' });
   }
-  
   try {
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        type: 'test'
-      })
+    const data = await sendViaAppsScript({
+      type: 'test',
+      to: process.env.ORDER_NOTIFY_EMAIL || '',
+      subject: '✅ Test email — ' + new Date().toLocaleString('en-GB'),
+      html: '<h2>এটা একটা টেস্ট ইমেইল</h2><p>Google Apps Script কনফিগারেশন সঠিকভাবে কাজ করছে।</p>',
+      fromName: 'আসল গ্রামের মজা (টেস্ট)',
     });
-    
-    const result = await response.json();
-    
-    if (result.success) {
-      res.json({ 
-        ok: true, 
-        status, 
-        messageId: result.messageId, 
-        to: result.to,
-        message: result.message
-      });
-    } else {
-      res.status(500).json({ 
-        ok: false, 
-        status, 
-        error: result.error 
-      });
-    }
+    res.json({ ok: true, status, messageId: data.messageId || null });
   } catch (err) {
-    res.status(500).json({ 
-      ok: false, 
-      status, 
-      error: err.message 
-    });
+    res.status(500).json({ ok: false, status, error: err.message });
   }
 });
 
