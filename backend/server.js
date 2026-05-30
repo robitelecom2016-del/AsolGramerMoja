@@ -31,6 +31,51 @@ if (GOOGLE_SCRIPT_URL) {
   console.warn('   Render Dashboard → Environment Variables-এ GOOGLE_SCRIPT_URL যোগ করুন');
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 📱 BulkSMS — SMS নোটিফিকেশন সার্ভিস
+// Render Dashboard → Environment-এ এই ভেরিয়েবলগুলো যোগ করুন:
+//   BULKSMS_BASIC_AUTH  = (Basic Auth টোকেন — = চিহ্নের পরের অংশ)
+//   ORDER_NOTIFY_PHONE  = +8801XXXXXXXXX  (E.164 format)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const BULKSMS_AUTH    = process.env.BULKSMS_BASIC_AUTH || '';
+const NOTIFY_PHONE    = process.env.ORDER_NOTIFY_PHONE || '';
+
+if (BULKSMS_AUTH && NOTIFY_PHONE) {
+  console.log('✅ BulkSMS SMS Service চালু আছে');
+  console.log('   → SMS যাবে:', NOTIFY_PHONE);
+} else {
+  console.warn('⚠️ BULKSMS_BASIC_AUTH বা ORDER_NOTIFY_PHONE সেট নেই — SMS পাঠানো হবে না');
+}
+
+// ── BulkSMS দিয়ে SMS পাঠানোর helper ──
+async function sendSMS(to, body) {
+  if (!BULKSMS_AUTH || !to) {
+    console.warn('⚠️ BulkSMS config নেই, SMS পাঠানো হলো না।');
+    return false;
+  }
+  try {
+    const res = await fetch('https://api.bulksms.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${BULKSMS_AUTH}`,
+      },
+      body: JSON.stringify({ to, body }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (res.ok) {
+      console.log(`📱 SMS sent via BulkSMS | to: ${to}`);
+      return true;
+    }
+    const errText = await res.text();
+    console.error(`❌ BulkSMS error ${res.status}:`, errText);
+    return false;
+  } catch (err) {
+    console.error('❌ BulkSMS fetch error:', err.message);
+    return false;
+  }
+}
+
 // ── Google Apps Script দিয়ে ইমেইল পাঠানোর helper ──
 async function sendViaGAS(to, subject, html, type = 'general') {
   if (!GOOGLE_SCRIPT_URL) {
@@ -1090,6 +1135,13 @@ app.post('/api/orders', async (req, res) => {
     // 📧 অর্ডার নোটিফিকেশন মেইল পাঠাও (response block করো না)
     sendOrderEmail(order).catch(e => console.error('mail err:', e.message));
 
+    // 📱 অর্ডার নোটিফিকেশন SMS পাঠাও
+    if (NOTIFY_PHONE) {
+      const hasAdvance = order.advanceProduct?.required;
+      const smsText = `${hasAdvance ? '💳🔔 ' : '🛒 '}নতুন অর্ডার! #${order.orderNum}\nনাম: ${order.customer?.name}\nফোন: ${order.customer?.phone}\nমোট: ৳${order.total}\nঠিকানা: ${order.customer?.address}${hasAdvance ? `\nঅগ্রিম: ৳${order.advanceProduct.amount} [${order.advanceProduct.method?.toUpperCase()}] TrxID:${order.advanceProduct.trxId}` : ''}`;
+      sendSMS(NOTIFY_PHONE, smsText).catch(e => console.error('sms err:', e.message));
+    }
+
 
     res.status(201).json(order);
   } catch (err) {
@@ -1214,6 +1266,11 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
             if (triggeredVariantOut) {
               sendStockOutEmail(product, triggeredVariantOut, order.orderNum)
                 .catch(e => console.error('stock-out mail err:', e.message));
+              // স্টক-আউট SMS
+              if (NOTIFY_PHONE) {
+                const stockSms = `⚠️ স্টক শেষ!\nপণ্য: ${product.nm}\nভ্যারিয়েন্ট: ${triggeredVariantOut}\nঅর্ডার: ${order.orderNum}`;
+                sendSMS(NOTIFY_PHONE, stockSms).catch(e => console.error('stock sms err:', e.message));
+              }
             }
           } catch (stockErr) {
             console.error(`Stock decrement failed for ${item.productId}:`, stockErr.message);
@@ -1864,6 +1921,20 @@ app.get('/api/test-email', async (req, res) => {
   } catch (err) {
     res.status(500).json({ ok: false, status, error: err.message });
   }
+});
+
+app.get('/api/test-sms', async (req, res) => {
+  const status = {
+    bulkSmsConfigured: !!BULKSMS_AUTH,
+    BULKSMS_BASIC_AUTH: BULKSMS_AUTH ? '✓ set' : '✗ missing',
+    ORDER_NOTIFY_PHONE: NOTIFY_PHONE || '✗ missing',
+  };
+  if (!BULKSMS_AUTH || !NOTIFY_PHONE) {
+    return res.status(500).json({ ok: false, status, error: 'BULKSMS_BASIC_AUTH বা ORDER_NOTIFY_PHONE সেট নেই' });
+  }
+  const ok = await sendSMS(NOTIFY_PHONE, `✅ Test SMS — আসল গ্রামের মজা — ${new Date().toLocaleString('en-GB')}`);
+  if (ok) res.json({ ok: true, status, message: 'Test SMS পাঠানো হয়েছে → ' + NOTIFY_PHONE });
+  else res.status(500).json({ ok: false, status, error: 'BulkSMS থেকে SMS পাঠানো ব্যর্থ হয়েছে' });
 });
 
 app.use((req, res) => {
