@@ -1212,6 +1212,44 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
     await order.save();
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // 📱 কাস্টমারকে Confirmation SMS — শুধু "confirmed" status-এ
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    if (status === 'confirmed' && prevStatus !== 'confirmed' && order.customer?.phone) {
+      try {
+        let custPhone = order.customer.phone.toString().replace(/\s+/g, '');
+        // বাংলাদেশি নম্বর E.164 format-এ রূপান্তর
+        if (custPhone.startsWith('01')) custPhone = '+880' + custPhone.slice(1);
+        else if (custPhone.startsWith('8801')) custPhone = '+' + custPhone;
+        else if (!custPhone.startsWith('+')) custPhone = '+880' + custPhone;
+
+        const itemLines = (order.items || []).map(i => {
+          const subtotal = (i.cartPrice || 0) * (i.qty || 1);
+          return `- ${i.nm}${i.varLabel ? ' (' + i.varLabel + ')' : ''} x${i.qty || 1} = Tk ${subtotal}`;
+        }).join('\n');
+
+        const confirmSms =
+`Asol Gramer Moja
+Order #${order.orderNum} CONFIRMED ✅
+
+${itemLines}
+
+Subtotal : Tk ${order.subtotal || 0}
+Delivery : Tk ${order.delivery?.charge || 0}
+Total    : Tk ${order.total}
+
+Address  : ${order.customer.address}
+
+Thank you! We will deliver soon.
+gramerasolmoja.shop`;
+
+        sendSMS(custPhone, confirmSms).catch(e => console.error('confirm sms err:', e.message));
+        console.log(`📱 Confirmation SMS পাঠানো হচ্ছে → ${custPhone} | Order: ${order.orderNum}`);
+      } catch (smsErr) {
+        console.error('Confirmation SMS error:', smsErr.message);
+      }
+    }
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // 📦 স্টক ম্যানেজমেন্ট লজিক
     //   - delivered: প্রথমবার delivered হলে স্টক কমাবে + variant=0 হলে ইমেইল
     //   - cancelled: আগে delivered ছিল হলে স্টক ফেরত দেবে
