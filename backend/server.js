@@ -57,42 +57,62 @@ function toBDFormat(phone) {
 }
 
 // ── bulksmsbd.net SMS helper ──
+// ⚠️ HTTPS endpoint ব্যবহার করতে হবে — Render.com HTTP block করে
+// এবং 1032 error এড়াতে www subdomain সহ HTTPS URL ব্যবহার করা হচ্ছে
 async function sendSMS(to, message) {
   if (!BULKSMSBD_API_KEY || !to) {
     console.warn('⚠️ bulksmsbd config নেই, SMS skip।');
     return { ok: false, code: null };
   }
-  try {
-    const number = toBDFormat(to);
-    const params = new URLSearchParams({
-      api_key  : BULKSMSBD_API_KEY,
-      type     : 'text',
-      number   : number,
-      senderid : BULKSMSBD_SENDER_ID,
-      message  : message,
-    });
-    const res  = await fetch(`http://bulksmsbd.net/api/smsapi?${params.toString()}`, {
-      signal: AbortSignal.timeout(15000),
-    });
-    const text = await res.text();
-    let code;
-    try { code = JSON.parse(text)?.response_code; } catch { code = text.trim(); }
-    if (String(code) === '202') {
-      console.log(`📱 SMS OK | to:${number} | code:202`);
-      return { ok: true, code };
+  const errMap = {
+    '1001':'Invalid Number', '1002':'Sender ID সঠিক নয়',
+    '1003':'Required fields missing', '1005':'Internal Error',
+    '1006':'Balance Validity নেই', '1007':'Balance অপর্যাপ্ত',
+    '1031':'Account Verified নয়', '1032':'IP Whitelisted নয় — bulksmsbd dashboard থেকে IP restriction বন্ধ করুন',
+  };
+
+  // ক্রমানুসারে চেষ্টা করার URL তালিকা (HTTPS first)
+  const SMS_URLS = [
+    'https://www.bulksmsbd.net/api/smsapi',
+    'https://bulksmsbd.net/api/smsapi',
+    'http://bulksmsbd.net/api/smsapi',
+  ];
+
+  const number = toBDFormat(to);
+  const params = new URLSearchParams({
+    api_key  : BULKSMSBD_API_KEY,
+    type     : 'text',
+    number   : number,
+    senderid : BULKSMSBD_SENDER_ID,
+    message  : message,
+  });
+
+  for (const baseUrl of SMS_URLS) {
+    try {
+      console.log(`📱 SMS চেষ্টা → ${baseUrl} | to:${number}`);
+      const res = await fetch(`${baseUrl}?${params.toString()}`, {
+        signal: AbortSignal.timeout(15000),
+      });
+      const text = await res.text();
+      let code;
+      try { code = JSON.parse(text)?.response_code; } catch { code = text.trim(); }
+      if (String(code) === '202') {
+        console.log(`✅ SMS OK | url:${baseUrl} | to:${number} | code:202`);
+        return { ok: true, code };
+      }
+      console.error(`❌ bulksmsbd | url:${baseUrl} | to:${number} | code:${code} — ${errMap[String(code)] || 'Unknown'}`);
+      // 1032 হলে পরের URL দিয়ে চেষ্টা করো না — IP সমস্যা সব URL-এ একই থাকবে
+      if (String(code) === '1032') {
+        console.error('⛔ IP Whitelist সমস্যা। bulksmsbd.net dashboard → API Settings → IP Restriction বন্ধ করুন।');
+        return { ok: false, code };
+      }
+      return { ok: false, code };
+    } catch (err) {
+      console.error(`❌ bulksmsbd fetch error (${baseUrl}):`, err.message);
+      // network error হলে পরের URL দিয়ে চেষ্টা করো
     }
-    const errMap = {
-      '1001':'Invalid Number', '1002':'Sender ID সঠিক নয়',
-      '1003':'Required fields missing', '1005':'Internal Error',
-      '1006':'Balance Validity নেই', '1007':'Balance অপর্যাপ্ত',
-      '1031':'Account Verified নয়', '1032':'IP Whitelisted নয়',
-    };
-    console.error(`❌ bulksmsbd | to:${number} | code:${code} — ${errMap[String(code)] || 'Unknown'}`);
-    return { ok: false, code };
-  } catch (err) {
-    console.error('❌ bulksmsbd fetch error:', err.message);
-    return { ok: false, code: null };
   }
+  return { ok: false, code: null };
 }
 
 // ── Google Apps Script দিয়ে ইমেইল পাঠানোর helper ──
@@ -1272,6 +1292,36 @@ Address: ${order.customer.address}
 Thank you for shopping with us!`;
           sendSMS(custPhone, shippedSms).catch(e => console.error('shipped sms err:', e.message));
           console.log(`📱 Shipped SMS → ${custPhone} | #${order.orderNum}`);
+        }
+
+        // ── ৩. DELIVERED — ডেলিভারি সম্পন্ন হলে ──
+        if (status === 'delivered' && prevStatus !== 'delivered') {
+          const deliveredSms =
+`Asol Gramer Moja
+Order #${order.orderNum} DELIVERED ✅
+
+আপনার অর্ডারটি সফলভাবে পৌঁছে দেওয়া হয়েছে!
+Total: Tk ${order.total}
+
+আমাদের সাথে কেনাকাটা করার জন্য ধন্যবাদ!
+gramerasolmoja.shop`;
+          sendSMS(custPhone, deliveredSms).catch(e => console.error('delivered sms err:', e.message));
+          console.log(`📱 Delivered SMS → ${custPhone} | #${order.orderNum}`);
+        }
+
+        // ── ৪. CANCELLED — অর্ডার বাতিল হলে ──
+        if (status === 'cancelled' && prevStatus !== 'cancelled') {
+          const cancelledSms =
+`Asol Gramer Moja
+Order #${order.orderNum} CANCELLED ❌
+
+দুঃখিত, আপনার অর্ডারটি বাতিল হয়েছে।
+${note ? 'কারণ: ' + note : ''}
+
+যেকোনো প্রশ্নের জন্য যোগাযোগ করুন।
+gramerasolmoja.shop`;
+          sendSMS(custPhone, cancelledSms).catch(e => console.error('cancelled sms err:', e.message));
+          console.log(`📱 Cancelled SMS → ${custPhone} | #${order.orderNum}`);
         }
 
       } catch (smsErr) {
