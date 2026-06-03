@@ -31,28 +31,27 @@ if (GOOGLE_SCRIPT_URL) {
   console.warn('   Render Dashboard → Environment Variables-এ GOOGLE_SCRIPT_URL যোগ করুন');
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 📱 bulksmsbd.net — SMS নোটিফিকেশন (Bangladesh)
-// Render Dashboard → Environment-এ যোগ করুন:
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 📱 bulksmsbd.net — Customer SMS Notification (Bangladesh)
+// Render Dashboard → Environment Variables-এ যোগ করুন:
 //   BULKSMSBD_API_KEY   = jtkcUD1u2Z45csHo9mnH
-//   BULKSMSBD_SENDER_ID = (Approved Sender ID — না থাকলে খালি)
-//   ORDER_NOTIFY_PHONE  = 8801XXXXXXXXX  (88 দিয়ে শুরু, + ছাড়া)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//   BULKSMSBD_SENDER_ID = 8809617634652
+//   ORDER_NOTIFY_PHONE  = 8801XXXXXXXXX  (Admin নম্বর, 88 দিয়ে শুরু)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const BULKSMSBD_API_KEY   = process.env.BULKSMSBD_API_KEY   || 'jtkcUD1u2Z45csHo9mnH';
-const BULKSMSBD_SENDER_ID = process.env.BULKSMSBD_SENDER_ID || '';
+const BULKSMSBD_SENDER_ID = process.env.BULKSMSBD_SENDER_ID || '8809617634652';
 const NOTIFY_PHONE        = process.env.ORDER_NOTIFY_PHONE  || '';
 
-if (BULKSMSBD_API_KEY && NOTIFY_PHONE) {
-  console.log('✅ bulksmsbd.net SMS Service চালু আছে');
-  console.log('   → Admin SMS যাবে:', NOTIFY_PHONE);
+if (BULKSMSBD_API_KEY) {
+  console.log('✅ bulksmsbd.net SMS Service চালু আছে | Sender:', BULKSMSBD_SENDER_ID);
 } else {
-  console.warn('⚠️ BULKSMSBD_API_KEY বা ORDER_NOTIFY_PHONE সেট নেই — SMS পাঠানো হবে না');
+  console.warn('⚠️ BULKSMSBD_API_KEY সেট নেই — SMS পাঠানো হবে না');
 }
 
-// ── যেকোনো নম্বর → bulksmsbd format (88017XXXXXXXX) ──
+// ── যেকোনো বাংলাদেশি নম্বর → 8801XXXXXXXXX format ──
 function toBDFormat(phone) {
   let p = phone.toString().replace(/\s+/g, '').replace(/^\+/, '');
-  if (p.startsWith('01'))  p = '880' + p.slice(1);
+  if (p.startsWith('01'))  p = '880' + p.slice(1);   // 01711... → 8801711...
   if (p.startsWith('1') && p.length === 10) p = '880' + p;
   return p;
 }
@@ -60,7 +59,7 @@ function toBDFormat(phone) {
 // ── bulksmsbd.net SMS helper ──
 async function sendSMS(to, message) {
   if (!BULKSMSBD_API_KEY || !to) {
-    console.warn('⚠️ bulksmsbd config নেই, SMS পাঠানো হলো না।');
+    console.warn('⚠️ bulksmsbd config নেই, SMS skip।');
     return { ok: false, code: null };
   }
   try {
@@ -72,21 +71,21 @@ async function sendSMS(to, message) {
       senderid : BULKSMSBD_SENDER_ID,
       message  : message,
     });
-    const res = await fetch(`http://bulksmsbd.net/api/smsapi?${params.toString()}`, {
+    const res  = await fetch(`http://bulksmsbd.net/api/smsapi?${params.toString()}`, {
       signal: AbortSignal.timeout(15000),
     });
     const text = await res.text();
     let code;
     try { code = JSON.parse(text)?.response_code; } catch { code = text.trim(); }
     if (String(code) === '202') {
-      console.log(`📱 SMS sent | to: ${number} | code: 202`);
+      console.log(`📱 SMS OK | to:${number} | code:202`);
       return { ok: true, code };
     }
     const errMap = {
-      '1001':'Invalid Number','1002':'Sender ID সঠিক নয়',
-      '1003':'সব field প্রয়োজন','1005':'Internal Error',
-      '1006':'Balance Validity নেই','1007':'Balance অপর্যাপ্ত',
-      '1007':'Balance Insufficient','1031':'Account Verified নয়','1032':'IP Whitelisted নয়',
+      '1001':'Invalid Number', '1002':'Sender ID সঠিক নয়',
+      '1003':'Required fields missing', '1005':'Internal Error',
+      '1006':'Balance Validity নেই', '1007':'Balance অপর্যাপ্ত',
+      '1031':'Account Verified নয়', '1032':'IP Whitelisted নয়',
     };
     console.error(`❌ bulksmsbd | to:${number} | code:${code} — ${errMap[String(code)] || 'Unknown'}`);
     return { ok: false, code };
@@ -1158,7 +1157,7 @@ app.post('/api/orders', async (req, res) => {
     // 📱 Admin SMS — নতুন অর্ডার এলে
     if (NOTIFY_PHONE) {
       const hasAdv = order.advanceProduct?.required;
-      const adminSms = `NEW ORDER #${order.orderNum}\nName: ${order.customer?.name}\nPhone: ${order.customer?.phone}\nTotal: Tk ${order.total}\nAddress: ${order.customer?.address}${hasAdv ? `\nAdvance: Tk ${order.advanceProduct.amount} [${(order.advanceProduct.method||'').toUpperCase()}] TrxID: ${order.advanceProduct.trxId}` : ''}`;
+      const adminSms = `NEW ORDER #${order.orderNum}\nName: ${order.customer?.name}\nPhone: ${order.customer?.phone}\nTotal: Tk ${order.total}\nAddress: ${order.customer?.address}${hasAdv ? `\nAdvance: Tk ${order.advanceProduct.amount} [${(order.advanceProduct.method || '').toUpperCase()}] TrxID: ${order.advanceProduct.trxId}` : ''}`;
       sendSMS(NOTIFY_PHONE, adminSms).catch(e => console.error('admin sms err:', e.message));
     }
 
@@ -1230,16 +1229,19 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
     }
     await order.save();
 
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // 📱 Customer SMS — শুধু "confirmed" status-এ একবার
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    if (status === 'confirmed' && prevStatus !== 'confirmed' && order.customer?.phone) {
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // 📱 Customer SMS — status অনুযায়ী
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    if (order.customer?.phone) {
       try {
         const custPhone = toBDFormat(order.customer.phone);
-        const itemLines = (order.items || []).map(i =>
-          `- ${i.nm}${i.varLabel ? ' (' + i.varLabel + ')' : ''} x${i.qty || 1} = Tk ${(i.cartPrice || 0) * (i.qty || 1)}`
-        ).join('\n');
-        const confirmSms =
+
+        // ── ১. CONFIRMED — অর্ডার কনফার্ম হলে ──
+        if (status === 'confirmed' && prevStatus !== 'confirmed') {
+          const itemLines = (order.items || []).map(i =>
+            `- ${i.nm}${i.varLabel ? ' (' + i.varLabel + ')' : ''} x${i.qty || 1} = Tk ${(i.cartPrice || 0) * (i.qty || 1)}`
+          ).join('\n');
+          const confirmSms =
 `Asol Gramer Moja
 Order #${order.orderNum} CONFIRMED
 
@@ -1250,11 +1252,30 @@ Delivery : Tk ${order.delivery?.charge || 0}
 Total    : Tk ${order.total}
 Address  : ${order.customer.address}
 
-Thank you! We will deliver soon.`;
-        sendSMS(custPhone, confirmSms).catch(e => console.error('confirm sms err:', e.message));
-        console.log(`📱 Confirmation SMS → ${custPhone} | Order: ${order.orderNum}`);
-      } catch (e) {
-        console.error('Confirm SMS build error:', e.message);
+Thank you! We will contact you soon.`;
+          sendSMS(custPhone, confirmSms).catch(e => console.error('confirm sms err:', e.message));
+          console.log(`📱 Confirmed SMS → ${custPhone} | #${order.orderNum}`);
+        }
+
+        // ── ২. SHIPPED — ডেলিভারি ম্যানের কাছে বুঝিয়ে দিলে ──
+        if (status === 'shipped' && prevStatus !== 'shipped') {
+          const shippedSms =
+`Asol Gramer Moja
+Order #${order.orderNum} SHIPPED
+
+Your order has been handed to the delivery agent and is on its way to your location.
+
+Expected delivery: within 1-2 days.
+
+Address: ${order.customer.address}
+
+Thank you for shopping with us!`;
+          sendSMS(custPhone, shippedSms).catch(e => console.error('shipped sms err:', e.message));
+          console.log(`📱 Shipped SMS → ${custPhone} | #${order.orderNum}`);
+        }
+
+      } catch (smsErr) {
+        console.error('Customer SMS error:', smsErr.message);
       }
     }
 
@@ -1970,21 +1991,24 @@ app.get('/api/test-email', async (req, res) => {
   }
 });
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🧪 SMS test endpoint
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// GET /api/test-sms?to=8801711XXXXXX  (optional — না দিলে ORDER_NOTIFY_PHONE যাবে)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 app.get('/api/test-sms', async (req, res) => {
-  const status = {
-    BULKSMSBD_API_KEY  : BULKSMSBD_API_KEY  ? '✓ set' : '✗ missing',
-    BULKSMSBD_SENDER_ID: BULKSMSBD_SENDER_ID || '(empty)',
+  const target = req.query.to ? toBDFormat(req.query.to) : NOTIFY_PHONE;
+  const cfg = {
+    BULKSMSBD_API_KEY  : BULKSMSBD_API_KEY   ? '✓ set' : '✗ missing',
+    BULKSMSBD_SENDER_ID: BULKSMSBD_SENDER_ID || '✗ missing',
     ORDER_NOTIFY_PHONE : NOTIFY_PHONE        || '✗ missing',
+    sending_to         : target              || '✗ missing',
   };
-  if (!BULKSMSBD_API_KEY || !NOTIFY_PHONE) {
-    return res.status(500).json({ ok: false, status, error: 'BULKSMSBD_API_KEY বা ORDER_NOTIFY_PHONE সেট নেই' });
+  if (!BULKSMSBD_API_KEY || !target) {
+    return res.status(500).json({ ok: false, cfg, error: 'Config অসম্পূর্ণ' });
   }
-  const result = await sendSMS(NOTIFY_PHONE, `Test SMS - Asol Gramer Moja - ${new Date().toLocaleString('en-GB')}`);
-  if (result.ok) res.json({ ok: true, code: result.code, status, to: NOTIFY_PHONE });
-  else res.status(500).json({ ok: false, code: result.code, status, error: 'SMS পাঠানো ব্যর্থ' });
+  const result = await sendSMS(target, `Test SMS - Asol Gramer Moja - ${new Date().toLocaleString('en-GB')}`);
+  if (result.ok) res.json({ ok: true, code: result.code, cfg, message: 'SMS পাঠানো হয়েছে → ' + target });
+  else res.status(500).json({ ok: false, code: result.code, cfg, error: 'SMS পাঠানো ব্যর্থ — code: ' + result.code });
 });
 
 app.use((req, res) => {
