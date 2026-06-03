@@ -1181,6 +1181,33 @@ app.post('/api/orders', async (req, res) => {
       sendSMS(NOTIFY_PHONE, adminSms).catch(e => console.error('admin sms err:', e.message));
     }
 
+    // 📱 Customer SMS — অর্ডার প্লেস হওয়ার সাথে সাথে কাস্টমারকে কনফার্মেশন SMS
+    // (status="pending" থাকা সত্ত্বেও — কাস্টমার জানবে অর্ডার রিসিভ হয়েছে)
+    if (order.customer?.phone) {
+      try {
+        const custPhone = toBDFormat(order.customer.phone);
+        const itemLines = (order.items || []).map(i =>
+          `- ${i.nm}${i.varLabel ? ' (' + i.varLabel + ')' : ''} x${i.qty || 1}`
+        ).join('\n');
+        const hasAdv = order.advanceProduct?.required;
+        const placedSms =
+`Asol Gramer Moja
+Order #${order.orderNum} RECEIVED
+
+${itemLines}
+
+Subtotal : Tk ${order.subtotal || 0}
+Delivery : Tk ${order.delivery?.charge || 0}
+Total    : Tk ${order.total}
+${hasAdv ? `Advance  : Tk ${order.advanceProduct.amount} [${(order.advanceProduct.method || '').toUpperCase()}] TrxID: ${order.advanceProduct.trxId}\n` : ''}Thank you! We will confirm your order shortly.
+gramerasolmoja.shop`;
+        sendSMS(custPhone, placedSms).catch(e => console.error('customer placed sms err:', e.message));
+        console.log(`📱 Order-placed SMS → ${custPhone} | #${order.orderNum}`);
+      } catch (smsErr) {
+        console.error('Customer placed SMS error:', smsErr.message);
+      }
+    }
+
     res.status(201).json(order);
   } catch (err) {
     res.status(500).json({ error: err.message });
