@@ -1191,16 +1191,19 @@ app.post('/api/orders', async (req, res) => {
         ).join('\n');
         const hasAdv = order.advanceProduct?.required;
         const placedSms =
-`Asol Gramer Moja
-Order #${order.orderNum} RECEIVED
+`আসসালামু আলাইকুম।
+প্রিয় গ্রাহক, আপনার অর্ডারটি সফলভাবে নিশ্চিত করা হয়েছে।
 
+অর্ডার বিবরণ:
 ${itemLines}
+মূল্য: ${order.total} টাকা
+নাম: ${order.customer?.name}
+মোবাইল: ${order.customer?.phone}
+${hasAdv ? `অগ্রিম: ${order.advanceProduct.amount} টাকা [${(order.advanceProduct.method || '').toUpperCase()}] TrxID: ${order.advanceProduct.trxId}\n` : ''}
+বর্তমানে আপনার অর্ডারটি প্রসেসিং পর্যায়ে রয়েছে। খুব শীঘ্রই আমরা পণ্যটি আপনার ঠিকানায় পৌঁছে দেওয়ার জন্য প্রয়োজনীয় ব্যবস্থা গ্রহণ করবো।
 
-Subtotal : Tk ${order.subtotal || 0}
-Delivery : Tk ${order.delivery?.charge || 0}
-Total    : Tk ${order.total}
-${hasAdv ? `Advance  : Tk ${order.advanceProduct.amount} [${(order.advanceProduct.method || '').toUpperCase()}] TrxID: ${order.advanceProduct.trxId}\n` : ''}Thank you! We will confirm your order shortly.
-gramerasolmoja.shop`;
+আমাদের উপর আস্থা রেখে অর্ডার করার জন্য আন্তরিক ধন্যবাদ।
+– Asol Gramer Moja`;
         sendSMS(custPhone, placedSms).catch(e => console.error('customer placed sms err:', e.message));
         console.log(`📱 Order-placed SMS → ${custPhone} | #${order.orderNum}`);
       } catch (smsErr) {
@@ -1289,17 +1292,19 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
             `- ${i.nm}${i.varLabel ? ' (' + i.varLabel + ')' : ''} x${i.qty || 1} = Tk ${(i.cartPrice || 0) * (i.qty || 1)}`
           ).join('\n');
           const confirmSms =
-`Asol Gramer Moja
-Order #${order.orderNum} CONFIRMED
+`আসসালামু আলাইকুম।
+প্রিয় গ্রাহক, আপনার অর্ডারটি সফলভাবে নিশ্চিত করা হয়েছে।
 
+অর্ডার বিবরণ:
 ${itemLines}
+মূল্য: ${order.total} টাকা
+নাম: ${order.customer?.name}
+মোবাইল: ${order.customer?.phone}
 
-Subtotal : Tk ${order.subtotal || 0}
-Delivery : Tk ${order.delivery?.charge || 0}
-Total    : Tk ${order.total}
-Address  : ${order.customer.address}
+বর্তমানে আপনার অর্ডারটি প্রসেসিং পর্যায়ে রয়েছে। খুব শীঘ্রই আমরা পণ্যটি আপনার ঠিকানায় পৌঁছে দেওয়ার জন্য প্রয়োজনীয় ব্যবস্থা গ্রহণ করবো।
 
-Thank you! We will contact you soon.`;
+আমাদের উপর আস্থা রেখে অর্ডার করার জন্য আন্তরিক ধন্যবাদ।
+– Asol Gramer Moja`;
           sendSMS(custPhone, confirmSms).catch(e => console.error('confirm sms err:', e.message));
           console.log(`📱 Confirmed SMS → ${custPhone} | #${order.orderNum}`);
         }
@@ -1307,31 +1312,38 @@ Thank you! We will contact you soon.`;
         // ── ২. SHIPPED — ডেলিভারি ম্যানের কাছে বুঝিয়ে দিলে ──
         if (status === 'shipped' && prevStatus !== 'shipped') {
           const shippedSms =
-`Asol Gramer Moja
-Order #${order.orderNum} SHIPPED
+`আসসালামু আলাইকুম।
+প্রিয় গ্রাহক, আপনার অর্ডারটি ডেলিভারিম্যানের কাছে হস্তান্তর করা হয়েছে এবং এটি আপনার ঠিকানায় পৌঁছানোর পথে রয়েছে।
 
-Your order has been handed to the delivery agent and is on its way to your location.
+প্রত্যাশিত ডেলিভারি: ১-২ দিনের মধ্যে।
 
-Expected delivery: within 1-2 days.
-
-Address: ${order.customer.address}
-
-Thank you for shopping with us!`;
+আমাদের উপর আস্থা রাখার জন্য আন্তরিক ধন্যবাদ।
+– Asol Gramer Moja`;
           sendSMS(custPhone, shippedSms).catch(e => console.error('shipped sms err:', e.message));
           console.log(`📱 Shipped SMS → ${custPhone} | #${order.orderNum}`);
         }
 
         // ── ৩. DELIVERED — ডেলিভারি সম্পন্ন হলে ──
         if (status === 'delivered' && prevStatus !== 'delivered') {
+          const deliveredItemLines = (order.items || []).map(i =>
+            `- ${i.nm}${i.varLabel ? ' (' + i.varLabel + ')' : ''} x${i.qty || 1}`
+          ).join('\n');
           const deliveredSms =
-`Asol Gramer Moja
-Order #${order.orderNum} DELIVERED ✅
+`আসসালামু আলাইকুম।
+আলহামদুলিল্লাহ! আপনার অর্ডারকৃত পণ্যটি সফলভাবে ডেলিভারি সম্পন্ন হয়েছে।
 
-আপনার অর্ডারটি সফলভাবে পৌঁছে দেওয়া হয়েছে!
-Total: Tk ${order.total}
+ডেলিভারি বিবরণ:
+${deliveredItemLines}
+মূল্য: ${order.total} টাকা
+নাম: ${order.customer?.name}
+মোবাইল: ${order.customer?.phone}
 
-আমাদের সাথে কেনাকাটা করার জন্য ধন্যবাদ!
-gramerasolmoja.shop`;
+অনুগ্রহ করে নির্ধারিত মূল্য পরিশোধ করে পণ্যটি বুঝে নিন।
+
+আমাদের সেবা সম্পর্কে আপনার মূল্যবান মতামত ও অভিজ্ঞতা জানালে আমরা আনন্দিত হবো।
+
+আমাদের উপর আস্থা রাখার জন্য আন্তরিক ধন্যবাদ।
+– Asol Gramer Moja`;
           sendSMS(custPhone, deliveredSms).catch(e => console.error('delivered sms err:', e.message));
           console.log(`📱 Delivered SMS → ${custPhone} | #${order.orderNum}`);
         }
@@ -1339,14 +1351,12 @@ gramerasolmoja.shop`;
         // ── ৪. CANCELLED — অর্ডার বাতিল হলে ──
         if (status === 'cancelled' && prevStatus !== 'cancelled') {
           const cancelledSms =
-`Asol Gramer Moja
-Order #${order.orderNum} CANCELLED ❌
-
+`আসসালামু আলাইকুম।
 দুঃখিত, আপনার অর্ডারটি বাতিল হয়েছে।
 ${note ? 'কারণ: ' + note : ''}
 
-যেকোনো প্রশ্নের জন্য যোগাযোগ করুন।
-gramerasolmoja.shop`;
+যেকোনো প্রশ্নের জন্য আমাদের সাথে যোগাযোগ করুন।
+– Asol Gramer Moja`;
           sendSMS(custPhone, cancelledSms).catch(e => console.error('cancelled sms err:', e.message));
           console.log(`📱 Cancelled SMS → ${custPhone} | #${order.orderNum}`);
         }
