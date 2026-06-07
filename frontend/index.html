@@ -3376,7 +3376,8 @@ function pdpWhatsAppOrder(id) {
   msg += '📍 *ঠিকানা:*';
 
   const phone = (p.phone || storePhone || '').replace(/[^0-9]/g, '');
-  window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+  const waUrl = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
+  window.location.href = waUrl;
 }
 
 let cart = {};
