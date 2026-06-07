@@ -1188,8 +1188,27 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
 .pdp-btn-cart.added{background:#4caf50;}
 .pdp-btn-order{background:#1a2740;color:#fff;border:none;padding:14px 10px;border-radius:8px;font-family:inherit;font-size:.92rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s,transform .15s;box-shadow:0 3px 10px rgba(0,0,0,.2);}
 .pdp-btn-order:hover{background:#2c3e60;transform:translateY(-1px);}
-.pdp-btn-whatsapp{background:#25d366;color:#fff;border:none;padding:14px 10px;border-radius:8px;font-family:inherit;font-size:.92rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s,transform .15s;box-shadow:0 3px 10px rgba(37,211,102,.3);}
-.pdp-btn-whatsapp:hover{background:#1da851;transform:translateY(-1px);}
+.pdp-btn-whatsapp{
+  background:linear-gradient(135deg,#25d366,#128c4e);
+  color:#fff;border:none;padding:14px 10px;border-radius:8px;
+  font-family:inherit;font-size:.92rem;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:background .2s,transform .15s,box-shadow .2s;
+  box-shadow:0 4px 14px rgba(37,211,102,.38);
+  position:relative;overflow:hidden;
+}
+.pdp-btn-whatsapp::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);
+  pointer-events:none;
+}
+.pdp-btn-whatsapp:hover{
+  background:linear-gradient(135deg,#20c55c,#0e7a42);
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(37,211,102,.5);
+}
+.pdp-btn-whatsapp:active{transform:translateY(0);box-shadow:0 2px 8px rgba(37,211,102,.3);}
+.pdp-btn-whatsapp i{font-size:1.15rem;}
 .pdp-btn-phone{background:#3b5bdb;color:#fff;border:none;padding:14px 10px;border-radius:8px;font-family:inherit;font-size:.92rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s,transform .15s;box-shadow:0 3px 10px rgba(59,91,219,.3);}
 .pdp-btn-phone:hover{background:#2f4ac4;transform:translateY(-1px);}
 
@@ -3271,7 +3290,7 @@ function renderPdp(p) {
           <button class="pdp-btn-order" onclick="pdpAddCart('${p._id||p.id}');openOrderModal()" ${stockOut?'disabled':''}>
             <i class="fa-solid fa-bolt"></i> ${stockOut?'স্টক নেই':'এখনই কিনুন'}
           </button>
-          <button class="pdp-btn-whatsapp" onclick="window.open('https://wa.me/${(p.phone||storePhone).replace(/[^0-9]/g,'')}?text='+encodeURIComponent('আমি ${p.nm} অর্ডার করতে চাই'))">
+          <button class="pdp-btn-whatsapp" onclick="pdpWhatsAppOrder('${p._id||p.id}')">
             <i class="fa-brands fa-whatsapp"></i> WhatsApp অর্ডার
           </button>
           <button class="pdp-btn-phone" onclick="window.location.href='tel:${p.phone||storePhone}'">
@@ -3332,6 +3351,35 @@ function pdpAddCart(id) {
   showToast(`✅ ${p.nm} (${v.lbl||''}) ×${pdpState.qty} কার্টে যোগ হয়েছে`);
   const btn = document.getElementById('pdpCartBtn');
   if (btn) { btn.classList.add('added'); btn.innerHTML = '<i class="fa-solid fa-check"></i> যোগ হয়েছে'; setTimeout(() => { btn.classList.remove('added'); btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> কার্টে যোগ করুন'; }, 1800); }
+}
+function pdpWhatsAppOrder(id) {
+  const p = prods.find(x => (x._id || x.id) === id);
+  if (!p) return;
+  const v = p.variants?.[pdpState.varIdx] || { p: getBasePrice(p), lbl: '' };
+  const qty = pdpState.qty || 1;
+  const totalPrice = v.p * qty;
+  const varLabel = v.lbl ? v.lbl : '';
+  const productUrl = window.location.origin + window.location.pathname + '#/product/' + (p.slug || p._id);
+
+  let msg = '🛒 *নতুন অর্ডার — আসল গ্রামের মজা*\n';
+  msg += '━━━━━━━━━━━━━━━━━━━━\n';
+  msg += `📦 *পণ্য:* ${p.nm}\n`;
+  if (varLabel) msg += `📏 *পরিমাণ/ধরন:* ${varLabel}\n`;
+  msg += `🔢 *সংখ্যা:* ${qty} টি\n`;
+  msg += `💵 *একক মূল্য:* ৳${v.p.toLocaleString('en')}\n`;
+  msg += `💰 *মোট মূল্য:* ৳${totalPrice.toLocaleString('en')}\n`;
+  if (v.op && v.op > v.p) {
+    const saved = (v.op - v.p) * qty;
+    msg += `🏷️ *সাশ্রয়:* ৳${saved.toLocaleString('en')}\n`;
+  }
+  msg += '━━━━━━━━━━━━━━━━━━━━\n';
+  msg += `🔗 *পণ্যের লিঙ্ক:* ${productUrl}\n`;
+  msg += '━━━━━━━━━━━━━━━━━━━━\n';
+  msg += '📍 আপনার নাম, ঠিকানা ও ফোন নম্বর দিন।\nআমরা শীঘ্রই যোগাযোগ করব। 🙏';
+
+  const phone = (p.phone || storePhone || '').replace(/[^0-9]/g, '');
+  const url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
 }
 let cart = {};
 let relIdx = 0, relItems = [], relTimer = null;
