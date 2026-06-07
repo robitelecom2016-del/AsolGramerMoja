@@ -1265,23 +1265,21 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
         // ── ৩. DELIVERED — ডেলিভারি সম্পন্ন হলে ──
         if (status === 'delivered' && prevStatus !== 'delivered') {
           const deliveredItemLines = (order.items || []).map(i =>
-            `- ${i.nm}${i.varLabel ? ' (' + i.varLabel + ')' : ''} x${i.qty || 1}`
+            `${i.nm}${i.varLabel ? ' (' + i.varLabel + ')' : ''} × ${i.qty || 1}মূল্য: ${((i.cartPrice || 0) * (i.qty || 1))} টাকা`
           ).join('\n');
           const deliveredSms =
 `আসসালামু আলাইকুম।
-আলহামদুলিল্লাহ!
-আপনার অর্ডারকৃত পণ্যটি আপনার ঠিকানায় পৌঁছে গেছে।
+আলহামদুলিল্লাহ! আমাদের উপর আস্থা রেখে অর্ডার করার জন্য আপনাকে ধন্যবাদ।
 
 ডেলিভারি বিবরণ:
 ${deliveredItemLines}
-মূল্য: ${order.total} টাকা
 নাম: ${order.customer?.name}
 মোবাইল: ${order.customer?.phone}
 
-অনুগ্রহ করে নির্ধারিত মূল্য পরিশোধ করে পণ্যটি বুঝে নিন।
+আপনার অর্ডারটি আপনার ঠিকানায় পাঠানো হয়েছে। অনুগ্রহ করে নির্ধারিত মূল্য পরিশোধ করে পণ্যটি গ্রহণ করুন।
+আপনার মূল্যবান মতামত আমাদের সেবার মান উন্নয়নে সহায়তা করবে।
 
-আমাদের সেবা সম্পর্কে আপনার মূল্যবান মতামত ও অভিজ্ঞতা জানালে আমরা আনন্দিত হবো।
-আমাদের উপর আস্থা রাখার জন্য আন্তরিক ধন্যবাদ।
+প্রতিটি অর্ডারে রয়েছে আকর্ষণীয় কুপন, আর ১০ম কুপনে থাকছে বিশেষ গিফট!
 – Asol Gramer Moja`;
           sendSMS(custPhone, deliveredSms).catch(e => console.error('delivered sms err:', e.message));
           console.log(`📱 Delivered SMS → ${custPhone} | #${order.orderNum}`);
