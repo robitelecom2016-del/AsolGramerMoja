@@ -1212,8 +1212,130 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
 .pdp-btn-phone{background:#3b5bdb;color:#fff;border:none;padding:14px 10px;border-radius:8px;font-family:inherit;font-size:.92rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s,transform .15s;box-shadow:0 3px 10px rgba(59,91,219,.3);}
 .pdp-btn-phone:hover{background:#2f4ac4;transform:translateY(-1px);}
 
-/* Description card */
-.pdp-desc-card{background:#fff;border-radius:10px;padding:22px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:28px;}
+/* ━━━ WhatsApp Order Modal ━━━ */
+.wa-modal-overlay{
+  position:fixed;inset:0;z-index:10000;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;
+  padding:16px;
+}
+.wa-modal-overlay.open{display:flex;}
+.wa-modal{
+  background:#fff;border-radius:18px;
+  width:100%;max-width:480px;
+  box-shadow:0 24px 60px rgba(0,0,0,.28);
+  overflow:hidden;
+  animation:waSlideUp .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes waSlideUp{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.wa-modal-header{
+  background:linear-gradient(135deg,#25d366,#128c4e);
+  padding:18px 20px;
+  display:flex;align-items:center;gap:14px;
+  color:#fff;
+}
+.wa-modal-logo{
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;flex-shrink:0;
+  border:2px solid rgba(255,255,255,.3);
+}
+.wa-modal-title{font-size:1.05rem;font-weight:800;line-height:1.2;}
+.wa-modal-sub{font-size:.72rem;opacity:.85;margin-top:2px;}
+.wa-modal-close{
+  margin-left:auto;background:rgba(255,255,255,.2);border:none;
+  color:#fff;width:32px;height:32px;border-radius:50%;
+  font-size:.95rem;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .18s;
+}
+.wa-modal-close:hover{background:rgba(255,255,255,.35);}
+/* Product summary strip */
+.wa-product-summary{
+  background:#f0fdf4;border-bottom:1px solid #d1fae5;
+  padding:12px 20px;font-size:.82rem;color:#1a5c35;
+  display:flex;flex-direction:column;gap:3px;
+}
+.wa-product-summary .wa-ps-name{font-weight:800;font-size:.9rem;color:#0e3d24;}
+.wa-product-summary .wa-ps-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;}
+.wa-product-summary .wa-ps-item{
+  background:#dcfce7;border-radius:6px;padding:3px 10px;
+  font-weight:700;font-size:.78rem;color:#15803d;
+}
+.wa-product-summary .wa-ps-total{
+  font-size:.98rem;font-weight:800;color:#128c4e;
+  background:#bbf7d0;border-radius:6px;padding:3px 12px;
+}
+/* Modal body */
+.wa-modal-body{padding:18px 20px;display:flex;flex-direction:column;gap:12px;max-height:50vh;overflow-y:auto;}
+.wa-field-group{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.wa-field{display:flex;flex-direction:column;gap:5px;}
+.wa-field label{
+  font-size:.78rem;font-weight:700;color:#444;
+  display:flex;align-items:center;gap:5px;
+}
+.wa-field label i{color:#25d366;font-size:.75rem;}
+.wa-req{color:#e53e3e;font-size:.85rem;}
+.wa-field input,.wa-field textarea{
+  border:1.5px solid #e2e8f0;border-radius:8px;
+  padding:10px 12px;font-family:inherit;font-size:.85rem;
+  color:#333;background:#f8fafc;outline:none;
+  transition:border-color .2s,background .2s;resize:none;
+}
+.wa-field input:focus,.wa-field textarea:focus{
+  border-color:#25d366;background:#fff;
+  box-shadow:0 0 0 3px rgba(37,211,102,.12);
+}
+.wa-field input.error,.wa-field textarea.error{border-color:#e53e3e;background:#fff5f5;}
+/* Preview box */
+.wa-preview-box{
+  background:#e8f5e9;border:1.5px solid #a5d6a7;
+  border-radius:10px;padding:12px 14px;
+}
+.wa-preview-label{
+  font-size:.72rem;font-weight:700;color:#2e7d32;
+  margin-bottom:7px;display:flex;align-items:center;gap:5px;
+}
+.wa-preview-text{
+  font-size:.75rem;color:#1b4332;line-height:1.75;
+  white-space:pre-wrap;font-family:'Hind Siliguri',sans-serif;
+  max-height:140px;overflow-y:auto;
+}
+/* Footer buttons */
+.wa-modal-footer{
+  display:flex;gap:10px;padding:14px 20px;
+  background:#f9fafb;border-top:1px solid #f0f0f0;
+}
+.wa-cancel-btn{
+  flex:1;padding:12px;border-radius:8px;
+  border:1.5px solid #e2e8f0;background:#fff;
+  font-family:inherit;font-size:.88rem;font-weight:600;
+  color:#666;cursor:pointer;transition:all .18s;
+}
+.wa-cancel-btn:hover{background:#f5f5f5;border-color:#ccc;}
+.wa-send-btn{
+  flex:2;padding:12px 18px;border-radius:8px;border:none;
+  background:linear-gradient(135deg,#25d366,#128c4e);
+  font-family:inherit;font-size:.92rem;font-weight:800;
+  color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 14px rgba(37,211,102,.4);
+  transition:all .2s;
+}
+.wa-send-btn:hover{
+  background:linear-gradient(135deg,#20c55c,#0e7a42);
+  box-shadow:0 6px 20px rgba(37,211,102,.55);
+  transform:translateY(-1px);
+}
+.wa-send-btn i{font-size:1.1rem;}
+.wa-send-btn:active{transform:translateY(0);}
+@media(max-width:480px){
+  .wa-field-group{grid-template-columns:1fr;}
+  .wa-modal-body{max-height:45vh;}
+}
+
 .pdp-desc-title{font-size:1rem;font-weight:700;color:var(--txt);margin-bottom:12px;display:flex;align-items:center;gap:7px;padding-bottom:10px;border-bottom:1px solid var(--border);}
 .pdp-desc-body{font-size:.88rem;color:#555;line-height:1.9;}
 .pdp-desc-body p{margin-bottom:10px;}
@@ -3352,35 +3474,134 @@ function pdpAddCart(id) {
   const btn = document.getElementById('pdpCartBtn');
   if (btn) { btn.classList.add('added'); btn.innerHTML = '<i class="fa-solid fa-check"></i> যোগ হয়েছে'; setTimeout(() => { btn.classList.remove('added'); btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> কার্টে যোগ করুন'; }, 1800); }
 }
+/* ━━━ WhatsApp Order Modal Functions ━━━ */
+let _waCurrent = null; // current product state for WA order
+
 function pdpWhatsAppOrder(id) {
   const p = prods.find(x => (x._id || x.id) === id);
   if (!p) return;
   const v = p.variants?.[pdpState.varIdx] || { p: getBasePrice(p), lbl: '' };
   const qty = pdpState.qty || 1;
+  _waCurrent = { p, v, qty };
+
+  // Product summary strip
   const totalPrice = v.p * qty;
-  const varLabel = v.lbl ? v.lbl : '';
+  const savedAmt = (v.op && v.op > v.p) ? (v.op - v.p) * qty : 0;
+  const summaryEl = document.getElementById('waProductSummary');
+  summaryEl.innerHTML = `
+    <div class="wa-ps-name">${p.em || '📦'} ${p.nm}</div>
+    <div class="wa-ps-row">
+      ${v.lbl ? `<span class="wa-ps-item">📏 ${v.lbl}</span>` : ''}
+      <span class="wa-ps-item">🔢 ${qty} টি</span>
+      <span class="wa-ps-item">💵 ৳${v.p.toLocaleString('en')} / একক</span>
+      ${savedAmt > 0 ? `<span class="wa-ps-item" style="background:#fef9c3;color:#854d0e;">🏷️ ৳${savedAmt.toLocaleString('en')} সাশ্রয়</span>` : ''}
+      <span class="wa-ps-total">মোট: ৳${totalPrice.toLocaleString('en')}</span>
+    </div>`;
+
+  // Clear fields
+  document.getElementById('waName').value = '';
+  document.getElementById('waPhone').value = '';
+  document.getElementById('waAddress').value = '';
+  document.getElementById('waNote').value = '';
+  ['waName','waPhone','waAddress'].forEach(id => document.getElementById(id).classList.remove('error'));
+
+  waPreview();
+  document.getElementById('waModalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('waName').focus(), 200);
+}
+
+function closeWaModal(e) {
+  if (e && e.target !== document.getElementById('waModalOverlay')) return;
+  document.getElementById('waModalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function waPreview() {
+  if (!_waCurrent) return;
+  const { p, v, qty } = _waCurrent;
+  const name    = document.getElementById('waName').value.trim() || '___________';
+  const phone   = document.getElementById('waPhone').value.trim() || '___________';
+  const address = document.getElementById('waAddress').value.trim() || '___________';
+  const note    = document.getElementById('waNote').value.trim();
+  const total   = v.p * qty;
   const productUrl = window.location.origin + window.location.pathname + '#/product/' + (p.slug || p._id);
 
   let msg = '🛒 *নতুন অর্ডার — আসল গ্রামের মজা*\n';
   msg += '━━━━━━━━━━━━━━━━━━━━\n';
   msg += `📦 *পণ্য:* ${p.nm}\n`;
-  if (varLabel) msg += `📏 *পরিমাণ/ধরন:* ${varLabel}\n`;
+  if (v.lbl) msg += `📏 *ধরন:* ${v.lbl}\n`;
   msg += `🔢 *সংখ্যা:* ${qty} টি\n`;
   msg += `💵 *একক মূল্য:* ৳${v.p.toLocaleString('en')}\n`;
-  msg += `💰 *মোট মূল্য:* ৳${totalPrice.toLocaleString('en')}\n`;
+  msg += `💰 *মোট মূল্য:* ৳${total.toLocaleString('en')}\n`;
   if (v.op && v.op > v.p) {
     const saved = (v.op - v.p) * qty;
     msg += `🏷️ *সাশ্রয়:* ৳${saved.toLocaleString('en')}\n`;
   }
   msg += '━━━━━━━━━━━━━━━━━━━━\n';
-  msg += `🔗 *পণ্যের লিঙ্ক:* ${productUrl}\n`;
+  msg += `👤 *নাম:* ${name}\n`;
+  msg += `📱 *মোবাইল:* ${phone}\n`;
+  msg += `📍 *ঠিকানা:* ${address}\n`;
+  if (note) msg += `📝 *নোট:* ${note}\n`;
   msg += '━━━━━━━━━━━━━━━━━━━━\n';
-  msg += '📍 আপনার নাম, ঠিকানা ও ফোন নম্বর দিন।\nআমরা শীঘ্রই যোগাযোগ করব। 🙏';
+  msg += `🔗 ${productUrl}`;
 
-  const phone = (p.phone || storePhone || '').replace(/[^0-9]/g, '');
-  const url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
+  document.getElementById('waPreviewText').textContent = msg;
+}
+
+function waSendOrder() {
+  if (!_waCurrent) return;
+  const { p, v, qty } = _waCurrent;
+
+  const nameEl    = document.getElementById('waName');
+  const phoneEl   = document.getElementById('waPhone');
+  const addressEl = document.getElementById('waAddress');
+
+  let valid = true;
+  [nameEl, phoneEl, addressEl].forEach(el => {
+    if (!el.value.trim()) { el.classList.add('error'); valid = false; }
+    else el.classList.remove('error');
+  });
+  if (!valid) {
+    showToast('❌ নাম, মোবাইল ও ঠিকানা অবশ্যই দিন');
+    return;
+  }
+
+  const name    = nameEl.value.trim();
+  const phone   = phoneEl.value.trim();
+  const address = addressEl.value.trim();
+  const note    = document.getElementById('waNote').value.trim();
+  const total   = v.p * qty;
+  const productUrl = window.location.origin + window.location.pathname + '#/product/' + (p.slug || p._id);
+
+  let msg = '🛒 *নতুন অর্ডার — আসল গ্রামের মজা*\n';
+  msg += '━━━━━━━━━━━━━━━━━━━━\n';
+  msg += `📦 *পণ্য:* ${p.nm}\n`;
+  if (v.lbl) msg += `📏 *ধরন:* ${v.lbl}\n`;
+  msg += `🔢 *সংখ্যা:* ${qty} টি\n`;
+  msg += `💵 *একক মূল্য:* ৳${v.p.toLocaleString('en')}\n`;
+  msg += `💰 *মোট মূল্য:* ৳${total.toLocaleString('en')}\n`;
+  if (v.op && v.op > v.p) {
+    const saved = (v.op - v.p) * qty;
+    msg += `🏷️ *সাশ্রয়:* ৳${saved.toLocaleString('en')}\n`;
+  }
+  msg += '━━━━━━━━━━━━━━━━━━━━\n';
+  msg += `👤 *নাম:* ${name}\n`;
+  msg += `📱 *মোবাইল:* ${phone}\n`;
+  msg += `📍 *ঠিকানা:* ${address}\n`;
+  if (note) msg += `📝 *নোট:* ${note}\n`;
+  msg += '━━━━━━━━━━━━━━━━━━━━\n';
+  msg += `🔗 ${productUrl}`;
+
+  const storeWaPhone = (p.phone || storePhone || '').replace(/[^0-9]/g, '');
+  const url = 'https://wa.me/' + storeWaPhone + '?text=' + encodeURIComponent(msg);
+
+  // Close modal first, then open WhatsApp
+  document.getElementById('waModalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
   window.open(url, '_blank');
 }
+
 let cart = {};
 let relIdx = 0, relItems = [], relTimer = null;
 function addToCartBase(id) {
@@ -4217,6 +4438,61 @@ function renderRecentPanel() {
     <button onclick="toggleRecent()"><i class="fa-solid fa-xmark"></i></button>
   </div>
   <div class="recent-body" id="recentBody"></div>
+</div>
+
+<!-- ━━━ WhatsApp Order Modal ━━━ -->
+<div class="wa-modal-overlay" id="waModalOverlay" onclick="closeWaModal(event)">
+  <div class="wa-modal" id="waModal">
+    <div class="wa-modal-header">
+      <div class="wa-modal-logo">
+        <i class="fa-brands fa-whatsapp"></i>
+      </div>
+      <div>
+        <div class="wa-modal-title">WhatsApp-এ অর্ডার করুন</div>
+        <div class="wa-modal-sub">তথ্য দিন, সেন্ড বাটনে ক্লিক করলেই অর্ডার যাবে!</div>
+      </div>
+      <button class="wa-modal-close" onclick="closeWaModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Product summary inside modal -->
+    <div class="wa-product-summary" id="waProductSummary"></div>
+
+    <div class="wa-modal-body">
+      <div class="wa-field-group">
+        <div class="wa-field">
+          <label><i class="fa-solid fa-user"></i> আপনার নাম <span class="wa-req">*</span></label>
+          <input type="text" id="waName" placeholder="পূর্ণ নাম লিখুন" oninput="waPreview()">
+        </div>
+        <div class="wa-field">
+          <label><i class="fa-solid fa-phone"></i> মোবাইল নম্বর <span class="wa-req">*</span></label>
+          <input type="tel" id="waPhone" placeholder="01XXXXXXXXX" oninput="waPreview()">
+        </div>
+      </div>
+      <div class="wa-field">
+        <label><i class="fa-solid fa-location-dot"></i> ডেলিভারি ঠিকানা <span class="wa-req">*</span></label>
+        <textarea id="waAddress" rows="2" placeholder="বাড়ি নং, রাস্তা, এলাকা, জেলা..." oninput="waPreview()"></textarea>
+      </div>
+      <div class="wa-field">
+        <label><i class="fa-solid fa-pen"></i> বিশেষ নোট <span style="font-size:.72rem;color:#aaa;">(ঐচ্ছিক)</span></label>
+        <input type="text" id="waNote" placeholder="যেকোনো বিশেষ নির্দেশনা..." oninput="waPreview()">
+      </div>
+
+      <!-- Message preview -->
+      <div class="wa-preview-box">
+        <div class="wa-preview-label"><i class="fa-solid fa-eye"></i> মেসেজ প্রিভিউ</div>
+        <div class="wa-preview-text" id="waPreviewText"></div>
+      </div>
+    </div>
+
+    <div class="wa-modal-footer">
+      <button class="wa-cancel-btn" onclick="closeWaModal()">বাতিল করুন</button>
+      <button class="wa-send-btn" id="waSendBtn" onclick="waSendOrder()">
+        <i class="fa-brands fa-whatsapp"></i>
+        <span>WhatsApp-এ পাঠান</span>
+        <i class="fa-solid fa-arrow-right" style="margin-left:4px;font-size:.8rem;"></i>
+      </button>
+    </div>
+  </div>
 </div>
 </body>
 </html>
