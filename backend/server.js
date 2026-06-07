@@ -1174,16 +1174,10 @@ app.post('/api/orders', async (req, res) => {
     // 📧 অর্ডার নোটিফিকেশন মেইল পাঠাও (response block করো না)
     sendOrderEmail(order).catch(e => console.error('mail err:', e.message));
 
-    // 📱 Admin SMS — নতুন অর্ডার এলে
-    if (NOTIFY_PHONE) {
-      const hasAdv = order.advanceProduct?.required;
-      const adminSms = `NEW ORDER #${order.orderNum}\nName: ${order.customer?.name}\nPhone: ${order.customer?.phone}\nTotal: Tk ${order.total}\nAddress: ${order.customer?.address}${hasAdv ? `\nAdvance: Tk ${order.advanceProduct.amount} [${(order.advanceProduct.method || '').toUpperCase()}] TrxID: ${order.advanceProduct.trxId}` : ''}`;
-      sendSMS(NOTIFY_PHONE, adminSms).catch(e => console.error('admin sms err:', e.message));
-    }
+    // 📱 Admin SMS — বন্ধ করা হয়েছে
+    // শুধু delivered স্ট্যাটাসে Customer SMS যাবে
 
     // 📱 Customer placed SMS — বন্ধ করা হয়েছে
-    // কাস্টমার অর্ডার দেওয়ার সাথে সাথে SMS যাবে না
-    // শুধু confirmed ও delivered স্ট্যাটাসে SMS যাবে
 
     res.status(201).json(order);
   } catch (err) {
@@ -1260,28 +1254,7 @@ app.patch('/api/orders/:id/status', authMiddleware, async (req, res) => {
       try {
         const custPhone = toBDFormat(order.customer.phone);
 
-        // ── ১. CONFIRMED — অর্ডার কনফার্ম হলে ──
-        if (status === 'confirmed' && prevStatus !== 'confirmed') {
-          const itemLines = (order.items || []).map(i =>
-            `- ${i.nm}${i.varLabel ? ' (' + i.varLabel + ')' : ''} x${i.qty || 1} = Tk ${(i.cartPrice || 0) * (i.qty || 1)}`
-          ).join('\n');
-          const confirmSms =
-`আসসালামু আলাইকুম।
-প্রিয় গ্রাহক, আপনার অর্ডারটি সফলভাবে নিশ্চিত করা হয়েছে।
-
-অর্ডার বিবরণ:
-${itemLines}
-মূল্য: ${order.total} টাকা
-নাম: ${order.customer?.name}
-মোবাইল: ${order.customer?.phone}
-
-বর্তমানে আপনার অর্ডারটি প্রসেসিং পর্যায়ে রয়েছে। খুব শীঘ্রই আমরা পণ্যটি আপনার ঠিকানায় পৌঁছে দেওয়ার জন্য প্রয়োজনীয় ব্যবস্থা গ্রহণ করবো।
-
-আমাদের উপর আস্থা রেখে অর্ডার করার জন্য আন্তরিক ধন্যবাদ।
-– Asol Gramer Moja`;
-          sendSMS(custPhone, confirmSms).catch(e => console.error('confirm sms err:', e.message));
-          console.log(`📱 Confirmed SMS → ${custPhone} | #${order.orderNum}`);
-        }
+        // ── ১. CONFIRMED — বন্ধ করা হয়েছে ──
 
         // ── ২. SHIPPED — বন্ধ করা হয়েছে ──
 
@@ -1292,7 +1265,8 @@ ${itemLines}
           ).join('\n');
           const deliveredSms =
 `আসসালামু আলাইকুম।
-আলহামদুলিল্লাহ! আপনার অর্ডারকৃত পণ্যটি সফলভাবে ডেলিভারি সম্পন্ন হয়েছে।
+আলহামদুলিল্লাহ!
+আপনার অর্ডারকৃত পণ্যটি আপনার ঠিকানায় পৌঁছে গেছে।
 
 ডেলিভারি বিবরণ:
 ${deliveredItemLines}
@@ -1303,7 +1277,6 @@ ${deliveredItemLines}
 অনুগ্রহ করে নির্ধারিত মূল্য পরিশোধ করে পণ্যটি বুঝে নিন।
 
 আমাদের সেবা সম্পর্কে আপনার মূল্যবান মতামত ও অভিজ্ঞতা জানালে আমরা আনন্দিত হবো।
-
 আমাদের উপর আস্থা রাখার জন্য আন্তরিক ধন্যবাদ।
 – Asol Gramer Moja`;
           sendSMS(custPhone, deliveredSms).catch(e => console.error('delivered sms err:', e.message));
