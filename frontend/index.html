@@ -3358,22 +3358,22 @@ function pdpWhatsAppOrder(id) {
   const total = v.p * qty;
   const productUrl = window.location.origin + window.location.pathname + '#/product/' + (p.slug || p._id);
 
-  let msg = '🛒 *অর্ডার — আসল গ্রামের মজা*\n';
+  let msg = '*অর্ডার — আসল গ্রামের মজা*\n';
   msg += '━━━━━━━━━━━━━━━━━━━━\n';
-  msg += `📦 *পণ্য:* ${p.nm}\n`;
-  if (v.lbl) msg += `📏 *ধরন:* ${v.lbl}\n`;
-  msg += `🔢 *পরিমাণ:* ${qty} টি\n`;
-  msg += `💵 *একক মূল্য:* ৳${v.p.toLocaleString('en')}\n`;
-  msg += `💰 *মোট মূল্য:* ৳${total.toLocaleString('en')}\n`;
+  msg += `*পণ্য:* ${p.nm}\n`;
+  if (v.lbl) msg += `*ধরন:* ${v.lbl}\n`;
+  msg += `*পরিমাণ:* ${qty} টি\n`;
+  msg += `*একক মূল্য:* ৳${v.p.toLocaleString('en')}\n`;
+  msg += `*মোট মূল্য:* ৳${total.toLocaleString('en')}\n`;
   if (v.op && v.op > v.p) {
-    msg += `🏷️ *সাশ্রয়:* ৳${((v.op - v.p) * qty).toLocaleString('en')}\n`;
+    msg += `*সাশ্রয়:* ৳${((v.op - v.p) * qty).toLocaleString('en')}\n`;
   }
   msg += '━━━━━━━━━━━━━━━━━━━━\n';
-  msg += `🔗 ${productUrl}\n`;
+  msg += `${productUrl}\n`;
   msg += '━━━━━━━━━━━━━━━━━━━━\n';
-  msg += '👤 *নাম:*\n';
-  msg += '📱 *মোবাইল:*\n';
-  msg += '📍 *ঠিকানা:*';
+  msg += '*নাম:*\n';
+  msg += '*মোবাইল:*\n';
+  msg += '*ঠিকানা:*';
 
   const phone = '8801316380515';
   window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
