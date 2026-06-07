@@ -144,32 +144,35 @@ async function sendViaGAS(to, subject, html, type = 'general') {
 function buildOrderEmailHtml(order) {
   const itemsRows = (order.items || []).map(i => `
     <tr>
-      <td style="padding:8px;border:1px solid #eee;">${i.nm || ''} <br><small style="color:#888">${i.varLabel || ''}</small></td>
+      <td style="padding:8px;border:1px solid #eee;">
+        ${i.img ? `<img src="${i.img}" alt="${i.nm||''}" width="64" height="64" style="display:block;width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid #eee;margin-bottom:6px;" />` : ''}
+        ${i.nm || ''} <br><small style="color:#888">${i.varLabel || ''}</small>
+      </td>
       <td style="padding:8px;border:1px solid #eee;text-align:center;">${i.qty || 1}</td>
       <td style="padding:8px;border:1px solid #eee;text-align:right;">৳${((i.cartPrice || 0) * (i.qty || 1)).toLocaleString('en')}</td>
     </tr>`).join('');
   const adv = order.advanceDelivery || {};
   const advHtml = adv.paid
     ? `<tr><td colspan="3" style="padding:10px;border:1px solid #eee;background:#fff8e6;">
-         💳 <b>অগ্রিম ডেলিভারি চার্জ পরিশোধিত</b><br>
+         <b>[অগ্রিম ডেলিভারি চার্জ পরিশোধিত]</b><br>
          ট্রানজেকশন ID: <b>${adv.trxId || '-'}</b> | পরিমাণ: ৳${adv.amount || 0}
        </td></tr>` : '';
   const ap = order.advanceProduct || {};
   const apItemsHtml = (ap.items || []).map(it => `• ${it.nm} × ${it.qty} → ৳${it.subtotal}`).join('<br>');
   const advProdHtml = ap.required
     ? `<tr><td colspan="3" style="padding:12px;border:2px solid #e53e3e;background:#fff5f5;color:#742a2a;">
-         🔔 <b style="color:#c53030;font-size:15px">পণ্য অগ্রিম পেমেন্ট আবশ্যক — VERIFY দরকার</b><br>
+         <b style="color:#c53030;font-size:15px">[!!!] পণ্য অগ্রিম পেমেন্ট আবশ্যক — VERIFY দরকার</b><br>
          <b>পরিমাণ:</b> ৳${ap.amount || 0} &nbsp;|&nbsp; <b>মাধ্যম:</b> ${(ap.method||'').toUpperCase()}<br>
          <b>TrxID:</b> <span style="background:#fff;padding:2px 8px;border-radius:4px;font-family:monospace;color:#c53030;border:1px solid #fed7d7">${ap.trxId || '-'}</span><br>
          <b>প্রেরকের নম্বর:</b> ${ap.senderNumber || '-'}<br>
          ${apItemsHtml ? `<div style="margin-top:6px;font-size:13px;color:#555">${apItemsHtml}</div>` : ''}
-         <div style="margin-top:8px;padding:6px 10px;background:#fed7d7;border-radius:4px;font-size:12px">⚠️ অ্যাডমিন প্যানেলে গিয়ে এই পেমেন্ট verify করুন।</div>
+         <div style="margin-top:8px;padding:6px 10px;background:#fed7d7;border-radius:4px;font-size:12px">[!] অ্যাডমিন প্যানেলে গিয়ে এই পেমেন্ট verify করুন।</div>
        </td></tr>` : '';
   return `
     <div style="font-family:Arial,'Hind Siliguri',sans-serif;max-width:640px;margin:auto;color:#222;">
-      <h2 style="color:#2d5a27;margin:0 0 6px;">🛒 নতুন অর্ডার এসেছে!</h2>
+      <h2 style="color:#2d5a27;margin:0 0 6px;">** নতুন অর্ডার এসেছে! **</h2>
       <p style="margin:0 0 14px;color:#555;">অর্ডার নং: <b>${order.orderNum}</b> · ${new Date(order.createdAt || Date.now()).toLocaleString('en-GB')}</p>
-      <h3 style="margin:14px 0 6px;">👤 কাস্টমার</h3>
+      <h3 style="margin:14px 0 6px;">কাস্টমার তথ্য</h3>
       <table style="width:100%;border-collapse:collapse;font-size:14px;">
         <tr><td style="padding:6px 8px;border:1px solid #eee;width:120px;"><b>নাম</b></td><td style="padding:6px 8px;border:1px solid #eee;">${order.customer?.name || ''}</td></tr>
         <tr><td style="padding:6px 8px;border:1px solid #eee;"><b>ফোন</b></td><td style="padding:6px 8px;border:1px solid #eee;"><a href="tel:${order.customer?.phone || ''}">${order.customer?.phone || ''}</a></td></tr>
@@ -177,7 +180,7 @@ function buildOrderEmailHtml(order) {
         ${order.customer?.note ? `<tr><td style="padding:6px 8px;border:1px solid #eee;"><b>নোট</b></td><td style="padding:6px 8px;border:1px solid #eee;">${order.customer.note}</td></tr>` : ''}
         <tr><td style="padding:6px 8px;border:1px solid #eee;"><b>ডেলিভারি</b></td><td style="padding:6px 8px;border:1px solid #eee;">${order.delivery?.type || ''} — ৳${order.delivery?.charge || 0}</td></tr>
       </table>
-      <h3 style="margin:14px 0 6px;">📦 পণ্য</h3>
+      <h3 style="margin:14px 0 6px;">অর্ডারকৃত পণ্য</h3>
       <table style="width:100%;border-collapse:collapse;font-size:14px;">
         <thead><tr style="background:#f5f5f5;">
           <th style="padding:8px;border:1px solid #eee;text-align:left;">পণ্য</th>
@@ -200,7 +203,7 @@ function buildOrderEmailHtml(order) {
 async function sendOrderEmail(order) {
   const to = ORDER_NOTIFY_EMAIL;
   if (!to) return;
-  const subject = `${order.advanceProduct?.required ? '💳🔔 ' : '🛒 '}নতুন অর্ডার ${order.orderNum} — ${order.customer?.name || ''} (৳${order.total || 0})${order.advanceProduct?.required ? ' [অগ্রিম: ৳' + (order.advanceProduct.amount||0) + ']' : ''}`;
+  const subject = `${order.advanceProduct?.required ? '[ADVANCE] ' : '[ORDER] '}নতুন অর্ডার ${order.orderNum} - ${order.customer?.name || ''} (৳${order.total || 0})${order.advanceProduct?.required ? ' [অগ্রিম: ৳' + (order.advanceProduct.amount||0) + ']' : ''}`;
   await sendViaGAS(to, subject, buildOrderEmailHtml(order), 'order');
 }
 
@@ -210,16 +213,17 @@ async function sendOrderEmail(order) {
 async function sendStockOutEmail(product, variantLabel, orderNum) {
   const to = ORDER_NOTIFY_EMAIL;
   if (!to) return;
-  const subject = `⚠️ স্টক শেষ — ${product.nm} (${variantLabel})`;
+  const subject = `[STOCK OUT] স্টক শেষ - ${product.nm} (${variantLabel})`;
   const html = `
     <div style="font-family:Arial,'Hind Siliguri',sans-serif;max-width:600px;margin:auto;color:#222;border:1px solid #eee;border-radius:8px;overflow:hidden;">
       <div style="background:#da3633;color:#fff;padding:14px 18px;">
-        <h2 style="margin:0;font-size:18px;">⚠️ স্টক আউট সতর্কতা</h2>
+        <h2 style="margin:0;font-size:18px;">[!] স্টক আউট সতর্কতা</h2>
       </div>
       <div style="padding:18px;">
         <p style="margin:0 0 10px;font-size:15px;">নিচের পণ্যের একটি ভ্যারিয়েন্টের স্টক <b>শূন্য</b> হয়ে গেছে:</p>
+        ${product.img ? `<img src="${product.img}" alt="${product.nm||''}" width="100" height="100" style="display:block;width:100px;height:100px;object-fit:cover;border-radius:8px;border:1px solid #eee;margin-bottom:12px;" />` : ''}
         <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:8px;">
-          <tr><td style="padding:8px;border:1px solid #eee;width:140px;"><b>পণ্যের নাম</b></td><td style="padding:8px;border:1px solid #eee;">${product.em||''} ${product.nm}</td></tr>
+          <tr><td style="padding:8px;border:1px solid #eee;width:140px;"><b>পণ্যের নাম</b></td><td style="padding:8px;border:1px solid #eee;">${product.nm}</td></tr>
           <tr><td style="padding:8px;border:1px solid #eee;"><b>ক্যাটাগরি</b></td><td style="padding:8px;border:1px solid #eee;">${product.cat||'-'}</td></tr>
           <tr><td style="padding:8px;border:1px solid #eee;"><b>ভ্যারিয়েন্ট</b></td><td style="padding:8px;border:1px solid #eee;color:#da3633;"><b>${variantLabel}</b></td></tr>
           <tr><td style="padding:8px;border:1px solid #eee;"><b>মোট স্টক</b></td><td style="padding:8px;border:1px solid #eee;">${product.stockQuantity||0}</td></tr>
@@ -1991,7 +1995,7 @@ app.get('/api/test-email', async (req, res) => {
   try {
     const ok = await sendViaGAS(
       ORDER_NOTIFY_EMAIL,
-      '✅ Test email — আসল গ্রামের মজা — ' + new Date().toLocaleString('en-GB'),
+      '[TEST] আসল গ্রামের মজা Email Service - ' + new Date().toLocaleString('en-GB'),
       '<h2>এটা একটা টেস্ট ইমেইল</h2><p>আপনার Google Apps Script Email Service সঠিকভাবে কাজ করছে ✅</p><p>— gramerasolmoja.shop</p>',
       'test'
     );
