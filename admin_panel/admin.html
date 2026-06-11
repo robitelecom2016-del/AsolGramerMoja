@@ -2637,21 +2637,9 @@ async function editProd(id) {
 }
 
 function deleteProd(id,name) {
-  if (!id || id === 'undefined' || id === 'null') {
-    toast('পণ্যের ID পাওয়া যায়নি। পেজ রিফ্রেশ করুন।','error');
-    return;
-  }
   showConfirm('🗑️',`"${name}" মুছে ফেলতে চান?`,'এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।', async ()=>{
-    try {
-      await api('DELETE',`/api/products/${id}`);
-      toast('✅ পণ্য মুছে ফেলা হয়েছে','success');
-      loadProducts();
-    }
-    catch(err) {
-      const msg = err.message || 'অজানা সমস্যা';
-      toast('মুছতে ব্যর্থ: '+msg,'error');
-      console.error('Delete product error:', msg);
-    }
+    try { await api('DELETE',`/api/products/${id}`); toast('পণ্য মুছে ফেলা হয়েছে','success'); loadProducts(); }
+    catch(err) { toast('মুছতে ব্যর্থ: '+err.message,'error'); }
   });
 }
 
