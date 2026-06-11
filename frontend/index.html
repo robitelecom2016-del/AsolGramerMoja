@@ -2078,7 +2078,7 @@ footer.site-footer p{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.7
           <div class="om-del-opt" id="delOpt2" onclick="selectDelivery(deliveryCharges.outside,'delOpt2','চট্টগ্রামের বাহিরে')">
             <div class="om-del-radio"></div>
             <div class="om-del-info"><div class="om-del-name">🗺️ চট্টগ্রামের বাহিরে</div><div class="om-del-desc">সারাদেশে হোম ডেলিভারি</div></div>
-            <div class="om-del-price" id="delCharge2">৳130</div>
+            <div class="om-del-price" id="delCharge2">—</div>
           </div>
         </div>
         <div class="om-advance-box" id="omAdvanceBox" style="display:none;margin-top:14px;">
@@ -2203,6 +2203,8 @@ let storePhone = '01316380515';
 const ADVANCE_DELIVERY_CATS = ['মিষ্টি', 'দই', 'গ্রীষ্মকালীন পানীয়', 'রশমালাই'];
 const ADVANCE_PAYMENT_INFO = {
   bkash: '01881245554',
+  nagad: '',
+  rocket: '',
 };
 let dataLoaded = false;
 let prodPage = 1;
@@ -2525,6 +2527,16 @@ function applySiteSettings() {
   // helpline time আলাদা
   const helpTimeEl = document.getElementById('footerHelpTime');
   if (helpTimeEl && s.footerHelpTime) helpTimeEl.textContent = s.footerHelpTime;
+
+  // ── ডেলিভারি চার্জ — admin settings থেকে আপডেট ──
+  if (s.deliveryInside != null) deliveryCharges.inside = parseInt(s.deliveryInside) || 80;
+  if (s.deliveryOutside != null) deliveryCharges.outside = parseInt(s.deliveryOutside) || 130;
+  if (s.storePhone) storePhone = s.storePhone;
+
+  // ── পেমেন্ট নম্বর — admin settings থেকে আপডেট ──
+  if (s.payBkash) ADVANCE_PAYMENT_INFO.bkash = s.payBkash;
+  if (s.payNagad) ADVANCE_PAYMENT_INFO.nagad = s.payNagad;
+  if (s.payRocket) ADVANCE_PAYMENT_INFO.rocket = s.payRocket;
 }
 
 function buildFooter() {
@@ -3211,7 +3223,7 @@ function renderPdp(p) {
     </div>` : '';
   // Build stock info
   const stockOut = isStockOut(p);
-  const stockCount = p.stock || 0;
+  const stockCount = p.stockQuantity || 0;
   const stockHtml = stockOut
     ? `<div class="pdp-stock-row"><div class="pdp-stock-dot out"></div><span class="pdp-stock-text out">স্টক আউট</span></div>`
     : `<div class="pdp-stock-row"><div class="pdp-stock-dot"></div><span class="pdp-stock-text">স্টকে আছে</span>${stockCount > 0 ? `<span class="pdp-stock-qty">(${stockCount} টি)</span>` : ''}</div>`;

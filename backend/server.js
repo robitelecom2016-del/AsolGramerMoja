@@ -1421,7 +1421,7 @@ app.patch('/api/orders/:id/verify-advance', authMiddleware, async (req, res) => 
     }
     order.advanceProduct.verified = verified !== false;
     order.advanceProduct.verifiedAt = new Date();
-    order.advanceProduct.verifiedBy = req.user?.username || 'admin';
+    order.advanceProduct.verifiedBy = req.admin?.username || 'admin';
     order.statusHistory.push({
       status: order.status,
       note: (verified !== false ? '✅ অগ্রিম পেমেন্ট verified' : '❌ অগ্রিম পেমেন্ট reject') + (note ? ' — ' + note : ''),
