@@ -248,24 +248,28 @@ const allowedOrigins = [
   'http://localhost:5500',
   'http://127.0.0.1:5500',
   'http://localhost:5173',
+  'https://gramerasolmoja.shop',
+  'https://www.gramerasolmoja.shop',
+  'https://admin.gramerasolmoja.shop',
+  'https://asolgramermoja.netlify.app',
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
 ].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {
-    // origin না থাকলে (same-origin বা Postman) allow করো
+    // origin না থাকলে (same-origin বা Postman/server-to-server) allow করো
     if (!origin) return callback(null, true);
-    // exact match অথবা শেষে / ছাড়াও match করো
+    // exact match অথবা trailing slash সহ match করো
+    const normalizedOrigin = origin.replace(/\/$/, '');
     const isAllowed = allowedOrigins.some(o => {
       const base = o.replace(/\/$/, '');
-      return origin === base || origin === base + '/';
+      return normalizedOrigin === base;
     });
     if (isAllowed) {
       callback(null, true);
     } else {
       console.warn(`CORS blocked: ${origin}`);
-      // Production-এ block করো, development-এ allow করো
       if (process.env.NODE_ENV === 'production') {
         callback(new Error('Not allowed by CORS'));
       } else {
@@ -276,6 +280,7 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200, // ✅ কিছু পুরনো browser-এর জন্য
 }));
 
 app.use(express.json({ limit: '10mb' }));
@@ -671,7 +676,14 @@ app.get('/api/products/special', async (req, res) => {
 
 app.get('/api/products/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const { id } = req.params;
+    // slug দিয়েও খোঁজা যাবে (যদি ObjectId না হয়)
+    let product;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      product = await Product.findById(id);
+    } else {
+      product = await Product.findOne({ slug: id });
+    }
     if (!product) return res.status(404).json({ error: 'Product not found' });
     res.json(product);
   } catch (err) {
@@ -693,11 +705,15 @@ app.post('/api/products', authMiddleware, async (req, res) => {
 
 app.put('/api/products/:id', authMiddleware, async (req, res) => {
   try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid product ID' });
+    }
     if (!req.body.slug && req.body.nm) {
       req.body.slug = generateSlug(req.body.nm);
     }
     const product = await Product.findByIdAndUpdate(
-      req.params.id,
+      id,
       { ...req.body, updatedAt: new Date() },
       { new: true, runValidators: true }
     );
@@ -710,24 +726,34 @@ app.put('/api/products/:id', authMiddleware, async (req, res) => {
 
 app.delete('/api/products/:id', authMiddleware, async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    const imageIds = [product.imgPublicId, ...product.imgsPublicIds].filter(Boolean);
-    for (const id of imageIds) {
-      try {
-        await cloudinary.uploader.destroy(id);
-      } catch (err) {
-        console.error(`Failed to delete image ${id}:`, err.message);
-      }
+    const { id } = req.params;
+    // ✅ ObjectId validation — invalid ID হলে সাথে সাথে 400 দাও
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid product ID' });
     }
-    res.json({ success: true });
+    const product = await Product.findByIdAndDelete(id);
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+    // Cloudinary থেকে ছবি মুছে ফেলো (background-এ, error হলেও response block করবে না)
+    const imageIds = [product.imgPublicId, ...(product.imgsPublicIds || [])].filter(Boolean);
+    if (imageIds.length > 0) {
+      Promise.all(imageIds.map(pubId =>
+        cloudinary.uploader.destroy(pubId).catch(err =>
+          console.error(`Cloudinary delete failed (${pubId}):`, err.message)
+        )
+      ));
+    }
+    console.log(`🗑️ পণ্য ডিলেট: ${product.nm} (${id})`);
+    res.json({ success: true, deleted: product.nm });
   } catch (err) {
+    console.error('Product delete error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 app.patch('/api/products/:id/toggle', authMiddleware, async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id))
+      return res.status(400).json({ error: 'Invalid product ID' });
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
     product.active = !product.active;
@@ -740,6 +766,8 @@ app.patch('/api/products/:id/toggle', authMiddleware, async (req, res) => {
 
 app.patch('/api/products/:id/best', authMiddleware, async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id))
+      return res.status(400).json({ error: 'Invalid product ID' });
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
     product.best = !product.best;
@@ -753,6 +781,8 @@ app.patch('/api/products/:id/best', authMiddleware, async (req, res) => {
 // ━━━ বিশেষ মূল্য / সেল toggle ━━━
 app.patch('/api/products/:id/sale', authMiddleware, async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id))
+      return res.status(400).json({ error: 'Invalid product ID' });
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
     product.isOnSale = !product.isOnSale;
@@ -766,6 +796,8 @@ app.patch('/api/products/:id/sale', authMiddleware, async (req, res) => {
 
 app.patch('/api/products/:id/stockout', authMiddleware, async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id))
+      return res.status(400).json({ error: 'Invalid product ID' });
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
     product.stockOut = !product.stockOut;
