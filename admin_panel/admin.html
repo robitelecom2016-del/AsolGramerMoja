@@ -1988,14 +1988,20 @@ let FRONTEND_URL = localStorage.getItem('frontendUrl') || '';
 let isUploadingMain = false; 
 let isUploadingThumbs = false;
 
-const api = async (method, path, body, isFormData = false) => {
-  const opts = { method, headers: { 'Authorization': `Bearer ${TOKEN}` } };
+const api = async (method, path, body, isFormData = false, _retry = 0) => {
+  const opts = { method, headers: { 'Authorization': `Bearer ${TOKEN}` }, signal: AbortSignal.timeout(60000) };
   if (body && !isFormData) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
   else if (body && isFormData) { opts.body = body; }
   let res;
   try {
     res = await fetch(API + path, opts);
   } catch (networkErr) {
+    // Render free tier: প্রথম request-এ সার্ভার ঘুম থেকে উঠতে দেরি করে — একবার retry করো
+    if (_retry === 0 && (networkErr.name === 'TimeoutError' || networkErr.name === 'AbortError')) {
+      toast('সার্ভার চালু হচ্ছে, একটু অপেক্ষা করুন...', 'info');
+      await new Promise(r => setTimeout(r, 5000));
+      return api(method, path, body, isFormData, 1);
+    }
     throw new Error('সার্ভারের সাথে সংযোগ করা যাচ্ছে না। ইন্টারনেট চেক করুন অথবা ব্যাকএন্ড সার্ভার চালু আছে কিনা দেখুন।');
   }
   // 401 হলে টোকেন মুছে লগইন পেজে পাঠাও
@@ -2133,7 +2139,7 @@ function navTo(page) {
 async function checkHealth() {
   const el = document.getElementById('dbStatus');
   try {
-    const res = await fetch(API + '/api/health', { signal: AbortSignal.timeout(8000) });
+    const res = await fetch(API + '/api/health', { signal: AbortSignal.timeout(30000) });
     const data = await res.json();
     if (data.db === 'connected') {
       el.innerHTML = '<span class="dot"></span><span>DB: <span class="val">connected</span></span>';
@@ -2706,7 +2712,7 @@ let allStockData = [];
 
 async function loadStock() {
   const tableEl = document.getElementById('stockTable');
-  tableEl.innerHTML = '<div class="loader"><i class="fa-solid fa-spinner"></i></div>';
+  tableEl.innerHTML = '<div class="loader"><i class="fa-solid fa-spinner"></i><p style="margin-top:10px;font-size:13px;color:#888">লোড হচ্ছে... (প্রথমবার একটু সময় লাগতে পারে)</p></div>';
   try {
     const [prodData, orderData] = await Promise.all([
       api('GET', '/api/products?active=all&limit=500'),
@@ -4570,9 +4576,9 @@ async function saveApiUrl() {
   // URL ফরম্যাট চেক করো
   try { new URL(url); } catch { toast('URL সঠিক নয় (https:// দিয়ে শুরু করুন)','error'); return; }
   // সংযোগ পরীক্ষা করো
-  toast('সংযোগ পরীক্ষা করা হচ্ছে...','info');
+  toast('সংযোগ পরীক্ষা করা হচ্ছে... (Render সার্ভার চালু হতে ৩০-৬০ সেকেন্ড লাগতে পারে)','info');
   try {
-    const res = await fetch(url + '/api/health', { signal: AbortSignal.timeout(6000) });
+    const res = await fetch(url + '/api/health', { signal: AbortSignal.timeout(30000) });
     const data = await res.json();
     if (data.status === 'ok') {
       API = url;
@@ -5068,7 +5074,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('apiUrlInp').value = API;
 
   // পেজ লোডে সার্ভার কানেকশন চেক করো
-  fetch(API + '/api/health', { signal: AbortSignal.timeout(8000) })
+  // Render free tier: সার্ভার sleep থেকে জেগে উঠতে ৩০-৬০ সেকেন্ড লাগতে পারে
+  const dbEl = document.getElementById('dbStatus');
+  if (dbEl) dbEl.innerHTML = '<span class="dot" style="background:#f0a500;animation:pulse 1s infinite"></span><span>Server: <span class="val" style="color:#f0a500">সংযোগ হচ্ছে...</span></span>';
+  fetch(API + '/api/health', { signal: AbortSignal.timeout(60000) })
     .then(r => r.json())
     .then(data => {
       const el = document.getElementById('dbStatus');
